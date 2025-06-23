@@ -5,7 +5,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.0
+Version: 1.0.0
 Author URI: https://nur.codist.dev/
 */
 
@@ -73,7 +73,7 @@ $myUpdateChecker = PucFactory::buildUpdateChecker(
 $myUpdateChecker->setBranch('main');
 
 //Optional: If you're using a private repository, specify the access token like this:
-// $myUpdateChecker->setAuthentication('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');
+// $myUpdateChecker->setAuthentication('');
 
 
 class EduPress

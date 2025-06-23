@@ -9,7 +9,7 @@ Version: 1.0
 Author URI: https://nur.codist.dev/
 */
 
-defined( 'ABSPATH' ) || die();
+defined( 'ABSPATH' ) || die(); 
 
 /**
  * Definining plugin dir path and url

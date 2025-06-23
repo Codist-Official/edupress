@@ -60,6 +60,21 @@ if( !defined( 'EDUPRESS_SEND_SMS') ){
     define( 'EDUPRESS_SEND_SMS', true );
 }
 
+require EDUPRESS_LIB_DIR . 'plugin-update-checker/plugin-update-checker.php';
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
+
+$myUpdateChecker = PucFactory::buildUpdateChecker(
+	'https://github.com/Codist-Official/edupress/',
+	__FILE__,
+	'edupress'
+);
+
+//Set the branch that contains the stable release.
+$myUpdateChecker->setBranch('main');
+
+//Optional: If you're using a private repository, specify the access token like this:
+// $myUpdateChecker->setAuthentication('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');
+
 
 class EduPress
 {

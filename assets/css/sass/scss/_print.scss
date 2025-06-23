@@ -1,0 +1,244 @@
+* {
+  -webkit-print-color-adjust: exact !important;   /* Chrome, Safari 6 – 15.3, Edge */
+  color-adjust: exact !important;                 /* Firefox 48 – 96 */
+  print-color-adjust: exact !important;           /* Firefox 97+, Safari 15.4+ */
+}
+
+@page {
+  @top-center {
+    content: element(pageHeader);
+  }
+
+  @bottom-center {
+    content: element(pageFooter);
+  }
+}
+
+#pageHeader{
+  position: running(pageHeader);
+}
+
+#pageFooter{
+  position: running(pageFooter);
+}
+
+.header{
+  width: 100%;
+  top: 0;
+  position: relative;
+}
+.footer{
+  width: 100%;
+  text-align: center;
+  color: #000;
+  padding-top: 5px;
+  border-top: 1px dashed #000;
+  bottom: 0;
+  position: fixed;
+  img{
+    height: 25px;
+    width: auto;
+    padding-right: 5px;
+    vertical-align: middle;
+  }
+}
+
+
+h2,h2,h3,h4,h5,h6{
+  line-height: 1.25em;
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
+}
+
+h1{ font-size: 26px;}
+h2{ font-size: 22px;}
+h3{ font-size: 20px;}
+h4{ font-size: 18px;}
+
+.master-title,
+.master-subtitle{
+  width: 100%;
+  height: auto;
+  display: inline-block;
+  text-align: center;
+  margin: 10px auto 5px;
+}
+.master-title{
+  font-size: 20px;
+}
+.master-subtitle{
+  font-size: 16px;
+}
+
+.edupress-print-header-wrap{
+  width: 100%;
+  max-width: 6in;
+  position: relative;
+  text-align: center;
+  line-height: 17px;
+  overflow: hidden;
+  margin: 0 auto;
+    .header-logo{
+      margin-bottom: 5px;
+    }
+    .header-title{
+      font-size: 20px;
+      font-weight: bold;
+      color: #000;
+    }
+    .header-address,
+    .header-metadata{
+      font-size: 12px;
+      color: #000;
+    }
+  }
+
+/** Print Icons **/
+
+$x: 14;
+.edupress-icon{
+  width: (1 * $x) + px;
+  height: auto;
+  margin: 0;
+  vertical-align: middle;
+  img{
+    vertical-align: middle;
+  }
+  &.size-1x{
+    width: (1 * $x) + px;
+  }
+  &.size-2x{
+    width: (2 * $x) + px;
+  }
+  &.size-3x{
+    width: (3 * $x) + px;
+  }
+}
+
+
+section{
+  &.head{
+    width: 100%;
+    height: auto;
+  }
+  &.student-details{
+    height: auto;
+    width: 100%;
+    margin: 25px 0;
+    padding: 0;
+    display: inline-block;
+    .details-wrap,
+    .attendance-wrap{
+      width: 50%;
+      float: left;
+      box-sizing:border-box;
+    }
+    .details-wrap{
+      padding-right: 15px;
+    }
+    .attendance-wrap{
+      padding-left: 15px;
+    }
+    .cgpa-wrap{
+      width: 225px;
+      float: right;
+      table tr td{
+        line-height: 14px;
+        font-size: 11px;
+        padding: 2px 5px;
+        &:nth-child(2),
+        &:nth-child(3){
+          text-align: center;
+        }
+      }
+    }
+  }
+}
+
+.edupress-before-list-wrap{
+  text-align: center;
+  margin-bottom: 10px;
+  h2{
+    margin: 5px auto 10px;
+  }
+}
+.edupress-after-list-wrap{
+  margin-top: 10px;
+}
+table.edupress-table{
+  width: 100%;
+  height: auto;
+  border-collapse: collapse;
+  tr{
+    th, td{
+      border: 1px solid $color-black;
+      padding: 3px 5px;
+      text-align: left;
+      line-height: 14px;
+    }
+  }
+  &.meta{
+    tr{
+      th, td{
+        border: 1px dashed #000;
+      }
+    }
+  }
+}
+
+.no-print{
+  display: none;
+}
+a{
+  color: #000 !important;
+  text-decoration: none !important;
+}
+.page-break{
+  page-break-after: always;
+}
+
+ul{
+  margin: 0;
+  padding: 0;
+  li{
+    list-style: none;
+    width: 100%;
+    display: inline-block;
+    .exam-mark-title,
+    .exam-mark-value{
+      width: auto;
+      float: left;
+      display: inline-block;
+    }
+  }
+}
+
+.edupress-table-wrap{
+  table{
+    &.compact{
+      tr{
+        th,td{
+          padding: 5px !important;
+          vertical-align: middle !important;
+          font-size: 13px !important;
+          div{
+            font-size: 13px !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+.text{
+  &-red{
+    color: $color-danger;
+  }
+  &-green{
+    color: $color-green;
+  }
+  &-center{
+    text-align: center;
+  }
+}

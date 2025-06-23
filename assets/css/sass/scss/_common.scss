@@ -1,0 +1,694 @@
+.edupress-popup-overlay{
+  content: " ";
+  background-color: rgba( 255, 255, 255, .75);
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  position: fixed;
+  z-index: 101;
+  .edupress-popup-wrap{
+    width: 95%;
+    max-width: 1600px;
+    height: 90vh;
+    padding: 50px;
+    box-sizing: border-box;
+    position: fixed;
+    background-color: #fff;
+    left: 50%;
+    top: 50%;
+    z-index: 9900;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+    transform: translate(-50%, -50%);
+    display: inline-block;
+    line-height: 1.3em;
+    border-radius: 8px;
+    overflow: hidden;
+    .close-popup{
+      height: 30px;
+      width: 30px;
+      box-sizing: border-box;
+      overflow: hidden;
+      position: fixed;
+      right: 0;
+      top: 0;
+      background-color: $secondary-color;
+      color: #fff;
+      text-align: center;
+      line-height: 30px;
+      text-decoration: none;
+      &:hover{
+        background-color: $color-black;
+      }
+    }
+    .edupress-popup{
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      align-content: center;
+      scrollbar-width: thin; /* Set the width of the scrollbar to thin */
+      scrollbar-color: $secondary-color $color-white; /* Set the color of the scrollbar */
+
+      .title{
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-transform: capitalize;
+      }
+      .content{
+        width: 100%;
+        padding-right: 20px;
+        box-sizing: border-box;
+        font-size: 16px;
+        line-height: 1.5em;
+      }
+
+      /* WebKit-based browsers */
+      &::-webkit-scrollbar {
+        width: 5px; /* Adjust the width as needed */
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: $secondary-color; /* Color of the thumb */
+        border-radius: 5px; /* Rounded corners for the thumb */
+      }
+
+      &::-webkit-scrollbar-thumb:hover {
+        background-color: #ccc; /* Color of the thumb on hover */
+      }
+    }
+  }
+}
+
+.text{
+  &-red{
+    color: $color-danger;
+  }
+  &-green{
+    color: $color-green;
+  }
+  &-center{
+    text-align: center;
+  }
+}
+
+
+/* Status */
+.edupress-status-wrap{
+  width: 100%;
+  height: 100%;
+  background-color: $overlay-bg-color;
+  position: fixed;
+  top: 0;
+  left: 0;
+  .edupress-status{
+    width: 100%;
+    max-width: 200px;
+    top: 50%;
+    left: 50%;
+    transform: translate( -50%, -50% );
+    text-align: center;
+    position: absolute;
+    img{
+      width: 100%;
+      max-width: 200px;
+    }
+  }
+}
+.edupress-circle {
+  stroke-dasharray: 76;
+  stroke-dashoffset: 76;
+  animation: draw 1s forwards;
+}
+
+.edupress-tick {
+  stroke-dasharray: 18;
+  stroke-dashoffset: 18;
+  animation: draw 1s forwards 1s;
+}
+
+@keyframes draw {
+  to { stroke-dashoffset: 0 }
+}
+
+.edupress-content-box{
+  width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  .title{
+    height: auto;
+    padding: 15px 20px;
+    font-size: 15px;
+    background-color: $secondary-color;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+    color: $color-white;
+    letter-spacing: 0.5px;
+  }
+  .content{
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    form{
+      padding: 20px;
+    }
+    .institute_logo_container img{
+      height: auto;
+      width: 100%;
+      max-width: 75px;
+    }
+  }
+}
+
+.edupress-admin-panel-wrap{
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  .sidebar{
+    flex: 1;
+  }
+  .main{
+    flex: 4;
+  }
+}
+table, tr, td, th{
+  background-color: $color-white !important;
+}
+
+.edupress-before-list-wrap{
+  text-align: center;
+}
+.edupress-table-wrap{
+  a{
+    color:$secondary-color;
+  }
+  width: 100%;
+  height: auto;
+  overflow: auto;
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    thead{
+      tr{
+        background-color: $color-white !important;
+        th {
+          background-color: $color-white !important;
+          border-color: #a9cccc;
+          border-block-start: 1px solid #a9cccc !important;
+        }
+      }
+      background-color: $color-white !important;
+    }
+    tr{
+      vertical-align: top;
+      &:nth-child(even){
+        background-color: $color-white !important;
+      }
+      &:nth-child(odd){
+        background-color: $light-page-bg-color !important;
+        td{
+          background-color: $light-page-bg-color !important;
+        }
+      }
+      &:first-child{
+        background-color: $color-white;
+        th{
+          background-color: $color-white;
+        }
+      }
+      &:hover{
+        background-color: $color-white;
+        td{
+          background-color: $color-white;
+          border-color: $primary-color;
+        }
+      }
+      th{
+        padding: 20px 15px;
+        color: $secondary-color;
+        background-color: $color-white;
+        vertical-align: top;
+      }
+      td{
+        padding: 10px 15px;
+        border: 1px solid #a9cccc;
+        vertical-align: top;
+        &[data-failed='1']{
+          background-color: #ffe7e7;
+        }
+        &.col-error{
+          background-color: $color-danger !important;
+        }
+      }
+      &.highlighted{
+        background-color: $highlight-color;
+        td {
+          background-color: $highlight-color;
+        }
+      }
+      &.updated{
+        background-color: $color-success;
+      }
+      &.row-error{
+        background-color: $color-danger !important;
+        td{
+          background-color: $color-danger !important;
+        }
+      }
+    }
+  }
+}
+
+.edupress-table-wrap{
+  table{
+    &.compact{
+      tr{
+        th,td{
+          padding: 5px !important;
+          vertical-align: middle !important;
+          font-size: 13px !important;
+          div{
+            font-size: 13px !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+.cell{
+  &-full{
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+  }
+  &-half{
+    width: 50%;
+    min-width: 50px;
+    float: left;
+    display: inline-block;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 0 5px;
+    &:first-child{
+      
+    }
+  }
+}
+
+.edupress-admin-settings-menu-wrap {
+  ul.edupress-admin-settings-menu{
+    margin: 0;
+    padding: 0;
+    li{
+      list-style: none;
+      border-bottom: 1px solid $light-border-color;
+      padding: 10px 20px;
+      &.active,
+      &:hover{
+        background-color: $light-bg-color;
+      }
+      a{
+        width: 100%;
+        box-sizing: border-box;
+        text-decoration: none;
+        display: inline-block;
+
+      }
+      &:last-child{
+        border-bottom: none;
+      }
+    }
+  }
+}
+.edupress-admin-settings-menu-content-wrap{
+  padding: 20px;
+  box-sizing: border-box;
+}
+form.edupress-send-sms-form{
+  padding: 20px;
+  background-color: $color-white;
+  box-shadow: $light-box-shadow;
+}
+
+.edupress-value-container{
+  width: 100%;
+  max-width: 50px;
+  padding: 5px 10px;
+  box-sizing: border-box;
+  border: 2px solid $secondary-color;
+  text-align: center;
+  display: inline-block;
+  font-size: 16px;
+  min-height: 30px;
+  border-radius: 6px;
+}
+
+.edupress-pagination{
+  width: 100%;
+  height: auto;
+  margin: 50px auto;
+  padding-bottom: 100px;
+  ul.page-numbers{
+    margin: 0 auto;
+    padding: 0;
+    text-align: center;
+    li{
+      list-style: none;
+      display: inline-block;
+      margin: 0 3px;
+      a,
+      span{
+        padding: 7px 15px;
+        border: 1px solid $secondary-color;
+        text-decoration: none;
+        display: inline-block;
+      }
+      span.current,
+      a:hover{
+        color: $color-white;
+        background-color: $secondary-color;
+        border-color: $secondary-color;
+        margin: 0;
+      }
+    }
+  }
+}
+
+ul.grade-table{
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  gap: 10px;
+  li{
+    flex: 1;
+    display:flex;
+    gap: 10px;
+    flex-direction: row;
+  }
+}
+
+$x: 18;
+.edupress-icon{
+  width: (1 * $x) + px;
+  height: auto;
+  margin: 0 5px 0 0;
+  vertical-align: middle;
+  &.size-1x{
+    width: (1 * $x) + px;
+  }
+  &.size-2x{
+    width: (2 * $x) + px;
+  }
+  &.size-3x{
+    width: (3 * $x) + px;
+  }
+}
+
+ul.transaction-details{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  li{
+    list-style: none;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 5px;
+    div{
+      flex: 1;
+    }
+    a.duplicate,
+    a.remove{
+      height: 20px;
+      width: 20px;
+      line-height: 20px;
+      text-align: center;
+      background-color: $secondary-color;
+      color: $color-white;
+      display: inline-block;
+      margin: 5px;
+    }
+  }
+}
+
+.ui-autocomplete{
+  z-index: 999999 !important;
+  box-shadow: $light-box-shadow;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  max-height: 350px;
+  overflow: auto;
+  li{
+    list-style: none;
+    line-height: 30px;
+    padding: 5px 15px;
+    border-bottom: 1px solid $secondary-color;
+    background-color: $light-page-bg-color;
+    cursor: pointer;
+    word-break: break-word;
+    &:nth-child(even){
+      background-color: $color-white;
+    }
+    &:hover{
+      background-color: $light-bg-color;
+    }
+  }
+}
+
+/** Exam Marks */
+ul.exam-mark-details{
+  margin: 0;
+  padding: 0;
+  li{
+    list-style:none;
+    width: 100%;
+    margin: 0 0 3px 0;
+    padding: 3px 0;
+    box-sizing: border-box;
+    line-height: 16px;
+    &.highlight-failed{
+      border: 1px solid red;
+    }
+    span {
+      display: inline-block;
+      color: $color-text;
+      line-height: 16px;
+      font-weight: 400;
+      &.exam-mark-title {
+        width: 75%;
+      }
+
+      &.exam-mark-value {
+        width: 25%;
+      }
+    }
+  }
+}
+
+.edupress-calendar-wrap{
+  width: 100%;
+  height: auto;
+  display: inline-block;
+  ul.calendar-month{
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 10px 0;
+    padding: 0;
+    justify-content: normal;
+    li{
+      flex: 1 0 calc(100% / 7);
+      list-style: none;
+      padding: 10px;
+      box-sizing: border-box;
+      margin: 0;
+      text-align: right;
+      border: 0.5px solid #ccc;
+      position: relative;
+      .calendar-note{
+        height: auto;
+        max-height: 36px;
+        line-height: 1em;
+        overflow: auto;
+        font-size: 12px;
+        text-align: left;
+      }
+      input[name=changeDayStatus]{
+        position: absolute;
+        top: 5px;
+        left: 5px;
+      }
+      &[data-open='1']{
+        background-color: $color-success;
+      }
+      &[data-open='0']{
+        background-color: $color-danger;
+      }
+      &.invisible{
+        visibility: hidden;
+      }
+      .day{
+        font-size: 20px;
+        font-weight: bold;
+        color: $secondary-color;
+      }
+      .month{
+        font-size: 16px;
+        font-weight: bold;
+        color: #111;
+      }
+    }
+  }
+}
+.legends-wrap{
+  width: auto;
+  height: auto;
+  margin: 10px 0;
+  padding: 10px;
+  display: inline-block;
+  color: $color-black;
+  border: 5px solid $primary-color;
+  .legend{
+    width: 50px;
+    height: 10px;
+    display: inline-block;
+    border: 1px solid #333;
+    &.open{
+      background-color: $color-success;
+    }
+    &.closed{
+      background-color: $color-danger;
+    }
+  }
+}
+
+.count-results{
+  padding: 10px;
+  margin: 25px 0;
+  border: 1px dotted $secondary-color;
+  background-color: $color-white;
+  font-weight: 500;
+}
+
+/** Print Button */
+.printMasterTable{
+  width: 48px;
+  height: 48px;
+  overflow: hidden;
+  position: fixed;
+  right: 25px;
+  bottom: 25px;
+  background-color: $primary-color;
+  z-index: 9999;
+  box-sizing: border-box;
+  border-radius: 10px;
+  text-align: center;
+  vertical-align: middle;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  img{
+    margin: 0 auto;
+  }
+  .print-icon{
+    width: 100%;
+    display: inline-block;
+    img{
+      height: 15px;
+      width: auto;
+      margin: 5px auto 0;
+    }
+  }
+  .print-vertical,
+  .print-horizontal{
+    width: 50%;
+    float: left;
+    img {
+      width: 75%;
+      height: auto;
+    }
+    &:hover{
+      background-color: $color-white;
+    }
+  }
+}
+.no-view,
+.none,
+button.none{
+  display: none;
+}
+
+.clear{
+  clear: both;
+}
+.page-break{
+  page-break-after: always;
+}
+
+
+/* TableSorter */
+.tablesorter-default{width:100%;color:#333;background-color:#fff;border-spacing:0;margin:10px 0 15px;text-align:left}
+.tablesorter-default th,.tablesorter-default thead td{font-weight:700;color:#000;background-color:#fff;border-collapse:collapse;border-bottom:#ccc 2px solid;}
+.tablesorter-default tfoot td,
+.tablesorter-default tfoot th{border:0}
+.tablesorter-default .header,
+.tablesorter-default .tablesorter-header{background-image:url(data:image/gif;base64,R0lGODlhFQAJAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAkAAAIXjI+AywnaYnhUMoqt3gZXPmVg94yJVQAAOw==);background-position:center right;background-repeat:no-repeat;cursor:pointer;white-space:normal;}
+.tablesorter-default thead .headerSortUp,
+.tablesorter-default thead .tablesorter-headerAsc,
+.tablesorter-default thead .tablesorter-headerSortUp{background-image:url(data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjI8Bya2wnINUMopZAQA7);border-bottom:teal 2px solid}
+.tablesorter-default thead .headerSortDown,
+.tablesorter-default thead .tablesorter-headerDesc,
+.tablesorter-default thead .tablesorter-headerSortDown{background-image:url(data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjB+gC+jP2ptn0WskLQA7);border-bottom:teal 2px solid}
+.tablesorter-default thead .sorter-false{background-image:none;cursor:default;padding:4px}
+.tablesorter-default tfoot .tablesorter-headerAsc,
+.tablesorter-default tfoot .tablesorter-headerDesc,
+.tablesorter-default tfoot .tablesorter-headerSortDown,
+.tablesorter-default tfoot .tablesorter-headerSortUp{border-top:#000 2px solid}
+.tablesorter-default td{background-color:#fff;border-bottom:#ccc 1px solid;vertical-align:middle}
+.tablesorter-default tbody>tr.even:hover>td,
+.tablesorter-default tbody>tr.hover>td,
+.tablesorter-default tbody>tr.odd:hover>td,
+.tablesorter-default tbody>tr:hover>td{background-color:#fff;color:#000}
+.tablesorter-default .tablesorter-processing{background-position:center center!important;background-repeat:no-repeat!important;background-image:url(data:image/gif;base64,R0lGODlhFAAUAKEAAO7u7lpaWgAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQBCgACACwAAAAAFAAUAAACQZRvoIDtu1wLQUAlqKTVxqwhXIiBnDg6Y4eyx4lKW5XK7wrLeK3vbq8J2W4T4e1nMhpWrZCTt3xKZ8kgsggdJmUFACH5BAEKAAIALAcAAAALAAcAAAIUVB6ii7jajgCAuUmtovxtXnmdUAAAIfkEAQoAAgAsDQACAAcACwAAAhRUIpmHy/3gUVQAQO9NetuugCFWAAAh+QQBCgACACwNAAcABwALAAACE5QVcZjKbVo6ck2AF95m5/6BSwEAIfkEAQoAAgAsBwANAAsABwAAAhOUH3kr6QaAcSrGWe1VQl+mMUIBACH5BAEKAAIALAIADQALAAcAAAIUlICmh7ncTAgqijkruDiv7n2YUAAAIfkEAQoAAgAsAAAHAAcACwAAAhQUIGmHyedehIoqFXLKfPOAaZdWAAAh+QQFCgACACwAAAIABwALAAACFJQFcJiXb15zLYRl7cla8OtlGGgUADs=)!important}
+.tablesorter-default tr.odd>td{background-color:#dfdfdf}
+.tablesorter-default tr.even>td{background-color:#efefef}
+.tablesorter-default tr.odd td.primary{background-color:#bfbfbf}
+.tablesorter-default td.primary,
+.tablesorter-default tr.even td.primary{background-color:#d9d9d9}
+.tablesorter-default tr.odd td.secondary{background-color:#d9d9d9}
+.tablesorter-default td.secondary,
+.tablesorter-default tr.even td.secondary{background-color:#e6e6e6}
+.tablesorter-default tr.odd td.tertiary{background-color:#e6e6e6}
+.tablesorter-default td.tertiary,
+.tablesorter-default tr.even td.tertiary{background-color:#f2f2f2}
+.tablesorter-default>caption{background-color:#fff}
+.tablesorter-default .tablesorter-filter-row{background-color:#eee}
+.tablesorter-default .tablesorter-filter-row td{background-color:#eee;border-bottom:#ccc 1px solid;line-height:normal;text-align:center;-webkit-transition:line-height .1s ease;-moz-transition:line-height .1s ease;-o-transition:line-height .1s ease;transition:line-height .1s ease}
+.tablesorter-default .tablesorter-filter-row .disabled{opacity:.5;cursor:not-allowed}
+.tablesorter-default .tablesorter-filter-row.hideme td{padding:2px;margin:0;line-height:0;cursor:pointer}
+.tablesorter-default .tablesorter-filter-row.hideme *{height:1px;min-height:0;border:0;padding:0;margin:0;opacity:0}
+.tablesorter-default input.tablesorter-filter,
+.tablesorter-default select.tablesorter-filter{width:95%;height:auto;margin:4px auto;padding:4px;background-color:#fff;border:1px solid #bbb;color:#333;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;-webkit-transition:height .1s ease;-moz-transition:height .1s ease;-o-transition:height .1s ease;transition:height .1s ease}
+.tablesorter .filtered{display:none}
+.tablesorter .tablesorter-errorRow td{text-align:center;cursor:pointer;background-color:#e6bf99}
+
+
+/* Mobile */
+@media screen and (max-width: 768px) {
+  #edupress-popup-wrap{
+    padding: 20px;
+  }
+}

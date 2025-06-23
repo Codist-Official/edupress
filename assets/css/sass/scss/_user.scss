@@ -1,0 +1,146 @@
+table{
+  &.edupress-table{
+    &[data-post-type=user]{
+      tr{
+        td{
+          vertical-align: middle;
+          img{
+            vertical-align: middle;
+          }
+        }
+      }
+    }
+  }
+}
+
+.user-profile-wrap{
+  width: 100%;
+  height: auto;
+  display: inline-block;
+  .section-title{
+    font-size: 18px;
+    line-height: 1.5em;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+  .header-wrap{
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    align-items: center;
+    .avatar-wrap{
+      flex: 1;
+    }
+    .title-wrap{
+      flex: 7;
+      h3{
+        font-size: 24px;
+        font-weight: bold;
+        margin: 0 0 5px !important;
+        text-transform: uppercase;
+        line-height: 48px;
+      }
+      .user-meta{
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: auto;
+        display: inline-block;
+        li{
+          list-style: none;
+          display: inline-block;
+          float: left;
+          margin: 0 5px 5px 0;
+          width: auto;
+          a{
+            padding: 3px 7px;
+            display: inline-block;
+            background-color: $secondary-color;
+            color: $color-white !important;
+            border-radius: 4px;
+            font-size:14px !important;
+            line-height: 14px;
+            &.absent{
+              background-color:$color-red;
+            }
+          }
+        }
+      }
+    }
+  }
+  .details-wrap{
+    width: 100%;
+    height: auto;
+    display: inline-block;
+    table.user-profile{
+      tr{
+        th,
+        td{
+          padding: 7px;
+          line-height: 22px;
+          vertical-align: middle;
+        }
+        th{
+          width: 150px;
+          text-align: left;
+        }
+      }
+    }
+    .col-left,
+    .col-right{
+      width: 50%;
+      float: left;
+      display: inline-block;
+      box-sizing: border-box;
+    }
+    .col-left{
+      padding-right: 15px;
+      box-sizing: border-box;
+    }
+    .col-right{
+      padding-left: 15px;
+      box-sizing: border-box;
+    }
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .user-profile-wrap{
+    .details-wrap{
+      .col-left,
+      .col-right{
+        width: 100%;
+        padding: 15px;
+        margin: 0;
+        float: none;
+      }
+    }
+  }
+}
+
+ul.transaction-activity{
+  width: 100%;
+  height: auto;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  li{
+    list-style: none;
+    margin: 5px 0;
+    padding: 0;
+    border-bottom: 1px solid $light-border-color;
+    line-height: 12px;
+    .activity-time{
+      width: 100%;
+      display: inline-block;
+      color: $secondary-color;
+      font-weight: 300;
+      font-size: 12px;
+    }
+    .activity-details{
+      font-size: 14px;
+      line-height: 22px;
+    }
+  }
+}

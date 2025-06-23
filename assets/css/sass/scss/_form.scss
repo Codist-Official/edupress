@@ -1,0 +1,193 @@
+.edupress-form{
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  .form-row{
+    display: flex;
+    flex-wrap: nowrap;
+    border-bottom: 1px solid $light-border-color;
+    &:nth-child(even){
+      background-color: #fafafa;
+    }
+    &:nth-child(odd){
+      background-color: #fff;
+    }
+    &:hover{
+      background-color: #f3f3f3;
+    }
+    &:last-child{
+      border-bottom: none;
+    }
+    .label-wrap{ flex: 1; }
+    .value-wrap { flex: 3; }
+    .label-wrap,
+    .value-wrap{
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 7px 10px;
+      justify-content: left;
+      line-height: 24px;
+    }
+    &.discount_type{
+      .discount_type,
+      .discount_amount {
+        width: 150px;
+        float: left;
+        margin-right: 10px;
+      }
+    }
+  }
+  &.edupressLoginForm{
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    .form-row{
+      flex-direction: column;
+      padding: 5px 0;
+      border :none;
+      background-color: transparent;
+      &.email{
+        margin-top: 20px;
+      }
+      &:hover{
+        background-color: transparent !important;
+      }
+      .label-wrap,
+      .value-wrap{
+        padding: 0;
+      }
+    }
+  }
+  &.edupress-filter-list,
+  &.grid-4-col,
+  &.grid-5-col{
+    display: grid;
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+    .form-row{
+      flex-direction: column;
+      border: none;
+      &:nth-child(odd),
+      &:nth-child(even){
+        background-color: transparent;
+      }
+      .label-wrap{
+        padding-left: 0;
+        padding-right: 0;
+      }
+      .value-wrap{
+        padding: 0;
+      }
+    }
+  }
+  &.grid-4-col{
+    grid-template-columns: repeat(4, 1fr);
+  }
+  &.edupress-filter-list,
+  &.grid-5-col{
+    grid-template-columns: repeat(5, 1fr);
+    margin-bottom: 20px;
+  }
+  input{
+    &[type='text'],
+    &[type='number'],
+    &[type='email'],
+    &[type='url'],
+    &[type='tel']{
+      width: 100%;
+    }
+  }
+  textarea,
+  select{
+    width: 100%;
+  }
+  label{
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+  }
+  .label-wrap{
+    margin-bottom: 5px;
+  }
+  button,
+  button:active,
+  button:focus,
+  button:visited,
+  input[type='submit']{
+    background-color: $primary-color;
+    color: $color-white;
+    border: 1px solid $primary-color;
+    outline: none;
+    &:hover{
+      background-color: #fff;
+      color: $primary-color;
+      border-color: $primary-color;
+    }
+    &:disabled{
+      background-color:#555;
+      color: #fff;
+      border-color: #555;
+    }
+  }
+}
+
+button.edupress-btn,
+button.edupress-btn:active,
+button.edupress-btn:visited,
+button.edupress-btn:focus,
+button.edupress-btn:focus-visible{
+  background-color: $primary-color;
+  color: $color-white;
+  border: 1px solid $primary-color;
+  &:hover{
+    background-color: #fff;
+    color: $primary-color;
+    border-color: $primary-color;
+  }
+}
+
+/* MOBILE */
+@media screen and (max-width: 768px) {
+  .edupress-form{
+    &.edupress-filter-list,
+    &.grid-5-col,
+    &.grid-4-col{
+      display: inline-block;
+    }
+    .form-column{
+      .label-wrap,
+      .value-wrap{
+        padding: 0;
+      }
+      .label-wrap{
+        margin-top: 5px;
+      }
+    }
+    .form-row{
+      display: inline-block;
+      width: 100%;
+      .label-wrap,
+      .value-wrap{
+        padding: 0;
+      }
+      .label-wrap{
+        margin-top: 5px;
+      }
+    }
+  }
+}
+
+.edupress-table{
+  label{
+    font-weight: 500;
+    cursor: pointer;
+  }
+}
+
+textarea#sms_text,
+textarea#mobile_numbers{
+  height: 150px;
+  border-radius: 10px;
+}

@@ -1,0 +1,29 @@
+.sms-compose-wrap{
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 20px;
+  .left-wrap{
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 5px;
+    ul.sms-users-list{
+      margin: 0 0 20px;
+      padding: 0;
+      display: grid;
+      gap: 5px;
+      grid-template-columns: repeat(2, 1fr);
+      height: 100%;
+      max-height: 200px;
+      overflow: auto;
+      li{
+        list-style: none;
+      }
+    }
+  }
+  .right-wrap{
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+}

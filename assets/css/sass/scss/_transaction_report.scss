@@ -1,0 +1,41 @@
+.transaction-report-wrap{
+  width: 100%;
+  height: auto;
+  display: inline-block;
+  .user-details{
+    .report-user-profile{
+      margin: 0 0 50px;
+      padding: 0;
+      display: flex;
+      flex-wrap: nowrap;
+      flex-direction: row;
+      li{
+        list-style: none;
+        display: flex;
+        flex: 1 1 50%;
+        .meta-name,
+        .meta-value{
+          padding: 5px;
+          box-sizing:border-box;
+        }
+        .meta-name{
+          flex: 1;
+        }
+        .meta-value{
+          flex: 4;
+          font-weight: bold;
+        }
+      }
+    }
+    .payment-details{
+      width: calc(50% - 25px);
+      float: left;
+      margin-right: 25px;
+    }
+    .due-details{
+      width: calc(50% - 25px);
+      margin-left: 25px;
+      float: right;
+    }
+  }
+}

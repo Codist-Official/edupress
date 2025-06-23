@@ -1,0 +1,44 @@
+=> institute_api_key - unique
+=> attendance_token - predefined by system
+=> attendance_api_key - received_from_remote
+
+Admin()
+edupress_admin_settings_before_menu_html
+edupress_admin_settings_after_menu_html
+edupress_admin_settings_menu_class
+
+edupress_admin_settings_menu_content($menu,$content)
+edupress_admin_settings_form($html, $form_id)
+edupress_admin_settings_sms_gateways
+
+
+edupress_publish_{$post_type}_fields
+edupress_publish_{$post_type}_skip_fields
+edupress_publish_{$post_type}_form_html
+edupress_publish_{$post_type}_before_send_callback
+edupress_publish_{$post_type}_success_callback
+edupress_publish_{$post_type}_error_callback
+edupress_publish_{$post_type}_before_submit_html
+edupress_publish_{$this->post_type}_button_html
+
+edupress_edit_{$post_type}_fields ($fields, $post_id)
+edupress_edit_{$post_type}_form_html
+edupress_edit_{$post_type}_before_send_callback
+edupress_edit_{$post_type}_success_callback
+edupress_edit_{$post_type}_error_callback
+
+
+edupress_filter_{$post_type}_fields
+edupress_filter_{$post_type}_form_html
+
+edupress_list_{$post_type}_fields
+edupress_list{$post_type}_query
+edupress_list_{$post_type}_html
+edupress_list_{$post_type}_before_html
+edupress_list_{$post_type}_after_html
+edupress_list_{$post_type}_action_html ( html, post_id )
+edupress_list_item_value ( value, key, post_id )
+
+edupress_sms_gateways
+
+edupress_user_display_fields($fields,  $user_id)

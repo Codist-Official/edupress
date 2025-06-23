@@ -1,0 +1,43 @@
+.attendance{
+  &-present,
+  &-absent,
+  &-closed,
+  &-undecided{
+    height: 15px;
+    width: 15px;
+    margin: 0 auto;
+    display: inline-block;
+    overflow: hidden;
+    background-size: cover !important;
+  }
+  &-present{
+    background: url('../img/check.png') no-repeat center center;
+  }
+  &-absent{
+    height: 10px;
+    width: 10px;
+    background: url('../img/cross.png') no-repeat center center;
+  }
+  &-closed{
+    background: url('../img/closed.png') no-repeat center center;
+  }
+  &-undecided{
+    background: url('../img/undecided.png') no-repeat center center;
+  }
+  &-day-status{
+    width: 100%;
+    max-width: 15px;
+    height: 3px;
+    margin: 0;
+    display: inline-block;
+    &.open{
+      background-color: $primary-color;
+    }
+    &.close{
+      background-color: $color-red;
+    }
+    .na{
+      background-color: $color-grey;
+    }
+  }
+}

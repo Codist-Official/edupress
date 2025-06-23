@@ -1,0 +1,283 @@
+.edupress-frontend-panel-wrap{
+  a{
+    color: $secondary-color;
+  }
+  width: 100%;
+  height: 100vh;
+  background-color: $light-page-bg-color;
+  position: fixed;
+  overflow: hidden;
+  left: 0;
+  display: inline-block;
+  .topbar-wrap{
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+    height: $topbar-height * 1px;
+    position: fixed;
+    background: $color-white;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    align-items: center;
+    z-index: 100;
+    box-shadow: $light-box-shadow;
+    .logo-wrap{
+      flex: 1;
+      flex-wrap: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      img{
+        height: 100%;
+        max-height: 75px;
+        width: auto;
+        overflow: hidden;
+      }
+      .institute-title{
+        font-size: 18px;
+        font-weight: bold;
+        line-height: 30px;
+      }
+    }
+    .top-menu-wrap{
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: end;
+      align-content: end;
+      ul.menu-links{
+        margin: 0;
+        padding: 0;
+        display: flex;
+        gap: 20px;
+        li{
+          list-style: none;
+          a{
+            color: $secondary-color;
+          }
+        }
+      }
+    }
+  }
+  .sidebar-wrap{
+    height: 100%;
+    width: 250px;
+    position: absolute;
+    background-color: $primary-color;
+    z-index: 90;
+    padding-top:  ($topbar-height + 50) * 1px;
+    display: inline-block;
+    overflow: auto;
+    ul.frontend-menu{
+      margin: 0;
+      padding: 0;
+      li{
+        list-style: none;
+        padding: 5px 10px;
+        box-sizing: border-box;
+        border-bottom: 1px solid $color-white;
+        vertical-align: middle;
+        &.active,
+        &:hover{
+          background-color: $light-page-bg-color;
+          a{
+            color: $primary-color;
+          }
+        }
+        a{
+          width: 100%;
+          text-decoration: none;
+          color:$color-white;
+          font-weight: 500;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          .menu-icon-wrap{
+            width: auto;
+            height: 20px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            img{
+              height: 100%;
+              width: auto;
+            }
+          }
+        }
+        .submenu{
+          margin: 0;
+          padding: 0;
+          background: #6fb200;
+          li{
+            &.active{
+              a{
+                color: $primary-color;
+              }
+            }
+          }
+        }
+      }
+    }
+    .mobile-nav-menu{
+      display: none;
+    }
+  }
+  .content-wrap{
+    height: 100%;
+    width: calc(100% - 250px);
+    margin-left: 250px;
+    padding: ($topbar-height + 50) * 1px 50px 200px;
+    box-sizing: border-box;
+    overflow: auto;
+    display: inline-block;
+    a{
+      color: $secondary-color;
+    }
+  }
+}
+
+.edupress-filter-list-wrap{
+  width: 100%;
+  padding: 20px;
+  background-color: $color-white;
+  margin-bottom: 25px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.edupress-publish-btn-wrap{
+  width: 100%;
+  margin-bottom: 25px;
+}
+
+ul.dashboard-stats-wrap{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+  li{
+    list-style: none;
+    margin: 0;
+    padding: 20px;
+    border: none;
+    box-sizing: border-box;
+    border-radius: 8px;
+    background-color: $color-white;
+    box-shadow: 0 0 10px rgba( 0, 0, 0, 0.15);
+    &:hover{
+      box-shadow: $light-box-shadow;
+    }
+    a{
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 500;
+      .icon-wrap,
+      .count-wrap{ flex: 1}
+      .title-wrap{ flex: 3}
+    }
+  }
+}
+
+ul.top-breadcrumb-bar{
+  margin: 0 0 50px;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+  align-content: center;
+  li{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+    line-height: 0;
+    font-size: 22px !important;
+    color: teal;
+    font-weight: bold;
+    &.current{
+      font-size: 22px !important;
+    }
+    img{
+      margin: 0;
+      padding: 0;
+    }
+  }
+}
+
+/* MOBILE */
+@media screen and (max-width: 768px) {
+  .edupress-frontend-panel-wrap{
+    width: 100%;
+    height: auto;
+    padding: 0;
+    position: relative;
+    left: 0;
+    .topbar-wrap{
+      position: relative;
+      .institute-title{
+        display: none;
+      }
+    }
+    .sidebar-wrap{
+      height: auto;
+      width: 100%;
+      position: relative;
+      top: 0;
+      left: inherit;
+      padding: 0;
+      .frontend-menu{
+        display: none;
+      }
+      .mobile-nav-menu{
+        width: 100%;
+        padding: 20px;
+        box-sizing: border-box;
+        display: inline-block;
+      }
+
+    }
+    .content-wrap{
+      height: auto;
+      width: 100%;
+      padding: 0 15px;
+      margin: 0;
+      display: inline-block;
+      ul.top-breadcrumb-bar{
+        margin: 20px 0;
+      }
+
+    }
+
+    /* Dashboard stats */
+    ul.dashboard-stats-wrap{
+      grid-template-columns: repeat(1 , 1fr);
+      gap: 10px;
+      li{
+        padding: 10px;
+        align-items: center;
+        align-content: center;
+        a{
+          .icon-wrap{
+            align-content: center;
+            align-items: center;
+            img{
+              width: 24px;
+              height: auto;
+              vertical-align: middle;
+            }
+          }
+        }
+      }
+    }
+  }
+  .edupress-admin-panel-wrap{
+    flex-direction: column;
+  }
+}

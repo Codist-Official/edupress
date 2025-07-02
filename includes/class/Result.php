@@ -1121,10 +1121,12 @@ class Result extends Post
         </div>
 
         <script>
-            edupress.sms_data = <?php echo json_encode($sms_data); ?>;
-            edupress.result_data = <?php echo json_encode($students_data); ?>;
-            edupress.subject_order = <?php echo json_encode($subject_ordered); ?>;
-            edupress.class_data = <?php echo json_encode($class_data); ?>;
+            jQuery(document).ready(function($){
+                edupress.sms_data = <?php echo json_encode($sms_data); ?>;
+                edupress.result_data = <?php echo json_encode($students_data); ?>;
+                edupress.subject_order = <?php echo json_encode($subject_ordered); ?>;
+                edupress.class_data = <?php echo json_encode($class_data); ?>;
+            });
         </script>
 
 

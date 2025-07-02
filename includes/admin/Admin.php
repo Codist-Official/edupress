@@ -103,13 +103,7 @@ class Admin
                 'url'       => EduPress::changeUrlParam( EduPress::getCurrentUrl(), 'activePage', 'basic' ),
                 'active'    => 0,
             ),
-            'result'        => array(
-                'id'        => 'result',
-                'title'     => 'Result',
-                'info'      => '',
-                'url'       => EduPress::changeUrlParam( EduPress::getCurrentUrl(), 'activePage', 'result' ),
-                'active'    => 0,
-            ),
+
             'print'         => array(
                 'id'        => 'print',
                 'title'     => 'Print',
@@ -124,14 +118,25 @@ class Admin
                 'url'       => EduPress::changeUrlParam( EduPress::getCurrentUrl(), 'activePage', 'user' ),
                 'active'    => 0,
             ),
-            'exam'          => array(
+            
+        );
+
+        if( Admin::getSetting('exam_active') == 'active' ){
+            $menus['result'] = array(
+                'id'        => 'result',
+                'title'     => 'Result',
+                'info'      => '',
+                'url'       => EduPress::changeUrlParam( EduPress::getCurrentUrl(), 'activePage', 'result' ),
+                'active'    => 0,
+            );
+            $menus['exam']  = array(
                 'id'        => 'exam',
                 'title'     => 'Exam',
                 'info'      => '',
                 'url'       => EduPress::changeUrlParam( EduPress::getCurrentUrl(), 'activePage', 'exam' ),
                 'active'    => 0,
-            ),
-        );
+            );
+        }
 
         if( Admin::getSetting('transaction_active') == 'active' ){
             $menus['transaction'] = array(
@@ -222,15 +227,8 @@ class Admin
 
             <?php
                 // Before Menu
-                if( !empty($before_html) ){
-                    ?>
-                    <div class="edupress-admin-settings-before-menu-wrap"><?php echo $before_html; ?></div>
-                    <?php
-                }
-            ?>
+                if( !empty($before_html) ) echo '<div class="edupress-admin-settings-before-menu-wrap">'.$before_html.'</div>';
 
-
-            <?php
                 // Menu content
                 if ( !empty($menu) ){
                     $menu_classes = apply_filters('edupress_admin_settings_menu_class', 'edupress-admin-settings-menu');
@@ -269,11 +267,7 @@ class Admin
 
             <?php
                 // After menu
-                if( !empty($before_html) ){
-                    ?>
-                    <div class="edupress-admin-settings-after-menu-wrap"><?php echo $after_html; ?></div>
-                    <?php
-                }
+                if( !empty($before_html) ) echo '<div class="edupress-admin-settings-after-menu-wrap">'.$after_html.'</div>';
             ?>
         </div>
 
@@ -352,7 +346,8 @@ class Admin
                         </div>
                         <div class="value-wrap">
                             <?php
-                                echo EduPress::generateFormElement( 'submit', 'Save', array('value'=>'Save') );
+                                $disabled = !current_user_can('administrator') && $form == 'features' ? 'disabled' : '';
+                                echo EduPress::generateFormElement( 'submit', 'Save', array('value'=>__('Save', 'edupress'), 'disabled'=>$disabled) );
                                 echo EduPress::generateFormElement( 'hidden', 'action', array( 'value'=>'edupress_admin_ajax' ) );
                                 echo EduPress::generateFormElement( 'hidden', 'ajax_action', array( 'value'=>'saveEduPressAdminSettingsForm' ) );
                                 echo EduPress::generateFormElement( 'hidden', 'is_ajax', array( 'value'=>1 ) );
@@ -384,11 +379,7 @@ class Admin
     public function getSettingsMenuContent( $menu )
     {
 
-        if( !$this->isValidSettingsMenu($menu) ){
-
-            return __('Invalid menu item', 'edupress');
-
-        }
+        if( !$this->isValidSettingsMenu($menu) ) return __('Invalid menu item', 'edupress');
 
         $content = apply_filters( 'edupress_admin_settings_menu_content', $this->getSettingsForm($menu), $menu );
 
@@ -631,9 +622,8 @@ class Admin
                         'label' => 'Global Print Button'
                     )
                 );
-
-
                 break;
+                
             case 'institute':
             case 'basic':
 

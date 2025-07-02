@@ -86,6 +86,9 @@ jQuery(document).ready(function(){
         let successCallback = $j(this).find(":input[name='success_callback']").val();
         let errorCallback = $j(this).find(":input[name='error_callback']").val();
 
+        // check if ajax_action equals to saveEduPressAdminSettingsForm
+        let refreshPage = $j(this).find(":input[name='ajax_action']").val() === 'saveEduPressAdminSettingsForm';
+
         $j.ajax({
             url: edupress.ajax_url,
             data: data,
@@ -106,6 +109,9 @@ jQuery(document).ready(function(){
                     if ( typeof window[successCallback] === 'undefined' ){
                         hideEduPressPopup();
                         showEduPressStatus( 'success' );
+                        if( refreshPage ){
+                            window.location.reload();
+                        }
                         if ( isEditPost ){
                             // Updating corresponding row
                             $j("tr[data-id='"+res.payload.post_id+"']").addClass('updated');

@@ -208,7 +208,7 @@ class Frontend
             'transaction' => 'Accounting',
             'setting' => 'Settings'
         ) ;
-        $post_types_always_active = [ 'grade_table', 'user', 'setting', 'result', 'calendar' ];
+        $post_types_always_active = [ 'user', 'setting' ];
 
         foreach( $post_types as $k => $v ){
 
@@ -242,7 +242,7 @@ class Frontend
         <ul class="frontend-menu">
             <?php if(User::currentUserCan('delete', 'user')): ?>
                 <li class="<?php echo empty($active_panel) ? 'active' : ''; ?>">
-                    <a href="<?php echo get_permalink(get_the_ID()); ?>">
+                    <a href="<?php echo $current_link; ?>">
                         <span class="menu-icon-wrap">
                             <?php echo EduPress::getIcon('dashboard'); ?>
                         </span>
@@ -337,6 +337,12 @@ class Frontend
     {
 
         $panel = isset($_REQUEST['panel']) ? sanitize_text_field($_REQUEST['panel']) : '';
+
+        $is_active = Admin::getSetting($panel.'_active') == 'active';
+
+        $always_active_panels = [ 'user', 'setting' ];
+
+        if( !in_array($panel, $always_active_panels) && !empty($panel) && !$is_active ) return __( "This feature is not active.", 'edupress' );
 
         $post = null;
 

@@ -508,17 +508,19 @@ ul.exam-mark-details{
     height: auto;
     display: flex;
     flex-wrap: wrap;
-    margin: 10px 0;
+    margin: 0;
     padding: 0;
     justify-content: normal;
     li{
       flex: 1 0 calc(100% / 7);
       list-style: none;
-      padding: 10px;
+      padding: 5px;
       box-sizing: border-box;
       margin: 0;
       text-align: right;
-      border: 0.5px solid #ccc;
+      border: 1px solid #ccc;
+      border-bottom: none;
+      border-left: none;
       position: relative;
       .calendar-note{
         height: auto;
@@ -543,12 +545,12 @@ ul.exam-mark-details{
         visibility: hidden;
       }
       .day{
-        font-size: 20px;
+        font-size: 16px;
         font-weight: bold;
         color: $secondary-color;
       }
       .month{
-        font-size: 16px;
+        font-size: 15px;
         font-weight: bold;
         color: #111;
       }

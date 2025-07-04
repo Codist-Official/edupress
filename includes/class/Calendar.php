@@ -339,6 +339,10 @@ class Calendar extends Post
             })
         </script>
         <style>
+            table.edupress-table tr th,
+            table.edupress-table tr td{
+                padding: 3px 5px !important;
+            }
             .calendar-month ul,
             .calendar-month ul li{
                 position: relative;

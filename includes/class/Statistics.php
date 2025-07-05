@@ -22,12 +22,7 @@ class Statistics
     public static function instance()
     {
 
-        if( is_null( self::$_instance ) ){
-
-            self::$_instance = new self();
-
-        }
-
+        if( is_null( self::$_instance ) ) self::$_instance = new self();
         return self::$_instance;
 
     }
@@ -44,21 +39,8 @@ class Statistics
     public static function getDashboardStats()
     {
 
-        $types = array(
-            'branch' => 'Branch',
-            'shift'  => 'Shift',
-            'class'  => 'Class',
-            'section'=> 'Section',
-            'subject' => 'Subject',
-            'grade_table' => 'Grade Table',
-            'calendar' => 'Calendar',
-            'term' => 'Exam Term',
-            'exam' => 'Exam',
-            'user' => 'User',
-            'sms' => 'SMS',
-            'attendance' => 'Attendance',
-            'transaction' => 'Transaction',
-        ) ;
+        $types =  EduPress::getFeatureList();
+
         $types_always_active = [ 'grade_table', 'user', 'setting', 'result' ];
 
         $menus = [];
@@ -67,11 +49,8 @@ class Statistics
 
             if( !in_array( $k, $types_always_active ) && Admin::getSetting(strtolower($k).'_active') === 'inactive' ) continue;
 
-            if( User::currentUserCan( 'read', $k ) ){
-
-                $menus[$k] = $v;
-
-            }
+            if( User::currentUserCan( 'read', $k ) ) $menus[$k] = $v;
+            
         }
 
         if( empty($menus) ) return '';
@@ -85,9 +64,12 @@ class Statistics
                     ?>
                     <li>
                         <a href="<?php echo $cur_page; ?>?panel=<?php echo $k; ?>">
-                            <div class="icon-wrap"><?php echo EduPress::getIcon($k, '', '3x'); ?></div>
-                            <div class="title-wrap"><?php echo $v; ?></div>
-                            <div class="count-wrap"><?php echo self::countPosts($k  ); ?></div>
+                            
+                            <div class="title-wrap">
+                                <div class="icon-wrap"><?php echo EduPress::getIcon($v['icon'], '', '3x'); ?></div>
+                                <div class="title"><?php echo $v['title']; ?></div>
+                            </div>
+                            <div class="count-wrap"><?php echo in_array($k, array('setting', 'support')) ? '' : self::countPosts($k  ); ?></div>
                         </a>
                     </li>
                     <?php

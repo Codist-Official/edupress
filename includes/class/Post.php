@@ -6,7 +6,7 @@ class Post
 {
 
     /**
-     * @var Object $_instance
+     * @var $_instance
      */
     private static $_instance;
 
@@ -21,7 +21,7 @@ class Post
     protected $post_type = 'post';
 
     /**
-     * @var Object $post
+     * @var $post
      */
     protected $post;
 
@@ -54,7 +54,6 @@ class Post
     {
 
         if ( is_null( self::$_instance ) ) self::$_instance = new self();
-
         return self::$_instance;
 
     }

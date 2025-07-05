@@ -26,12 +26,7 @@ class Klass extends Post
     public static function instance()
     {
 
-        if ( is_null( self::$_instance ) ){
-
-            self::$_instance = new self();
-
-        }
-
+        if ( is_null( self::$_instance ) ) self::$_instance = new self();
         return self::$_instance;
 
     }

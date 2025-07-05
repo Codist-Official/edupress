@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.1
+Version: 1.2
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -18,51 +18,23 @@ defined( 'ABSPATH' ) || die();
 /**
  * Definining plugin dir path and url
  */
-if ( !defined('EDUPRESS_PATH') ) {
+if ( !defined('EDUPRESS_PATH') ) define('EDUPRESS_PATH', plugin_dir_path( __FILE__ ) );
 
-    define( 'EDUPRESS_PATH', plugin_dir_path( __FILE__ ) );
+if ( !defined( 'EDUPRESS_CLASS_DIR') ) define( 'EDUPRESS_CLASS_DIR', EDUPRESS_PATH .'includes/class/' );
 
-}
-if ( !defined( 'EDUPRESS_CLASS_DIR') ){
+if ( !defined( 'EDUPRESS_ADMIN_DIR') ) define( 'EDUPRESS_ADMIN_DIR', EDUPRESS_PATH .'includes/admin/' );
 
-    define ( 'EDUPRESS_CLASS_DIR', EDUPRESS_PATH .'includes/class/' );
+if ( !defined( 'EDUPRESS_LIB_DIR') ) define( 'EDUPRESS_LIB_DIR', EDUPRESS_PATH .'includes/libs/' );
 
-}
-if ( !defined( 'EDUPRESS_ADMIN_DIR') ){
+if ( !defined( 'EDUPRESS_URL') ) define( 'EDUPRESS_URL', plugin_dir_url( __FILE__ ) );
 
-    define ( 'EDUPRESS_ADMIN_DIR', EDUPRESS_PATH .'includes/admin/' );
+if ( !defined( 'EDUPRESS_IMG_URL') ) define( 'EDUPRESS_IMG_URL', EDUPRESS_URL . 'assets/img/' );
 
-}
-if ( !defined( 'EDUPRESS_LIB_DIR') ){
+if ( !defined( 'EDUPRESS_CSS_URL') ) define( 'EDUPRESS_CSS_URL', EDUPRESS_URL . 'assets/css/' );
 
-    define ( 'EDUPRESS_LIB_DIR', EDUPRESS_PATH .'includes/libs/' );
+if ( !defined( 'EDUPRESS_JS_URL') ) define( 'EDUPRESS_JS_URL', EDUPRESS_URL . 'assets/js/' );
 
-}
-if ( !defined( 'EDUPRESS_URL') ){
-
-    define( 'EDUPRESS_URL', plugin_dir_url( __FILE__ ) );
-
-}
-if ( !defined( 'EDUPRESS_IMG_URL') ){
-
-    define( 'EDUPRESS_IMG_URL', EDUPRESS_URL . 'assets/img/' );
-
-}
-if ( !defined( 'EDUPRESS_CSS_URL') ){
-
-    define( 'EDUPRESS_CSS_URL', EDUPRESS_URL . 'assets/css/' );
-
-}
-if ( !defined( 'EDUPRESS_JS_URL') ){
-
-    define( 'EDUPRESS_JS_URL', EDUPRESS_URL . 'assets/js/' );
-
-}
-
-if( !defined( 'EDUPRESS_SEND_SMS') ){
-
-    define( 'EDUPRESS_SEND_SMS', true );
-}
+if( !defined( 'EDUPRESS_SEND_SMS') ) define( 'EDUPRESS_SEND_SMS', true );
 
 require EDUPRESS_LIB_DIR . 'plugin-update-checker/plugin-update-checker.php';
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
@@ -75,10 +47,6 @@ $myUpdateChecker = PucFactory::buildUpdateChecker(
 
 //Set the branch that contains the stable release.
 $myUpdateChecker->setBranch('main');
-
-//Optional: If you're using a private repository, specify the access token like this:
-// $myUpdateChecker->setAuthentication('');
-
 
 class EduPress
 {
@@ -154,8 +122,6 @@ class EduPress
             if(!current_user_can('manage_options')) return false;
             return $show;
         });
-
-
 
     }
 
@@ -343,6 +309,7 @@ class EduPress
     public static function registerInstall()
     {
         $string = "SSERPUDE";
+        return $string;
 
     }
 
@@ -876,6 +843,9 @@ class EduPress
         // css file
         wp_enqueue_style( 'edupress', EDUPRESS_CSS_URL.'edupress.css', array(), rand(1, 1000000), 'all' );
 
+        // fontawesome 
+        wp_enqueue_style( 'fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css', array(), rand(1, 1000000), 'all' );
+
         // jquery
         wp_enqueue_script('jquery' );
 
@@ -1122,6 +1092,14 @@ class EduPress
      */
     public static function getIcon( $icon = '' , $class = '', $size = '1x' )
     {
+
+        $icon = strtolower( trim( $icon ) );
+
+        if( str_contains( $icon, 'fa-' ) ) return "<i class='{$icon}'></i>";
+
+        if( $icon == 'dashboard' ) return "<i class='fa-solid fa-bars'></i>";
+        if( $icon == 'report' ) return "<i class='fa-solid fa-chart-line'></i>";
+
         switch ( strtolower( trim( $icon ) ) ){
 
             case 'edit':
@@ -1185,6 +1163,77 @@ class EduPress
             echo "Error: Unable to open the file.";
             return FALSE;
         }
+    }
+
+    /**
+     * GET eudpress feature list
+     * 
+     * @return array
+     */
+    public static function getFeatureList()
+    {
+        return array(
+            'branch' => array(
+                'title' => 'Branch',
+                'icon' => 'fa-solid fa-network-wired',
+            ),
+            'shift'  => array(
+                'title' => 'Shift',
+                'icon' => 'fa-solid fa-clock',
+            ),
+            'class'  => array(
+                'title' => 'Class',
+                'icon' => 'fa-solid fa-chalkboard-user',
+            ),
+            'section'=> array(
+                'title' => 'Section',
+                'icon' => 'fa-solid fa-building',
+            ),
+            'term' => array(
+                'title' => 'Exam Term',
+                'icon' => 'fa-solid fa-calendar-day',
+            ),
+            'grade_table' => array(
+                'title' => 'Grade Table',
+                'icon' => 'fa-solid fa-table-list',
+            ),
+            'result' => array(
+                'title' => 'Result',
+                'icon' => 'fa-solid fa-pen-to-square',
+            ),
+            'calendar' => array(
+                'title' => 'Calendar',
+                'icon' => 'fa-solid fa-calendar',
+            ),
+            'notice' => array(
+                'title' => 'Notice',
+                'icon' => 'fa-solid fa-bullhorn',
+            ),
+            'user' => array(
+                'title' => 'User',
+                'icon' => 'fa-solid fa-user',
+            ),
+            'sms' => array(
+                'title' => 'SMS',
+                'icon' => 'fa-solid fa-sms',
+            ),
+            'attendance' => array(
+                'title' => 'Attendance',
+                'icon' => 'fa-solid fa-fingerprint',
+            ),
+            'transaction' => array(
+                'title' => 'Accounting',
+                'icon' => 'fa-solid fa-money-bill',
+            ),
+            'setting' => array(
+                'title' => 'Settings',
+                'icon' => 'fa-solid fa-gear',
+            ),
+            'support' => array(
+                'title' => 'Support',
+                'icon' => 'fa-solid fa-headset',
+            )
+        );
     }
 
     /**

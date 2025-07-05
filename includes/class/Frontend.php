@@ -190,35 +190,17 @@ class Frontend
     {
 
         $menus = [];
-        $post_types = array(
-            'branch' => 'Branch',
-            'shift'  => 'Shift',
-            'class'  => 'Class',
-            'section'=> 'Section',
-            'subject' => 'Subject',
-            'term' => 'Exam Term',
-            'grade_table' => 'Grade Table',
-            'exam' => 'Exam',
-            'result' => 'Result',
-            'calendar' => 'Calendar',
-            'notice' => 'Notice',
-            'user' => 'User',
-            'sms' => 'SMS',
-            'attendance' => 'Attendance',
-            'transaction' => 'Accounting',
-            'setting' => 'Settings'
-        ) ;
-        $post_types_always_active = [ 'user', 'setting' ];
+
+        $post_types = EduPress::getFeatureList();
+
+        $post_types_always_active = [ 'user', 'setting', 'support' ];
 
         foreach( $post_types as $k => $v ){
 
             if( !in_array( $k, $post_types_always_active ) && !EduPress::isActive($k) ) continue;
 
-            if( User::currentUserCan( 'read', $k ) ){
-
-                $menus[$k] = $v;
-
-            }
+            if( User::currentUserCan( 'read', $k ) ) $menus[$k] = $v;
+            
         }
 
         ob_start();
@@ -234,7 +216,7 @@ class Frontend
                 <?php
                 foreach( $menus as $k => $v ):
                     $selected = $k === $active_panel ? " selected='selected' " : ''; ?>
-                    <option value="<?php echo "{$current_link}?panel={$k        }"; ?>" <?php echo $selected; ?>><?php _e( $v, 'edupress' ) ; ?></option>
+                    <option value="<?php echo "{$current_link}?panel={$k}"; ?>" <?php echo $selected; ?>><?php _e( $v['title'], 'edupress' ) ; ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -257,9 +239,9 @@ class Frontend
                     <li class="<?php echo $active_class; ?>">
                         <a href="<?php echo $current_link; ?>?panel=<?php echo $k; ?>">
                             <span class="menu-icon-wrap">
-                                <?php echo EduPress::getIcon($k); ?>
-                            </span>
-                            <?php _e( $v, 'edupress' ) ; ?>
+                                <?php echo EduPress::getIcon($v['icon']); ?>
+                            </span> 
+                            <?php _e( $v['title'], 'edupress' ) ; ?>
                         </a>
                         <?php if($k == 'transaction'): ?>
                             <?php $active_class = $active_panel === 'transaction_report' ? ' active ' : ''; ?>
@@ -315,10 +297,13 @@ class Frontend
     {
         $panel = strtoupper(str_replace('_', ' ', sanitize_text_field($_REQUEST['panel'] ?? '')));
         if(empty($panel)) $panel = 'Dashboard';
+        $feature_list = EduPress::getFeatureList();
+        $panel_details = $feature_list[strtolower($panel)] ?? null;
+        $panel_icon = $panel_details['icon'] ?? 'dashboard';
         ob_start();
         ?>
         <ul class="top-breadcrumb-bar">
-            <li class="dash"><?php echo EduPress::getIcon('dashboard'); ?></li>
+            <li class="dash"><?php echo EduPress::getIcon($panel_icon); ?></li>
             <li class="current"><?php echo $panel; ?></li>
         </ul>
         <?php
@@ -340,7 +325,7 @@ class Frontend
 
         $is_active = Admin::getSetting($panel.'_active') == 'active';
 
-        $always_active_panels = [ 'user', 'setting' ];
+        $always_active_panels = [ 'user', 'setting', 'support' ];
 
         if( !in_array($panel, $always_active_panels) && !empty($panel) && !$is_active ) return __( "This feature is not active.", 'edupress' );
 
@@ -415,6 +400,10 @@ class Frontend
 
             case 'notice':
                 $post = new Notice();
+                break;
+
+            case 'support':
+                $post = new Support();
                 break;
 
             default:

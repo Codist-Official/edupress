@@ -29,12 +29,7 @@ class Subject extends Post
     public static function instance()
     {
 
-        if ( is_null( self::$_instance ) ){
-
-            self::$_instance = new self();
-
-        }
-
+        if ( is_null( self::$_instance ) ) self::$_instance = new self();
         return self::$_instance;
 
     }
@@ -243,7 +238,7 @@ class Subject extends Post
         if( $connected_id ) return $connected_id;
 
         global $wpdb;
-        return $wpdb->get_var("SELECT post_id FROM {$wpdb->prefix}postmeta WHERE meta_key = 'connected_subject_id' AND meta_value = {$subject_id} ");
+        return (int) $wpdb->get_var("SELECT post_id FROM {$wpdb->prefix}postmeta WHERE meta_key = 'connected_subject_id' AND meta_value = {$subject_id} ");
 
     }
 

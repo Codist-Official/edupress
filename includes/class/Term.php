@@ -24,12 +24,7 @@ class Term extends Post
     public static function instance()
     {
 
-        if ( is_null( self::$_instance ) ){
-
-            self::$_instance = new self();
-
-        }
-
+        if ( is_null( self::$_instance ) ) self::$_instance = new self();
         return self::$_instance;
 
     }
@@ -51,11 +46,8 @@ class Term extends Post
         // filter publish fields
         add_filter( "edupress_edit_{$this->post_type}_fields", [ $this, 'filterPublishFields' ] );
 
-
         // filter list fields
         add_filter( "edupress_list_{$this->post_type}_fields", [ $this, 'filterListFields' ] );
-
-
 
     }
 

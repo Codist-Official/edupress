@@ -197,8 +197,8 @@ class Frontend
 
         foreach( $post_types as $k => $v ){
 
+            if( $k == 'result' && EduPress::isActive('exam')) $menus[$k] = $v;
             if( !in_array( $k, $post_types_always_active ) && !EduPress::isActive($k) ) continue;
-
             if( User::currentUserCan( 'read', $k ) ) $menus[$k] = $v;
             
         }
@@ -326,6 +326,8 @@ class Frontend
         $is_active = Admin::getSetting($panel.'_active') == 'active';
 
         $always_active_panels = [ 'user', 'setting', 'support' ];
+
+        if(EduPress::isActive('exam')) $always_active_panels[] = 'result';
 
         if( !in_array($panel, $always_active_panels) && !empty($panel) && !$is_active ) return __( "This feature is not active.", 'edupress' );
 

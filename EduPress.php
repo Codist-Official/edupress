@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.2
+Version: 1.3
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -1189,9 +1189,21 @@ class EduPress
                 'title' => 'Section',
                 'icon' => 'fa-solid fa-building',
             ),
+            'subject' => array(
+                'title' => 'Subject',
+                'icon' => 'fa-solid fa-book',
+            ),
             'term' => array(
                 'title' => 'Exam Term',
                 'icon' => 'fa-solid fa-calendar-day',
+            ),
+            'exam' => array(
+                'title' => 'Exam',
+                'icon' => 'fa-solid fa-calendar-day',
+            ),
+            'result' => array(
+                'title' => 'Result',
+                'icon' => 'fa-solid fa-pen-to-square',
             ),
             'grade_table' => array(
                 'title' => 'Grade Table',

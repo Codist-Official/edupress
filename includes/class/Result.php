@@ -421,13 +421,16 @@ class Result extends Post
             // This is used for subject ordering
             $sub_order = [];
             $exam_id_sub_id_mapping = [];
-            while($qry->have_posts()):
-                $qry->the_post();
-                $sub_id = get_post_meta( $qry->post->ID, 'subject_id', true );
-                $order = get_post_meta( $sub_id, 'sort_order', true );
-                $sub_order[$order] = $sub_id;
-                $exam_id_sub_id_mapping[$qry->post->ID] = (int) $sub_id;
-            endwhile;
+            if($qry->have_posts()){
+                while($qry->have_posts()):
+                    $qry->the_post();
+                    $sub_id = get_post_meta( $qry->post->ID, 'subject_id', true );
+                    $order = get_post_meta( $sub_id, 'sort_order', true );
+                    $sub_order[$order] = $sub_id;
+                    $exam_id_sub_id_mapping[$qry->post->ID] = (int) $sub_id;
+                endwhile;
+                wp_reset_postdata();    
+            }
 
             // Sorting as per key number
             ksort($sub_order);
@@ -814,41 +817,46 @@ class Result extends Post
                         <th>Name</th>
                         <?php
                         $found_subjects = $qry->found_posts;
-                        while($qry->have_posts()) :
-                            $qry->the_post();
-                            $subject_id = get_post_meta( $qry->post->ID, 'subject_id', true );
-                            $subject_title = $found_subjects > 5 ? get_post_meta( $subject_id, 'shortname', true ) : get_the_title( $subject_id);
-                            if( $ranking_method  !== 'marks' ){
-                                $combined_name = get_post_meta( $subject_id, 'combined_name', true );
-                                if(!empty($combined_name)) $subject_title = $combined_name;
-                                // Continue if subject or connected subject already shown
-                                if ( in_array( $subject_id, $shown_connected_subjects ) ) continue;
-                                $shown_connected_subjects[] = $subject_id;
-                                $shown_connected_subjects[] = $connected_subject_id_mapping[$subject_id];
-                            }
-                            ?>
-                            <th>
-                                <!-- subject -->
-                                <?php echo  $subject_title; ?>
-                                <br>
-                                <!-- Exam date -->
-                                <?php $date = get_post_meta($qry->post->ID, 'exam_date', true ); if(!empty($date)) echo date('d/m/y', strtotime($date)); ?>
-                                <br>
-                                <!-- Exam marks -->
-                                <?php
-
-                                // Subject heads
-                                    echo "<ul class='exam-mark-details'>";
-                                    if(!empty($exam_marks_head_wise_data[$subject_id])){
-                                        foreach($exam_marks_head_wise_data[$subject_id] as $k=>$v){
-                                            echo "<li><span class='exam-mark-title'>$k: </span><span class='exam-mark-value'>$v</span></li>";
-                                        }
-                                        echo "<li><span class='exam-mark-title'><strong>Total: </strong></span><span class='exam-mark-value'><strong>".array_sum($exam_marks_head_wise_data[$subject_id])."</strong></span></li>";
-                                    }
-                                    echo "</ul>";
+                        if($qry->have_posts()):
+                            while($qry->have_posts()) :
+                                $qry->the_post();
+                                $subject_id = get_post_meta( $qry->post->ID, 'subject_id', true );
+                                $subject_title = $found_subjects > 5 ? get_post_meta( $subject_id, 'shortname', true ) : get_the_title( $subject_id);
+                                if( $ranking_method  !== 'marks' ){
+                                    $combined_name = get_post_meta( $subject_id, 'combined_name', true );
+                                    if(!empty($combined_name)) $subject_title = $combined_name;
+                                    // Continue if subject or connected subject already shown
+                                    if ( in_array( $subject_id, $shown_connected_subjects ) ) continue;
+                                    $shown_connected_subjects[] = $subject_id;
+                                    $shown_connected_subjects[] = $connected_subject_id_mapping[$subject_id];
+                                }
                                 ?>
-                            </th>
-                        <?php endwhile; ?>
+                                <th>
+                                    <!-- subject -->
+                                    <?php echo  $subject_title; ?>
+                                    <br>
+                                    <!-- Exam date -->
+                                    <?php $date = get_post_meta($qry->post->ID, 'exam_date', true ); if(!empty($date)) echo date('d/m/y', strtotime($date)); ?>
+                                    <br>
+                                    <!-- Exam marks -->
+                                    <?php
+    
+                                    // Subject heads
+                                        echo "<ul class='exam-mark-details'>";
+                                        if(!empty($exam_marks_head_wise_data[$subject_id])){
+                                            foreach($exam_marks_head_wise_data[$subject_id] as $k=>$v){
+                                                echo "<li><span class='exam-mark-title'>$k: </span><span class='exam-mark-value'>$v</span></li>";
+                                            }
+                                            echo "<li><span class='exam-mark-title'><strong>Total: </strong></span><span class='exam-mark-value'><strong>".array_sum($exam_marks_head_wise_data[$subject_id])."</strong></span></li>";
+                                        }
+                                        echo "</ul>";
+                                    ?>
+                                </th>
+                            <?php endwhile;
+                            wp_reset_postdata();
+                        endif;
+                        ?>
+                        
                         <?php if( $ranking_method == 'marks' ): ?>
                             <th>Total</th>
                             <th>Merit<br>Pos.</th>
@@ -1011,7 +1019,9 @@ class Result extends Post
                                         echo "<span class='no-view'>{$print_html}</span>";
                                     ?>
                             </td>
-                            <?php endwhile; ?>
+                            <?php endwhile; 
+                            wp_reset_postdata();
+                            ?>
 
                         <?php if( $ranking_method == 'marks' ) : ?>
 

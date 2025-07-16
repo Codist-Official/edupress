@@ -262,9 +262,6 @@ class Subject extends Post
             'compare' => '>',
             'type' => 'NUMERIC'
         );
-//        echo "<pre>";
-//        var_dump($args);
-//        echo "</pre>";
         return $args;
     }
 

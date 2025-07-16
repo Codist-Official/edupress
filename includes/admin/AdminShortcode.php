@@ -20,12 +20,7 @@ class AdminShortcode
     public static function instance()
     {
 
-        if ( is_null( self::$_instance ) ){
-
-            self::$_instance  = new self();
-
-        }
-
+        if ( is_null( self::$_instance ) ) self::$_instance  = new self();
         return self::$_instance;
 
     }
@@ -65,12 +60,8 @@ class AdminShortcode
 
         $method = $params['action'];
 
-        if( method_exists( $this, $method ) ){
-
-            return $this->$method();
-
-        }
-
+        if( method_exists( $this, $method ) ) return $this->$method();
+        
     }
 
     /**

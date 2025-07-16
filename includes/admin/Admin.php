@@ -926,6 +926,7 @@ class Admin
                 break;
 
             case 'accounting':
+            case 'transaction':
 
                 $fields['transaction_accounts'] = array(
                     'type'  => 'textarea',

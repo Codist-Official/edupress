@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.3
+Version: 1.4
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -895,6 +895,7 @@ class EduPress
      */
     public function printFooterHtml()
     {
+        global $post;
         $action = isset($_REQUEST['action']) ? sanitize_text_field($_REQUEST['action']) : '';
         if($action == 'elementor') return;
 
@@ -948,6 +949,7 @@ class EduPress
                             'title' => $qry->post->post_title
                         );
                     }
+                    wp_reset_postdata();
                 }
 
                 $shifts = [];
@@ -963,6 +965,7 @@ class EduPress
                                 'branch_id' => (int) get_post_meta($qry->post->ID, 'branch_id', true ),
                             );
                         }
+                        wp_reset_postdata();
                     }
                 }
 
@@ -980,7 +983,9 @@ class EduPress
                                 'shift_id' => (int) get_post_meta($qry->post->ID, 'shift_id', true ),
                             );
                         }
+                        wp_reset_postdata();
                     }
+                    
                 }
 
                 $sections = [];
@@ -998,6 +1003,7 @@ class EduPress
                                 'class_id' => (int) get_post_meta($qry->post->ID, 'class_id', true ),
                             );
                         }
+                        wp_reset_postdata();
                     }
                 }
             ?>

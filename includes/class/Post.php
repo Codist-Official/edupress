@@ -421,35 +421,33 @@ class Post
      */
     public function getPosts( $args = [], $only_id_title = false )
     {
-
         $args['post_type'] = $this->post_type;
-
         $args['post_status']  = $args['post_status'] ?? 'publish';
-
         $args['posts_per_page'] = $args['posts_per_page'] ?? -1;
-
         $args['orderby'] = $args['orderby'] ?? 'title';
-
         $args['order'] = $args['order'] ?? 'ASC';
 
         $qry = new \WP_Query($args);
 
-        wp_reset_query();
+        if( !$only_id_title ) {
+            wp_reset_postdata();
+            return $qry;
+        }
 
-        if( !$only_id_title ) return $qry;
-
-        if ( !$qry->have_posts() ) return [];
+        if ( !$qry->have_posts() ){
+            wp_reset_postdata();
+            return [];
+        }
 
         $response = [];
 
-        while( $qry->have_posts() ){
-
-            $qry->the_post();
-
-            $response[$qry->post->ID] = $qry->post->post_title;
-
+        if($qry->have_posts()){
+            while( $qry->have_posts() ){
+                $qry->the_post();
+                $response[$qry->post->ID] = $qry->post->post_title;
+            }
+            wp_reset_postdata();
         }
-
         return $response;
     }
 
@@ -879,7 +877,9 @@ class Post
 
                         <?php endif; ?>
                     </tr>
-                <?php } ?>
+                <?php }
+                wp_reset_postdata();
+                ?>
                 </tbody>
             </table>
         </div>

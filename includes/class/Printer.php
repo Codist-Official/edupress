@@ -104,10 +104,14 @@ class Printer
                 position: fixed;
                 text-align: center;
                 <?php
-                    $top_margin = Admin::getSetting('print_qr_code_top_margin');
-                    $bottom_margin = Admin::getSetting('print_qr_code_bottom_margin');
-                    $left_margin = Admin::getSetting('print_qr_code_left_margin');
-                    $right_margin = Admin::getSetting('print_qr_code_right_margin');
+                    $top_margin = (float) Admin::getSetting('print_qr_code_top_margin', 0.01);
+                    $bottom_margin = (float) Admin::getSetting('print_qr_code_bottom_margin', 0.01);
+                    $left_margin = (float) Admin::getSetting('print_qr_code_left_margin', 0.01);
+                    $right_margin = (float) Admin::getSetting('print_qr_code_right_margin', 0.01);
+                    if($top_margin == 0) $top_margin = 0.01;
+                    if($bottom_margin == 0) $bottom_margin = 0.01;
+                    if($left_margin == 0) $left_margin = 0.01;
+                    if($right_margin == 0) $right_margin = 0.01;
                     switch (trim(strtolower($qr_position))){
 
                         case 'topleft':
@@ -439,8 +443,12 @@ class Printer
                             <?php } else { ?>
                                 <th rowspan="2">Letter<br>Grade </th>
                                 <th rowspan="2">Grade<br>Point </th>
-                                <th rowspan="2" style="text-align:center;">GPA <br>Without Op. Sub.</th>
-                                <th rowspan="2" style="text-align:center;">GPA <br>With Op. Sub.</th>
+                                <?php if(!empty($optional_subject_data)): ?>
+                                    <th rowspan="2" style="text-align:center;">CGPA <br>Without Optional</th>
+                                    <th rowspan="2" style="text-align:center;">CGPA <br>With Optional</th>
+                                <?php else: ?>
+                                    <th rowspan="2" style="text-align:center;">CGPA</th>
+                                <?php endif; ?>
                                 <th rowspan="2" style="text-align:center;">Grade</th>
                             <?php } ?>
                         </tr>
@@ -520,14 +528,17 @@ class Printer
                                     <?php if( !empty($optional_subject_data) ) $rowspan++; ?>
                                     <td><?php echo $result['grade'] ?? ''; ?></td>
                                     <td><?php echo number_format($result['grade_point'], 2); ?></td>
+                                    <!-- showing combined cgpa -->
                                     <?php if( $i == 0 ){ ?>
-                                        <td style="text-align:center" rowspan="<?php echo $rowspan; ?>"><strong><?php echo $user_data['grade_point_without_optional']; ?></strong></td>
-                                        <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo $user_data['grade_point_with_optional']; ?></strong></td>
+                                        <?php if(!empty($optional_subject_data)): ?>
+                                            <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo $user_data['grade_point_without_optional']; ?></strong></td>
+                                            <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo $user_data['grade_point_with_optional']; ?></strong></td>
+                                        <?php else: ?>
+                                            <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo $user_data['grade_point_without_optional']; ?></strong></td>
+                                        <?php endif; ?>
                                         <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo $user_data['grade']; ?></strong></td>
                                     <?php } ?>
-
                                 <?php } ?>
-
                             </tr>
                           <?php
                           $i++;
@@ -557,24 +568,26 @@ class Printer
                         </tr>
                       <?php endif; ?>
                   </table>
-                  <p class="legends" style="margin: 3px 0 10px 0;"> Legends: <strong>(A)</strong> - Absent, <strong>(F)</strong> - Failed, <strong>N/A</strong> - Not Applicable </p>
+                  <p class="legends" style="margin: 5px 0 0 0;"> Obtained Total: <?php echo array_sum(array_column($user_data['results'], 'obtained')); ?> </p>
+                  <p class="legends" style="margin: 5px 0 0 0;"> Legends: <strong>(A)</strong> - Absent, <strong>(F)</strong> - Failed, <strong>N/A</strong> - Not Applicable </p>
                 </div>
 
-            <?php if($format !== 'marks' ) : ?>
+        </section>
+
+        <?php echo Result::getEndorsementBox(); ?>
+
+        <?php if($format !== 'marks' ) : ?>
             <!-- Grade table data -->
             <style>
                 .grade-table-wrap{ width: 100%; max-width: 200px; float: right; margin-bottom: 20px;}
                 .grade-table-wrap table tr th,
-                .grade-table-wrap table tr td { font-size: 8px !important; line-height: 8px !important;}
+                .grade-table-wrap table tr td { font-size: 8px !important; line-height: 8px !important; padding: 2px !important; vertical-align: middle !important;}
             </style>
             <div class="grade-table-wrap">
-                <h3 class="master-subtitle"><?php _e( 'Grading System', 'edupress' ); ?></h3>
+                <h3 class="master-subtitle"><?php _e( 'Grade Table', 'edupress' ); ?></h3>
                 <?php echo GradeTable::getTable($extra_data['method']); ?>
             </div>
-            <?php endif; ?>
-        </section>
-
-        <?php echo Result::getEndorsementBox(); ?>
+        <?php endif; ?>
 
         <?php
         return ob_get_clean();

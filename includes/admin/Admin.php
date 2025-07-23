@@ -1559,6 +1559,19 @@ class Admin
                     )
                 );
 
+                $fields['print_show_edupress_credits'] = array(
+                    'type'  => 'select',
+                    'name'  => 'print_show_edupress_credits',
+                    'settings' => array(
+                        'value' => Admin::getSetting('print_show_edupress_credits', 'active'),
+                        'label' => 'Show EduPress Credits',
+                        'options' => array(
+                            'active' => 'Active',
+                            'inactive' => 'Inactive',
+                        )
+                    )
+                );
+
                 break;
 
             case 'display':

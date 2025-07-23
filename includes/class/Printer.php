@@ -202,15 +202,18 @@ class Printer
                 height: <?php echo Admin::getSetting('print_footer_height', 0.5); ?>in;
                 width: 100%;
                 overflow: hidden;
+                border: none !important;
             }
         </style>
-        <section class="edupress-print-footer-wrap">
-            <p style="font-size:8px !important;line-height:8px !important;margin:0;padding:0;">
-                This document was generated on <?php echo date('h:i:s a, d/m/y', strtotime(current_time('mysql'))); ?>
-                using <strong>EduPress School Management Software </strong> | +880 1979 001 001 | www.edupressbd.com
-            </p>
-        </section>
-
+        <?php $show_edupress_credits = Admin::getSetting('print_show_edupress_credits', 'active'); ?>
+        <?php if($show_edupress_credits == 'active'): ?>
+            <section class="edupress-print-footer-wrap">
+                <p style="font-size:8px !important;line-height:8px !important;margin:0;padding:0;">
+                    This document was generated on <?php echo date('h:i:s a, d/m/y', strtotime(current_time('mysql'))); ?>
+                    using <strong>EduPress School Management Software </strong> | +880 1979 001 001 | www.edupressbd.com
+                </p>
+            </section>
+        <?php endif; ?>
         <?php
         $html = ob_get_clean();
         return "<div class='footer' id='pageFooter'>{$html}</div>";
@@ -531,10 +534,10 @@ class Printer
                                     <!-- showing combined cgpa -->
                                     <?php if( $i == 0 ){ ?>
                                         <?php if(!empty($optional_subject_data)): ?>
-                                            <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo $user_data['grade_point_without_optional']; ?></strong></td>
-                                            <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo $user_data['grade_point_with_optional']; ?></strong></td>
+                                            <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo number_format($user_data['grade_point_without_optional'], 2); ?></strong></td>
+                                            <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo number_format($user_data['grade_point_with_optional'], 2); ?></strong></td>
                                         <?php else: ?>
-                                            <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo $user_data['grade_point_without_optional']; ?></strong></td>
+                                            <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo number_format($user_data['grade_point_without_optional'], 2); ?></strong></td>
                                         <?php endif; ?>
                                         <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo $user_data['grade']; ?></strong></td>
                                     <?php } ?>
@@ -568,7 +571,7 @@ class Printer
                         </tr>
                       <?php endif; ?>
                   </table>
-                  <p class="legends" style="margin: 5px 0 0 0;"> Obtained Total: <?php echo array_sum(array_column($user_data['results'], 'obtained')); ?> </p>
+                  <p class="legends" style="margin: 5px 0 0 0;"> <strong>Obtained Total:</strong> <?php echo array_sum(array_column($user_data['results'], 'obtained')); ?> </p>
                   <p class="legends" style="margin: 5px 0 0 0;"> Legends: <strong>(A)</strong> - Absent, <strong>(F)</strong> - Failed, <strong>N/A</strong> - Not Applicable </p>
                 </div>
 

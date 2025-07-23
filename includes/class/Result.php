@@ -511,71 +511,76 @@ class Result extends Post
         // Connected subject id mapping
         $connected_subject_id_mapping = [];
 
-        // Marks based ranking
-        while($qry->have_posts()):
+        if($qry->have_posts()):
+            // Marks based ranking
+            while($qry->have_posts()):
 
-            $qry->the_post();
-            $exam_id = $qry->post->ID;
-            $results = maybe_unserialize(get_post_meta( $qry->post->ID, 'results', true ));
-            $subject_id = get_post_meta( $qry->post->ID, 'subject_id', true );
-            $subject_title = get_the_title($subject_id);
-            $exam_date = get_post_meta( $qry->post->ID, 'exam_date', true );
-            $all_dates[] = strtotime($exam_date);
+                $qry->the_post();
+                $exam_id = $qry->post->ID;
+                $results = maybe_unserialize(get_post_meta( $qry->post->ID, 'results', true ));
+                $subject_id = get_post_meta( $qry->post->ID, 'subject_id', true );
+                $subject_title = get_the_title($subject_id);
+                $exam_date = get_post_meta( $qry->post->ID, 'exam_date', true );
+                $all_dates[] = strtotime($exam_date);
 
-            if( isset($connected_subject_id_mapping[$subject_id]) ){
+                if( isset($connected_subject_id_mapping[$subject_id]) ){
 
-                $connected_subject_id = $connected_subject_id_mapping[$subject_id];
+                    $connected_subject_id = $connected_subject_id_mapping[$subject_id];
 
-            } else {
+                } else {
 
-                $connected_subject_id = Subject::getConnectedId($subject_id);
-                $connected_subject_id_mapping[$subject_id] = $connected_subject_id;
+                    $connected_subject_id = Subject::getConnectedId($subject_id);
+                    $connected_subject_id_mapping[$subject_id] = $connected_subject_id;
 
-            }
-
-            $combined_title = get_post_meta( $subject_id, 'combined_name', true );
-            if(empty($combined_title)){
-                $combined_title = get_post_meta( $connected_subject_id, 'combined_name', true );
-            }
-
-            // Exam mark details
-            $exam_marks_head_wise_data[$subject_id] = maybe_unserialize( get_post_meta( $exam_id, 'exam_marks', true ) );
-
-            foreach($results as $student_id => $marks_data ){
-
-                $user_marks_data = $marks_data['results'];
-
-                // Adding failed subject if registered
-                if( !$marks_data['unregistered'] && $ranking_method == 'marks' ){
-                    foreach($user_marks_data as $k=>$v){
-                        $new_array = $v;
-                        if( is_array($new_array) ){
-                            $passed = $new_array['obtained'] > ($pass_percentage[$k] * $exam_marks_head_wise_data[$subject_id][$k] / 100);
-                            $new_array['failed'] = !$passed ? 1 : 0;
-                            $new_array['exam_marks'] = (float) $exam_marks_head_wise_data[$subject_id][$k];
-                            $user_marks_data[$k] = $new_array;
-                            if(!$passed) $students_data[$student_id]['failed_subjects'][] = (int) $subject_id;
-                        }
-                    }
                 }
 
-                $total_obtained = array_sum( array_column( $user_marks_data, 'obtained' ) );
-                $students_data[$student_id]['results'][$subject_id]['unregistered'] = $marks_data['unregistered'];
-                $students_data[$student_id]['results'][$subject_id]['marks'] = $user_marks_data;
-                $students_data[$student_id]['results'][$subject_id]['obtained'] = $total_obtained;
-                if( !isset($subject_wise_highest_obtained_marks[$subject_id]) ) $subject_wise_highest_obtained_marks[$subject_id] = $total_obtained;
-                if( $subject_wise_highest_obtained_marks[$subject_id] < $total_obtained ) $subject_wise_highest_obtained_marks[$subject_id] = $total_obtained;
-                $students_data[$student_id]['results'][$subject_id]['exam_marks'] = array_sum($exam_marks_head_wise_data[$subject_id]);
-                // reducing data
-               $students_data[$student_id]['results'][$subject_id]['exam_date'] = $exam_date;
-//                $students_data[$student_id]['results'][$subject_id]['subject_title'] = $subject_title;
-//                $students_data[$student_id]['results'][$subject_id]['combined_title'] = $combined_title;
-                $students_data[$student_id]['results'][$subject_id]['connected_subject_id'] = $connected_subject_id;
-                if( !isset($students_data[$student_id]['total_obtained_marks']) ) $students_data[$student_id]['total_obtained_marks'] = 0;
-                $students_data[$student_id]['total_obtained_marks'] += array_sum(array_column($user_marks_data, 'obtained')) ;
+                $combined_title = get_post_meta( $subject_id, 'combined_name', true );
+                if(empty($combined_title)){
+                    $combined_title = get_post_meta( $connected_subject_id, 'combined_name', true );
+                }
 
-            }
-        endwhile;
+                // Exam mark details
+                $exam_marks_head_wise_data[$subject_id] = maybe_unserialize( get_post_meta( $exam_id, 'exam_marks', true ) );
+
+                if(!is_array($results)) continue;
+
+                foreach($results as $student_id => $marks_data ){
+
+                    $user_marks_data = $marks_data['results'];
+
+                    // Adding failed subject if registered
+                    if( !$marks_data['unregistered'] && $ranking_method == 'marks' ){
+                        foreach($user_marks_data as $k=>$v){
+                            $new_array = $v;
+                            if( is_array($new_array) ){
+                                $passed = $new_array['obtained'] > ($pass_percentage[$k] * $exam_marks_head_wise_data[$subject_id][$k] / 100);
+                                $new_array['failed'] = !$passed ? 1 : 0;
+                                $new_array['exam_marks'] = (float) $exam_marks_head_wise_data[$subject_id][$k];
+                                $user_marks_data[$k] = $new_array;
+                                if(!$passed) $students_data[$student_id]['failed_subjects'][] = (int) $subject_id;
+                            }
+                        }
+                    }
+
+                    $total_obtained = array_sum( array_column( $user_marks_data, 'obtained' ) );
+                    $students_data[$student_id]['results'][$subject_id]['unregistered'] = $marks_data['unregistered'];
+                    $students_data[$student_id]['results'][$subject_id]['marks'] = $user_marks_data;
+                    $students_data[$student_id]['results'][$subject_id]['obtained'] = $total_obtained;
+                    if( !isset($subject_wise_highest_obtained_marks[$subject_id]) ) $subject_wise_highest_obtained_marks[$subject_id] = $total_obtained;
+                    if( $subject_wise_highest_obtained_marks[$subject_id] < $total_obtained ) $subject_wise_highest_obtained_marks[$subject_id] = $total_obtained;
+                    $students_data[$student_id]['results'][$subject_id]['exam_marks'] = array_sum($exam_marks_head_wise_data[$subject_id]);
+                    // reducing data
+                $students_data[$student_id]['results'][$subject_id]['exam_date'] = $exam_date;
+    //                $students_data[$student_id]['results'][$subject_id]['subject_title'] = $subject_title;
+    //                $students_data[$student_id]['results'][$subject_id]['combined_title'] = $combined_title;
+                    $students_data[$student_id]['results'][$subject_id]['connected_subject_id'] = $connected_subject_id;
+                    if( !isset($students_data[$student_id]['total_obtained_marks']) ) $students_data[$student_id]['total_obtained_marks'] = 0;
+                    $students_data[$student_id]['total_obtained_marks'] += array_sum(array_column($user_marks_data, 'obtained')) ;
+
+                }
+            endwhile;
+            wp_reset_postdata();
+        endif;
 
         // Updating combined subject marks heads
         if( $ranking_method != 'marks' ){
@@ -945,7 +950,7 @@ class Result extends Post
 
                                 // Checking if subject is registered or not
                                 // Skip if NOT registered
-                                $unregistered = $students_data[$student_id]['results'][$subject_id]['unregistered'];
+                                $unregistered = $students_data[$student_id]['results'][$subject_id]['unregistered'] ?? null;
                                 $connected_unregistered = !empty($connected_subject_id) && isset($students_data[$student_id]['results'][$connected_subject_id]['unregistered']) && $students_data[$student_id]['results'][$connected_subject_id]['unregistered']  == 1 ? 1 : 0;
 
                                 if($unregistered || $connected_unregistered) {

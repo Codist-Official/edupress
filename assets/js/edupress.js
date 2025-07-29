@@ -1691,3 +1691,21 @@ function insertAttendanceUsersInPopup( res ){
 function confirmBeforeSendCallback(){
     return confirm('Are you sure to proceed on?');
 }
+
+function printIdCardBeforeSend(){
+    let printType = $j("[name='print_type']").val();
+    if( printType === 'students_roll_wise' ){
+        let roll = $j("[name='roll']").val();
+        if( roll === '' ){
+            alert('Please enter roll!');
+            return false;
+        }
+    } else if( printType === 'class_wise' ){
+        let classId = $j("[name='class_id']").val();
+        if( classId === '' ){
+            alert('Please select class!');
+            return false;
+        }
+    }
+    return true;
+}

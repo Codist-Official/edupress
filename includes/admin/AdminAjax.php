@@ -1606,6 +1606,30 @@ class AdminAjax
         );
     }
 
+    /**
+     * Print ID cards 
+     * 
+     * @return array 
+     * 
+     * @since 1.5
+     * @acess public 
+     */
+    public function printIdCard()
+    {
+        $args = [
+            'print_type' => sanitize_text_field($_REQUEST['print_type'] ?? ''),
+            'roll' => sanitize_text_field($_REQUEST['roll'] ?? ''),
+            'class_id' => intval($_REQUEST['class_id'] ?? 0),
+            'section_id' => intval($_REQUEST['section_id'] ?? 0),
+            'shift_id' => intval($_REQUEST['shift_id'] ?? 0),
+            'branch_id' => intval($_REQUEST['branch_id'] ?? 0),
+        ];
+        $filename = PrintMaterial::getBulkIdCardHtml( $args );
+        return array(
+            'status' => 1,
+            'data' => $filename ,
+        );
+    }
 
 }
 

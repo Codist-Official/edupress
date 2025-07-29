@@ -67,7 +67,6 @@ class Admin
 
         $active = array_filter( $features, function($v, $k){
             return EduPress::isActive($k);
-//            return Admin::getSetting($k.'_active') === 'active';
         }, ARRAY_FILTER_USE_BOTH);
 
         $active['subject'] = 'Subject';

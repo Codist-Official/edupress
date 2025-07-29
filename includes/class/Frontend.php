@@ -57,12 +57,9 @@ class Frontend
 
         // Check if the current post content contains your custom shortcode
         if( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'edupress' ) ) {
-
             $classes[] = 'edupress-panel';
-
         }
         $classes[] = has_shortcode( $post->post_content, 'edupress' ) ? 'pppp' : 'xxxxx';
-
         return $classes;
 
     }
@@ -197,7 +194,7 @@ class Frontend
 
         foreach( $post_types as $k => $v ){
 
-            if( in_array($k, array('result', 'grade_table')) && EduPress::isActive('exam')) $menus[$k] = $v;
+            if( in_array($k, array('result', 'grade_table', 'print')) && EduPress::isActive('exam')) $menus[$k] = $v;
             if( !in_array( $k, $post_types_always_active ) && !EduPress::isActive($k) ) continue;
             if( User::currentUserCan( 'read', $k ) ) $menus[$k] = $v;
             
@@ -330,6 +327,7 @@ class Frontend
         if(EduPress::isActive('exam')){
             $always_active_panels[] = 'result';
             $always_active_panels[] = 'grade_table';
+            $always_active_panels[] = 'print';
         }
 
         if( !in_array($panel, $always_active_panels) && !empty($panel) && !$is_active ) return __( "This feature is not active.", 'edupress' );
@@ -410,6 +408,10 @@ class Frontend
             case 'support':
                 $post = new Support();
                 break;
+            
+            case 'print_material':
+                $post = new PrintMaterial();
+                break;
 
             default:
                 break;
@@ -417,21 +419,22 @@ class Frontend
 
         if( !is_user_logged_in() && empty($panel) ) return __( "Please select a menu item.", 'edupress' );
 
-        if( empty($panel) || $panel == 'dashboard' ){
 
-            $html = Statistics::getDashboardStats();
-
-        } else if ( $panel == 'setting' ){
-
-            $html = $post->getSettingsPanel();
-
+        switch($panel){
+            case 'print':
+                $html = PrintMaterial::getPanels();
+                break;
+            case 'dashboard':
+            case '':
+                $html = Statistics::getDashboardStats();
+                break;
+            case 'setting':
+                $html = $post->getSettingsPanel();
+                break;
+            default:
+                $html = !is_null($post) ? $post->getList() : '';
+                break;
         }
-        else {
-
-            $html = !is_null($post) ? $post->getList() : '';
-
-        }
-
         return $this->getTopBreadcrumbBar() . $html;
 
     }

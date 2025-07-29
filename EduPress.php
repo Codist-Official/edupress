@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.5
+Version: 1.5.1
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -35,6 +35,16 @@ if ( !defined( 'EDUPRESS_CSS_URL') ) define( 'EDUPRESS_CSS_URL', EDUPRESS_URL . 
 if ( !defined( 'EDUPRESS_JS_URL') ) define( 'EDUPRESS_JS_URL', EDUPRESS_URL . 'assets/js/' );
 
 if( !defined( 'EDUPRESS_SEND_SMS') ) define( 'EDUPRESS_SEND_SMS', true );
+
+if( !defined( 'EDUPRESS_TEMPLATES_DIR') ) define( 'EDUPRESS_TEMPLATES_DIR', EDUPRESS_PATH . '/templates/' );
+
+if( !defined( 'EDUPRESS_ID_TEMPLATES_DIR') ) define( 'EDUPRESS_ID_TEMPLATES_DIR', EDUPRESS_TEMPLATES_DIR . 'id-card/' );
+
+if( !defined( 'EDUPRESS_ID_TEMPLATES_URL') ) define( 'EDUPRESS_ID_TEMPLATES_URL', EDUPRESS_URL . 'templates/id-card/' );
+
+if( !defined( 'EDUPRESS_ID_TEMPLATES_IMG_URL') ) define( 'EDUPRESS_ID_TEMPLATES_IMG_URL', EDUPRESS_ID_TEMPLATES_URL . 'assets/img/' );
+
+if( !defined( 'EDUPRESS_ID_TEMPLATES_CSS_URL') ) define( 'EDUPRESS_ID_TEMPLATES_CSS_URL', EDUPRESS_ID_TEMPLATES_URL . 'assets/css/' );
 
 require EDUPRESS_LIB_DIR . 'plugin-update-checker/plugin-update-checker.php';
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
@@ -69,7 +79,6 @@ class EduPress
     {
 
         if ( is_null( self::$_instance ) ) self::$_instance = new self();
-
         return self::$_instance;
 
     }
@@ -1246,6 +1255,10 @@ class EduPress
             'setting' => array(
                 'title' => 'Settings',
                 'icon' => 'fa-solid fa-gear',
+            ),
+            'print' => array(
+                'title' => 'Print Materials',
+                'icon' => 'fa-solid fa-print',
             ),
             'support' => array(
                 'title' => 'Support',

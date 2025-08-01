@@ -194,7 +194,8 @@ class Frontend
 
         foreach( $post_types as $k => $v ){
 
-            if( in_array($k, array('result', 'grade_table', 'print')) && EduPress::isActive('exam')) $menus[$k] = $v;
+            if( in_array($k, array('result', 'grade_table')) && EduPress::isActive('exam')) $menus[$k] = $v;
+            if( $k == 'print' && EduPress::isActive('exam') && current_user_can('edit_setting') ) $menus[$k] = $v;
             if( !in_array( $k, $post_types_always_active ) && !EduPress::isActive($k) ) continue;
             if( User::currentUserCan( 'read', $k ) ) $menus[$k] = $v;
             

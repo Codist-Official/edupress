@@ -170,14 +170,7 @@ class User
     {
 
         $metadata = $this->getUsermeta();
-
-
-        if ( isset($metadata[$key]) ){
-
-            return $single ? $metadata[$key][0] : $metadata[$key];
-
-        }
-
+        if ( isset($metadata[$key]) ) return $single ? $metadata[$key][0] : $metadata[$key];
         return null;
 
     }
@@ -198,13 +191,9 @@ class User
     {
 
         $update = update_user_meta( $this->id, $key, $value, $prev_value );
-
         $usermeta = $this->getUsermeta();
-
         $usermeta[$key] = get_user_meta( $this->id, $key, false );
-
         $this->setUsermeta( $usermeta );
-
         return $update;
 
     }
@@ -224,13 +213,9 @@ class User
     {
 
         $delete = delete_user_meta( $this->id, $key, $prev_value );
-
         $usermeta = $this->getUsermeta();
-
         $usermeta[$key] = get_user_meta( $this->id, $key, false );
-
         $this->setUsermeta( $usermeta );
-
         return $delete;
 
     }
@@ -447,6 +432,33 @@ class User
         foreach($caps as $cap){
             $manager->add_cap($cap);
         }
+    }
+
+    /**
+     * Get User Academic start date
+     * 
+     * @return string 
+     * 
+     * @since 1.5.1
+     * @access public 
+     */
+    public function getDate( $type = '' )
+    {
+        switch($type){
+            case 'start_date':
+                $start_date = $this->getMeta('start_date');
+                if(!$start_date) return '';
+                return date('Y-m-d', strtotime($start_date));
+            case 'end_date':
+                $end_date = $this->getMeta('end_date');
+                if(!$end_date) return '';
+                return date('Y-m-d', strtotime($end_date));
+            case 'register_date':
+                return date('Y-m-d', strtotime($this->getMeta('user_registered')));
+            default:
+                break;
+        }
+
     }
 
     /**
@@ -2816,29 +2828,25 @@ class User
         if( Admin::getSetting('attendance_active') !== 'active'  ) return array( 'error' => 'Attendance Inactive' );
         if ( !$this->id )return array('error' => 'Invalid user id');
 
-        $id_selector = Admin::getSetting('section_active') == 'active' ? 'section_id' : 'class_id';
-        $section_id = $this->getMeta($id_selector);
+        $section_id = EduPress::isActive('section') ? $this->getMeta('section_id') : $this->getMeta('class_id');
         $calendar_data = get_post_meta( $section_id, 'academic_calendar', true );
         if(empty($calendar_data)) {
-            $section_id = $this->getMeta('class_id');
+            $section_id = EduPress::isActive('class') ? $this->getMeta('class_id') : $this->getMeta('shift_id');
         }
 
 
         if(empty($start_date)){
-
-            $user_reg_date = $this->getRegisterDate('Y-m-d');
+            $user_reg_date = $this->getDate('start_date');
             $section_start_date = get_post_meta( $section_id, 'start_date', true );
-            $start_date = empty($section_start_date) || strtotime($section_start_date) < strtotime($user_reg_date) ? $user_reg_date : $section_start_date;
-
+            $start_date = empty($user_reg_date) ? $section_start_date : $user_reg_date;
         }
 
         if(empty($end_date)){
-
             $today = current_time( 'Y-m-d' );
             $section_end_date = get_post_meta( $section_id, 'end_date', true );
-
-            $end_date = empty($section_end_date) || strtotime($section_end_date) > strtotime($today) ? $today : $section_end_date;
-
+            $user_end_date = $this->getDate('end_date');
+            $is_end_date = $user_end_date < $section_end_date ? $user_end_date : $section_end_date;
+            $end_date = empty($is_end_date) || strtotime($is_end_date) > strtotime($today) ? $today : $is_end_date;
         }
 
         $dt_start = new \DateTime($start_date);
@@ -2850,19 +2858,17 @@ class User
         // Getting calendar details
         $calendar = new Calendar( $section_id );
         $cal_stats = $calendar->getStats( $start_date, $end_date );
-        // echo "<pre>";
-        // var_dump($cal_stats);
-        // echo "</pre>";
 
         // Response data
         $res = [];
         $res['start_date'] = $start_date;
         $res['end_date']  = $end_date;
         $res['total_days'] = $diff;
-        $res['open'] = $cal_stats['count_open'];
-        $res['close'] = $cal_stats['count_close'];
+        $res['o'] = $cal_stats['count_o'];
+        $res['c'] = $cal_stats['count_c'];
+        $res['h'] = $cal_stats['count_h'];
+        $res['u'] = $cal_stats['count_u'];
         $res['present_data'] = [];
-
 
         // Finding user logs
         global $wpdb;
@@ -2875,12 +2881,12 @@ class User
         }
 
         $res['present'] = count($res['present_data']);
-        $res['absent'] = $res['open'] - $res['present'];
-        $res['present_percentage'] = $res['open'] > 0 ? number_format($res['present'] / $res['open'] * 100, 2) : 0;
+        $absent = $res['o'] - $res['present'];
+        if($absent < 0) $absent = 0;
+        $res['absent'] = $absent;
+        $res['present_percentage'] = $res['0'] > 0 ? number_format($res['present'] / $res['o'] * 100, 2) : 0;
 
         return $res;
-
-
     }
 
     /**
@@ -2907,15 +2913,21 @@ class User
                 </tr>
                 <tr>
                     <th><?php _e( 'Open', 'edupress' ); ?> </th>
-                    <td><?php echo $data['open'] ; ?></td>
+                    <td><?php echo $data['o'] ; ?> days</td>
                     <th><?php _e( 'Close', 'edupress' ); ?></th>
-                    <td><?php echo $data['close'] ; ?></td>
+                    <td><?php echo $data['c'] ; ?> days</td>
+                </tr>
+                <tr>
+                    <th><?php _e( 'Holiday', 'edupress' ); ?> </th>
+                    <td><?php echo $data['h'] ; ?> days</td>
+                    <th><?php _e( 'No data', 'edupress' ); ?> </th>
+                    <td><?php echo (int) $data['u'] ; ?> days</td>
                 </tr>
                 <tr>
                     <th><?php _e( 'Present', 'edupress' ); ?></th>
-                    <td><?php echo $data['present'] ; ?></td>
+                    <td><?php echo $data['present'] ; ?> days</td>
                     <th><?php _e( 'Absent', 'edupress' ); ?></th>
-                    <td><?php echo $data['absent'] ; ?></td>
+                    <td><?php echo $data['absent'] ; ?> days</td>
                 </tr>
                 <tr>
                     <th><?php _e( 'Presence %', 'edupress' ); ?></th>

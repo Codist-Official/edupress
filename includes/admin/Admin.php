@@ -1185,6 +1185,18 @@ class Admin
                     )
                 );
 
+                $daynames = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                $fields['attendance_weekend_holidays'] = array(
+                    'type'  => 'checkbox',
+                    'name'  => 'attendance_weekend_holidays',
+                    'settings' => array(
+                        'options' => array_combine($daynames, $daynames),
+                        'value' => Admin::getSetting('attendance_weekend_holidays'),
+                        'label' => 'Attendance Weekly Holiday',
+                        'id' => 'attendance_weekend_holidays',
+                    )
+                );
+
                 break;
 
             case 'user':

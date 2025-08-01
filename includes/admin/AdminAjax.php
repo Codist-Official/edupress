@@ -1054,10 +1054,10 @@ class AdminAjax
 
         for( $i = 0; $i < count($_REQUEST['date']); $i++ ){
             $date = $_REQUEST['date'][$i];
-            $is_open = $_REQUEST['is_open'][$i];
+            $status = $_REQUEST['day_status'][$i];
             $note = $_REQUEST['note'][$i];
             $data['data'][$date] = array(
-                'is_open' => $is_open,
+                'status' => $status,
                 'note' => $note
             );
         }

@@ -309,19 +309,17 @@ class Calendar extends Post
             jQuery(document).ready(function(){
 
                 // Bulk update
-                $j(document).on( 'change', ':input[name=dayBulkSelect]', function(e){
+                $j(document).on( 'change', ".bulkStatusUpdate", function(e){
                     let dayName = $j(this).data('dayname');
-                    let isOpen = $j(this).val();
-                    $j(`li[data-dayname='${dayName}']`).attr('data-open', isOpen);
-                    $j(`li[data-dayname='${dayName}'] :input[name='is_open[]']`).val(isOpen);
-                    $j(`li[data-dayname='${dayName}'] :input[name=changeDayStatus]`).prop( 'checked', parseInt(isOpen) === 1);
+                    let dayStatus = $j(this).val();
+                    let month = $j(this).data('month');
+                    $j(`li[data-dayname='${dayName}'][data-month='${month}']`).attr('data-status', dayStatus);
+                    $j(`li[data-dayname='${dayName}'][data-month='${month}'] .calendar-day-status`).val(dayStatus);
                 })
 
-                // Day change
-                $j(document).on( 'click touch', ':input[name=changeDayStatus]', function(e){
-                    let isOpen = $j(this).is(':checked');
-                    $j(this).parents('li').attr('data-open', isOpen ? 1 : 0 );
-                    $j(this).parents('li').find(`:input[name='is_open[]']`).val( isOpen ? 1 : 0 );
+                $j(document).on('change', '.calendar-day-status', function(e){
+                    let status = $j(this).val();
+                    $j(this).parent('li').attr('data-status', status);
                 })
 
                 // Bulk note update
@@ -334,6 +332,10 @@ class Calendar extends Post
             })
         </script>
         <style>
+
+            .calendarMonthSelector{
+                margin-bottom: 20px;
+            }
             table.edupress-table tr th,
             table.edupress-table tr td{
                 padding: 3px 5px !important;
@@ -342,13 +344,55 @@ class Calendar extends Post
             .calendar-month ul li{
                 position: relative;
             }
-            .fixed-calendar-day{
+            .header_weekly_title_wrap,
+            .header_weekly_selector_wrap{
+                display: flex;
+                font-size: 12px;
+                flex-wrap: no-wrap;
+                flex: 1;
+                justify-content: space-between;
+                align-items: center;
+                gap: 3px;
+
+            }
+
+            select.calendar-day-status{
+                padding: 3px !important;
+                font-size: 10px !important;
+                width: auto !important;
+                position: absolute;
+                left: 5px;
+                top: 5px;
+            }
+            .header_weekly_selector_wrap input,
+            .header_weekly_selector_wrap label{
+                font-size: 10px !important;
+                align-items: center;
+            }
+
+            .header-calendar-day,
+            .header-calendar-month{
                 font-size: 10px;
                 font-weight: bold;
                 color: #aaa;
-                position: absolute;
-                left: 10px;
-                top: 20px;
+                display: inline-block;
+            }
+            .legend_open, li[data-status='o']{ background-color: rgba( 0, 255, 0, 0.1); }
+            .legend_holiday, li[data-status='h']{ background-color: rgba(255, 255, 0, 0.1); }
+            .legend_close, li[data-status='c']{ background-color: rgba(255, 0, 0, 0.1); }
+            .legend_open,
+            .legend_close,
+            .legend_holiday{
+                height: 20px;
+                width: 100px;
+                display: inline-block;
+                font-size:12px;
+                text-align: center;
+                line-height: 20px;
+                border: 1px solid #fff;
+                margin: 0 10px;
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+                border-radius: 10px;
             }
         </style>
         <div class="edupress-calendar-wrap">
@@ -432,8 +476,30 @@ class Calendar extends Post
                 if(User::currentUserCan('edit', 'calendar')):
                     echo "<ul class='calendar-month' {$default_hide_style} data-my='{$day->format('Y-m')}' data-month='{$day->format('m')}' data-year='{$day->format('Y')}'>";
                     foreach($all_week_days as $week_day){
+                        $month_week_day = $day->format('m') . "_{$week_day}";
                         $monthly_day_selector = $week_day . $day->format('_m_y');
-                        echo "<li><span class='fixed-calendar-day'>{$day->format('F')}</span><input data-dayname='{$week_day}' data-month='{$day->format('m')}' data-year='{$day->format('Y')}' id='monthly_day_selector_{$monthly_day_selector}' type='checkbox' class='monthly_day_selector' name='monthly_day_selector'> <label for='monthly_day_selector_{$monthly_day_selector}'>{$week_day}</label></li>";
+                        $month = $day->format('F');
+                        echo "
+                            <li>
+                                <div class='header_weekly_title_wrap'>
+                                    <span style='float:left' class='header-calendar-day'>{$day->format('F')}</span>
+                                    <span style='float:right' class='header-calendar-month' for='monthly_day_selector_{$monthly_day_selector}'>{$week_day}</span>
+                                </div>
+                                <div class='header_weekly_selector_wrap'>
+                                    <span title='Open' class='weekly_selector'>
+                                        <input class='bulkStatusUpdate' id='{$month_week_day}_open' data-month='{$month}' data-dayname='{$week_day}' type='radio' name='weekly_selector_{$week_day}' value='o'>
+                                        <label for='{$month_week_day}_open'>Open</label>
+                                    </span>
+                                    <span title='Close' class='weekly_selector'>
+                                        <input class='bulkStatusUpdate' id='uid_{$month_week_day}_close' data-month='{$month}' data-dayname='{$week_day}' type='radio' name='weekly_selector_{$week_day}' value='c'>
+                                        <label for='uid_{$month_week_day}_close'>Close</label>
+                                    </span>
+                                    <span title='Holiday' class='weekly_selector'>
+                                        <input class='bulkStatusUpdate' id='uid_{$month_week_day}_holiday' data-month='{$month}' data-dayname='{$week_day}' type='radio' name='weekly_selector_{$week_day}' value='h'>
+                                        <label for='uid_{$month_week_day}_holiday'>Holiday</label>
+                                    </span>
+                                </div>
+                            </li>";
                     }
                     echo "</ul>";
                 endif;
@@ -474,25 +540,28 @@ class Calendar extends Post
             $uniqid = uniqid();
             $date = $day->format('Y-m-d');
             $date_data = $data[$date] ?? [];
-            $isopen = $date_data['is_open'] ?? '';
+            $weekend_holidays = Admin::getSetting('attendance_weekend_holidays');
+            if(!is_array($weekend_holidays)) $weekend_holidays = explode(',', $weekend_holidays);
+            $is_weekend_holiday = in_array($day->format('l'), $weekend_holidays) ? 'h' : '';
+            $status = $date_data['status'] ?? $is_weekend_holiday;
             $note = $date_data['note'] ?? '';
-            $checked = $isopen ? ' checked ' : '';
             $disabled = $can_edit ? "" : " disabled='disabled' aria-disabled='true' ";
             ?>
-                <li data-open="<?php echo $isopen; ?>" data-dayname="<?php echo $day->format('l'); ?>" data-date="<?php echo $date;?>" data-year="<?php echo $day->format('Y'); ?>" data-day="<?php echo $day->format('l');?>" data-month="<?php echo $day->format('F'); ?>" data-year="<?php echo $day->format('Y'); ?>">
+                <li data-status="<?php echo $status; ?>" data-dayname="<?php echo $day->format('l'); ?>" data-date="<?php echo $date;?>" data-year="<?php echo $day->format('Y'); ?>" data-day="<?php echo $day->format('l');?>" data-month="<?php echo $day->format('F'); ?>" data-year="<?php echo $day->format('Y'); ?>">
                     <input type="hidden" name="date[]" value="<?php echo $date; ?>">
-                    <input data-dayname="<?php echo $day->format('l'); ?>" data-month="<?php echo $day->format('m'); ?>" data-year="<?php echo $day->format("Y"); ?>" type="hidden" name="is_open[]" value="<?php echo $isopen; ?>">
                     <span class="fixed-calendar-day"><?php echo $day->format('l'); ?> </span>
                     <?php echo $day_month; ?>
                     <?php if( $can_edit ) : ?>
-                        <input data-dayname="<?php echo $day->format('l'); ?>" data-month="<?php echo $day->format('m'); ?>" data-year="<?php echo $day->format("Y"); ?>" type="checkbox" name="changeDayStatus" id="<?php echo $uniqid;?>" value="<?php $isopen; ?>" <?php echo $checked; ?>>
+                        <select name=day_status[] class='calendar-day-status' data-year="<?php echo $day->format('Y'); ?>" data-dayname="<?php echo $day->format('l'); ?>" data-month="<?php echo $day->format('m'); ?>" <?php echo $day->format('Y'); ?> data-date='<?php echo $date; ?>' id="<?php echo $uniqid; ?>">
+                            <option value='o' <?php echo $status == 'o' ? 'selected' : ''; ?>>Open</option>
+                            <option value='c' <?php echo $status == 'c' ? 'selected' : ''; ?>>Close</option>
+                            <option value='h' <?php echo $status == 'h' ? 'selected' : ''; ?>>Holiday</option>
+                        </select>
                         <textarea placeholder="" style="height: 50px;" rows="1" name="note[]" <?php echo $disabled; ?>><?php echo $note; ?></textarea>
                     <?php else: ?>
                         <div class="calendar-note" title="<?php echo $note; ?>"><?php echo $note; ?></div>
                     <?php endif; ?>
                 </li>
-
-
             <?php
 
             // Month end
@@ -689,7 +758,7 @@ class Calendar extends Post
                     </tr>
                 </table>
                 <div class="legends-wrap">
-                    Legends: <span class="legend open"></span> Open <span class="legend closed"></span> Closed
+                    Legends: <span class="legend_open">Open</span>  <span class="legend_close">Closed</span>  <span class="legend_holiday">Holiday</span> 
                 </div>
                 <?php echo self::getCalendar( $start_date, $end_date, $data['data'] ?? [] ); ?>
                 <div class="form-row cal-save-btn" style="display:none;">
@@ -747,11 +816,14 @@ class Calendar extends Post
 
         $response = [];
         $response['details'] = [];
-        $response['open'] = [];
-        $response['close'] = [];
-        $response['undecided'] = [];
+        $response['o'] = [];
+        $response['c'] = [];
+        $response['h'] = [];
+        $response['u'] = [];
 
         $calendar = maybe_unserialize(get_post_meta( $this->id, 'academic_calendar', true ) );
+        $weekend_holidays = Admin::getSetting('attendance_weekend_holidays');
+        if(!is_array($weekend_holidays)) $weekend_holidays = explode(',', $weekend_holidays);
 
         if(empty($calendar)) $calendar = [];
         if(!isset($calendar['data'])) $calendar['data'] = [];
@@ -762,22 +834,21 @@ class Calendar extends Post
             $day_data = $data[$day] ?? null;
             $response['details'][] = $day_data;
 
-            if(empty($day_data)){
-                $response['open'][] = $day;
-                continue;
-            }
+            $status = $day_data['status'] ?? '';
+            $day_formatted= new \DateTime($day);
+            if(empty($status) && in_array($day_formatted->format('l'), $weekend_holidays)) $status = 'h';
+            if(empty($status)) $status = 'u';
 
-            $is_close = $day_data['is_open'] == 0;
-            $is_open = !$is_close;
-            $undecided = empty($day_data['is_open']);
-            if($is_open) $response['open'][] = $day;
-            if($is_close) $response['close'][] = $day;
-            if($undecided) $response['undecided'][] = $day;
-        }
+            if($status == 'o') $response['o'][] = $day;
+            if($status == 'c') $response['c'][] = $day;
+            if($status == 'h') $response['h'][] = $day;
+            if($status == 'u') $response['u'][] = $day;
+         }
 
-        $response['count_open']= count($response['open']);
-        $response['count_close']= count($response['close']);
-        $response['count_undecided']= count($response['undecided']);
+        $response['count_o']= count($response['o']);
+        $response['count_c']= count($response['c']);
+        $response['count_h']= count($response['h']);
+        $response['count_u']= count($response['u']);
         return $response;
     }
 

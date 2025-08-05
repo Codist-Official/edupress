@@ -173,9 +173,9 @@ class PrintMaterial{
                 'value'     => 'printIdCardBeforeSend',
             )
         );
-        $fields['after_success_callback'] = array(
+        $fields['success_callback'] = array(
             'type'      => 'hidden',
-            'name'      => 'after_success_callback',
+            'name'      => 'success_callback',
             'settings'  => array(
                 'value'     => 'printIdCardAfterSuccess',
             )

@@ -2884,7 +2884,7 @@ class User
         $absent = $res['o'] - $res['present'];
         if($absent < 0) $absent = 0;
         $res['absent'] = $absent;
-        $res['present_percentage'] = $res['0'] > 0 ? number_format($res['present'] / $res['o'] * 100, 2) : 0;
+        $res['present_percentage'] = $res['o'] > 0 ? number_format($res['present'] / $res['o'] * 100, 2) : 0;
 
         return $res;
     }

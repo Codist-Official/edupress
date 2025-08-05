@@ -279,8 +279,6 @@ class Result extends Post
                 </table>
             </div>
         </form>
-
-
         <?php
         return ob_get_clean();
 

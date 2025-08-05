@@ -200,7 +200,6 @@ class AdminAjax
 
         unset($_REQUEST['ajax_action']);
 
-
         return array(
             'status'    => $status,
             'data'      => $status ? $success_msg : 'Error occurred!',
@@ -313,6 +312,10 @@ class AdminAjax
                 $post = new Notice($post_id);
                 break;
 
+            case 'transaction':
+                $post = new Transaction($post_id);
+                break;
+
             case 'calendar':
                 $post = new Calendar($post_id);
                 return array(
@@ -347,7 +350,13 @@ class AdminAjax
     {
 
         $post_id = intval($_REQUEST['post_id']);
-        $delete = wp_delete_post( $post_id );
+        $post_type = sanitize_text_field($_REQUEST['post_type'] ?? '');
+        if($post_type == 'transaction'){
+            $post = new Transaction($post_id);
+            $delete = $post->delete();
+        } else {
+            $delete = wp_delete_post( $post_id );
+        }
         return array(
             'status'    => $delete ? 1 : 0,
             'data'      => $delete ? 'Successfully deleted!' : 'Error occurred!',
@@ -423,8 +432,6 @@ class AdminAjax
             default:
                 $post = new Post();
                 break;
-
-
         }
 
         return array(
@@ -590,11 +597,7 @@ class AdminAjax
     {
 
         $user = new User( intval($_REQUEST['user_id']) );
-        if( !$user->id ) {
-
-            return array();
-
-        }
+        if( !$user->id ) return [];
 
         return array(
             'status'    => 1,
@@ -632,7 +635,6 @@ class AdminAjax
             if( in_array( $k, $skip_fields ) ) continue;
             $metadata[$k] = $v;
         }
-
 
         $update = $user->edit( $userdata, $metadata );
         $_REQUEST['post_id'] = intval($_REQUEST['user_id'] );
@@ -1629,6 +1631,21 @@ class AdminAjax
             'status' => 1,
             'data' => $filename ,
         );
+    }
+
+    /**
+     * Send transaction SMS 
+     * 
+     * @return array 
+     * 
+     * @since 1.5.3
+     * @access public 
+     */
+    public function smsTransaction()
+    {
+        $id = intval($_REQUEST['post_id']);
+        $transaction = new Transaction($id);
+        return $transaction->sms();
     }
 
 }

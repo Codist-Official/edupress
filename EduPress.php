@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.5.2
+Version: 1.5.3
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -18,32 +18,20 @@ defined( 'ABSPATH' ) || die();
 /**
  * Definining plugin dir path and url
  */
-if ( !defined('EDUPRESS_PATH') ) define('EDUPRESS_PATH', plugin_dir_path( __FILE__ ) );
-
-if ( !defined( 'EDUPRESS_CLASS_DIR') ) define( 'EDUPRESS_CLASS_DIR', EDUPRESS_PATH .'includes/class/' );
-
-if ( !defined( 'EDUPRESS_ADMIN_DIR') ) define( 'EDUPRESS_ADMIN_DIR', EDUPRESS_PATH .'includes/admin/' );
-
-if ( !defined( 'EDUPRESS_LIB_DIR') ) define( 'EDUPRESS_LIB_DIR', EDUPRESS_PATH .'includes/libs/' );
-
-if ( !defined( 'EDUPRESS_URL') ) define( 'EDUPRESS_URL', plugin_dir_url( __FILE__ ) );
-
-if ( !defined( 'EDUPRESS_IMG_URL') ) define( 'EDUPRESS_IMG_URL', EDUPRESS_URL . 'assets/img/' );
-
-if ( !defined( 'EDUPRESS_CSS_URL') ) define( 'EDUPRESS_CSS_URL', EDUPRESS_URL . 'assets/css/' );
-
-if ( !defined( 'EDUPRESS_JS_URL') ) define( 'EDUPRESS_JS_URL', EDUPRESS_URL . 'assets/js/' );
-
+if( !defined( 'EDUPRESS_VERSION') ) define( 'EDUPRESS_VERSION', '1.5.2' );
+if( !defined( 'EDUPRESS_PATH') ) define('EDUPRESS_PATH', plugin_dir_path( __FILE__ ) );
+if( !defined( 'EDUPRESS_CLASS_DIR') ) define( 'EDUPRESS_CLASS_DIR', EDUPRESS_PATH .'includes/class/' );
+if( !defined( 'EDUPRESS_ADMIN_DIR') ) define( 'EDUPRESS_ADMIN_DIR', EDUPRESS_PATH .'includes/admin/' );
+if( !defined( 'EDUPRESS_LIB_DIR') ) define( 'EDUPRESS_LIB_DIR', EDUPRESS_PATH .'includes/libs/' );
+if( !defined( 'EDUPRESS_URL') ) define( 'EDUPRESS_URL', plugin_dir_url( __FILE__ ) );
+if( !defined( 'EDUPRESS_IMG_URL') ) define( 'EDUPRESS_IMG_URL', EDUPRESS_URL . 'assets/img/' );
+if( !defined( 'EDUPRESS_CSS_URL') ) define( 'EDUPRESS_CSS_URL', EDUPRESS_URL . 'assets/css/' );
+if( !defined( 'EDUPRESS_JS_URL') ) define( 'EDUPRESS_JS_URL', EDUPRESS_URL . 'assets/js/' );
 if( !defined( 'EDUPRESS_SEND_SMS') ) define( 'EDUPRESS_SEND_SMS', true );
-
 if( !defined( 'EDUPRESS_TEMPLATES_DIR') ) define( 'EDUPRESS_TEMPLATES_DIR', EDUPRESS_PATH . '/templates/' );
-
 if( !defined( 'EDUPRESS_ID_TEMPLATES_DIR') ) define( 'EDUPRESS_ID_TEMPLATES_DIR', EDUPRESS_TEMPLATES_DIR . 'id-card/' );
-
 if( !defined( 'EDUPRESS_ID_TEMPLATES_URL') ) define( 'EDUPRESS_ID_TEMPLATES_URL', EDUPRESS_URL . 'templates/id-card/' );
-
 if( !defined( 'EDUPRESS_ID_TEMPLATES_IMG_URL') ) define( 'EDUPRESS_ID_TEMPLATES_IMG_URL', EDUPRESS_ID_TEMPLATES_URL . 'assets/img/' );
-
 if( !defined( 'EDUPRESS_ID_TEMPLATES_CSS_URL') ) define( 'EDUPRESS_ID_TEMPLATES_CSS_URL', EDUPRESS_ID_TEMPLATES_URL . 'assets/css/' );
 
 require EDUPRESS_LIB_DIR . 'plugin-update-checker/plugin-update-checker.php';
@@ -126,6 +114,9 @@ class EduPress
         // Cron task
         add_action('ep_every_day_event', [ $this, 'epDailyCronTask' ] );
 
+        // database upgrade 
+        add_action( 'plugins_loaded', [$this, 'checkDatabaseUpgrade'] );
+
         // Hide top bar
         add_filter( 'show_admin_bar' , function($show){
             if(!current_user_can('manage_options')) return false;
@@ -155,28 +146,20 @@ class EduPress
 
         // Include all sms gateways
         foreach ( glob( EDUPRESS_CLASS_DIR . '/sms-gateways/' . '*.php') as $file ) {
-
             include( $file );
-
         }
 
         // Include all class
         foreach ( glob( EDUPRESS_CLASS_DIR . '*.php') as $file ) {
-
             // Skip post class
             if ( str_contains( $file, 'Post.php' ) ) continue;
-
             include( $file );
-
         }
 
         // Include admin class
         foreach ( glob( EDUPRESS_ADMIN_DIR . '*.php') as $file ) {
-
             if ( str_contains( $file, 'Admin.php' ) ) continue;
-
             include( $file );
-
         }
 
     }
@@ -285,6 +268,7 @@ class EduPress
             t_note varchar(1024) NULL,
             t_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             record_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            update_log text NULL, 
             PRIMARY KEY (id),
             INDEX transactions (branch_id,shift_id,class_id,section_id,is_inflow,amount,discount,user_id, account,method,wc_order_id,input_by,status)
         ) $charset_collate";
@@ -304,6 +288,22 @@ class EduPress
         ) $charset_collate";
         dbDelta( $sql );
 
+        // Update database 
+        update_option( 'edupress_version', EDUPRESS_VERSION, 'no');
+
+    }
+
+    /**
+     * Check datase upgrade 
+     * 
+     * @return void 
+     */
+    public function checkDatabaseUpgrade()
+    {
+        $current_version = get_option( 'edupress_version' );
+        if( $current_version !== EDUPRESS_VERSION ) {
+            $this->createCustomTables();
+        }
     }
 
     /**
@@ -781,30 +781,15 @@ class EduPress
     public static function logData( $data, $target = null )
     {
 
-//        if( Admin::getSetting('log_data') == 'inactive' ) return;
-
         if( empty( $target ) ) {
-
             $target_dir = WP_CONTENT_DIR . '/edupress-logs';
-
             $target_file = $target_dir . '/logs-'. current_time('m-d-Y') . '.txt';
-
-            if( !file_exists($target_dir) ){
-
-                mkdir( $target_dir, 0777, true );
-
-            }
+            if( !file_exists($target_dir) ) mkdir( $target_dir, 0777, true );
         }
 
         // Encoding json
-        if(is_array($data) || is_object($data)){
-
-            $data = json_encode($data, true);
-
-        }
-
+        if(is_array($data) || is_object($data)) $data = json_encode($data, true);
         $data = date('Y-m-d h:i:s A : ' ) . $data . "\r\n";
-
         file_put_contents( $target_file, $data . file_get_contents($target_file) );
     }
 
@@ -834,7 +819,6 @@ class EduPress
     {
 
         $notice = empty( $notice ) ? '(Only for pro version)' : sanitize_text_field($notice);
-
         return self::hasValidProLicense() ? '' : "<span class='edupress-form-pro-notice'>" . __( $notice, 'edupress' ) . "</span>";
 
     }
@@ -866,6 +850,31 @@ class EduPress
 
         // tablesorter file
         wp_enqueue_script( 'tablesorter', EDUPRESS_JS_URL.'jquery.tablesorter.min.js', array('jquery'), rand(1,1000000) );
+
+        // localize script 
+        wp_localize_script(
+            'edupress',
+            'edupress',
+            array(
+                'ajax_action' => 'edupress_admin_ajax',
+                'ajax_url' => admin_url('admin-ajax.php'),
+                'img_dir_url' => EDUPRESS_IMG_URL,
+                'wpnonce' => wp_create_nonce('edupress'),
+                'branch_active' => EduPress::isActive('branch') ? 1 : 0,
+                'shift_active' => EduPress::isActive('shift') ? 1 : 0,
+                'class_active' => EduPress::isActive('class') ? 1 : 0,
+                'section_active' => EduPress::isActive('section') ? 1 : 0,
+                'subject_active' => EduPress::isActive('subject') ? 1 : 0,
+                'term_active' => EduPress::isActive('term') ? 1 : 0,
+                'sms_balance_refresh_sec' => 60,
+                'sms_rate' => Admin::getSetting( 'sms_rate', 0.25 ),
+                'sms_footer_len' => !empty(Admin::getSetting('sms_footer')) ? strlen(Admin::getSetting('sms_footer')) + 2 : 0,
+                'page_url' => get_permalink(get_the_ID()),
+                'active_panel' => $_REQUEST['panel'] ?? "",
+                'transaction_sms' => Admin::getSetting('transaction_sms') == 'active' ? 1 : 0,
+                'transaction_print' => Admin::getSetting('transaction_print') == 'active' ? 1 : 0,
+            )
+        );
 
     }
 
@@ -927,23 +936,6 @@ class EduPress
         </style>
 
         <script>
-            var edupress = {};
-            edupress.ajax_action = 'edupress_admin_ajax';
-            edupress.ajax_url = '<?php echo admin_url('admin-ajax.php'); ?>';
-            edupress.img_dir_url = '<?php echo EDUPRESS_IMG_URL; ?>';
-            edupress.wpnonce = '<?php echo wp_create_nonce('edupress'); ?>';
-            edupress.branch_active = <?php echo EduPress::isActive('branch') ? 1 : 0; ?>;
-            edupress.shift_active = <?php echo EduPress::isActive('shift') ? 1 : 0; ?>;
-            edupress.class_active = <?php echo EduPress::isActive('class') ? 1 : 0; ?>;
-            edupress.section_active = <?php echo EduPress::isActive('section') ? 1 : 0; ?>;
-            edupress.subject_active = <?php echo EduPress::isActive('subject') ? 1 : 0; ?>;
-            edupress.term_active = <?php echo EduPress::isActive('term') ? 1 : 0; ?>;
-            edupress.sms_balance_refresh_sec = 60;
-            edupress.sms_rate = <?php echo Admin::getSetting( 'sms_rate', 0.25 ); ?>;
-            edupress.sms_footer_len = <?php $sms_footer = Admin::getSetting('sms_footer'); echo !empty($sms_footer) ? strlen($sms_footer) + 2 : 0; ?>;
-            edupress.page_url = '<?php echo get_permalink(get_the_ID()); ?>';
-            edupress.active_panel = '<?php echo $_REQUEST['panel'] ?? ""; ?>';
-
             <?php
 
                 // Branches with id and name

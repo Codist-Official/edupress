@@ -257,14 +257,14 @@ table, tr, td, th{
         background-color: $color-success;
       }
       &.row-error{
-        background-color: $color-danger !important;
+        background-color: $color-danger-light !important;
         td{
-          background-color: $color-danger !important;
+          background-color: $color-danger-light !important;
         }
       }
     }
   }
-}
+} 
 
 .edupress-table-wrap{
   table{

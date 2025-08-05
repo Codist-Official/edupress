@@ -168,7 +168,7 @@ jQuery(document).ready(function(){
             beforeSend: function (){
                 clog(data);
                 if( typeof window[beforeSendCallback] !== 'undefined' && typeof window[beforeSendCallback] === 'function' ){
-                    let r = window[beforeSendCallback]( { data: data}, ele );
+                    let r = window[beforeSendCallback]( { data: data }, ele );
                     if( !r ) return false;
                 } else {
                     showEduPressLoading();
@@ -209,9 +209,7 @@ jQuery(document).ready(function(){
         clog(`BeforeSend: ${beforeSendCallback} Success: ${successCallback} Error: ${errorCallback}`);
 
         let ele = $j(this);
-
         let data = $j(this).serialize();
-
         let dataAttr = $j(this).data();
         $j.each( dataAttr, function( k, v ){
             data += `&${k}=${v}`;
@@ -268,13 +266,15 @@ jQuery(document).ready(function(){
         branchId = parseInt(branchId);
 
         // Checking if shift is active or not
-        if( edupress.shift_active === 1 ) {
+        if( edupress.shift_active == 1 ) {
 
             // Removing existing options
             $j(":input[name=shift_id] option").each(function(){
                 let v = $j(this).attr('value');
                 if( v !== '' ) $j(this).remove();
             })
+
+            clog(edupress.shifts);
 
             // Adding new options
             for( i in edupress.shifts ){
@@ -283,7 +283,7 @@ jQuery(document).ready(function(){
                 $j(":input[name=shift_id]").append(`<option value='${edupress.shifts[i]['id']}' ${selected}>${edupress.shifts[i]['title']}</option>`);
             }
 
-        } else if (edupress.class_active === 1) {
+        } else if (edupress.class_active == 1) {
             // Updating class
             // Removing existing options
             $j(":input[name=class_id] option").each(function(){
@@ -311,7 +311,7 @@ jQuery(document).ready(function(){
         })
 
         // Adding new options
-        if(edupress.class_active === 1) {
+        if(edupress.class_active == 1) {
             for( i in edupress.classes ){
                 // if( parseInt(edupress.classes[i]['shift_id']) !== shiftId ) continue;
                 let classId = parseInt(getUrlParameter('class_id'));
@@ -332,7 +332,7 @@ jQuery(document).ready(function(){
         })
 
         // Adding new options
-        if(edupress.section_active === 1) {
+        if(edupress.section_active == 1) {
             for( i in edupress.sections ){
                 if( parseInt(edupress.sections[i]['class_id']) !== classId ) continue;
                 let selected = parseInt(edupress.sections[i]['id']) === parseInt(getUrlParameter('section_id')) ? " selected='selected' " : '';
@@ -361,7 +361,7 @@ jQuery(document).ready(function(){
     let paramClassId = getUrlParameter('class_id');
 
     if(paramBranchId > 0){
-        if(edupress.shift_active === 1){
+        if(edupress.shift_active == 1){
             updateShiftOptions(paramBranchId);
         } else {
             updateClassOptions(paramBranchId);
@@ -374,12 +374,18 @@ jQuery(document).ready(function(){
         updateSectionOptions(paramClassId);
     }
 
-    // Updating branch if branch is 1
+    // Updating branch if branch is 1 only when dom content loaded done 
     let curBranchId = $j(":input[name='branch_id']").val();
-    if( curBranchId === '' && edupress.default_branch_id > 0){
+    if( curBranchId == '' && edupress.default_branch_id > 0){
         $j(":input[name='branch_id']").val(edupress.default_branch_id);
-        updateClassOptions();
+        if(edupress.shift_active == 1){
+            updateShiftOptions(edupress.default_branch_id);
+        } else {
+            updateClassOptions(edupress.default_branch_id);
+            updateSectionOptions(edupress.default_branch_id);
+        }
     }
+
 
     // Ajax link for edit post
     $j(document).on('click', '.edupress-edit-post', function (e){
@@ -522,49 +528,7 @@ jQuery(document).ready(function(){
                 hideEduPressLoading();
                 if(res.status === 1){
                     showEduPressPopup(res.data);
-                    let sel = $j(".edupress-publish-attendance .a_user, .edupress-publish-transaction :input.user_search");
-                    if ( sel.length > 0 ){
-                        sel.autocomplete({
-                            minLength: 2,
-                            source: function( request, response ){
-                                let branchId = sel.parents('form').find(":input[name='branch_id']").val();
-                                $j.ajax({
-                                    url: edupress.ajax_url,
-                                    data: {
-                                        'branch_id': branchId,
-                                        'action': 'edupress_admin_ajax',
-                                        'ajax_action' : 'getTransactionUserDetails',
-                                        'term' : request.term,
-                                        '_wpnonce': edupress.wpnonce,
-                                    },
-                                    dataType: 'json',
-                                    method: 'POST',
-                                    beforeSend:function(){
-                                        if( branchId === '' ){
-                                            alert('Please select a branch first!');
-                                            return false;
-                                        }
-                                    },
-                                    success: function( r ){
-                                        response(r);
-                                    },
-                                    error: function(){}
-                                })
-                            },
-                            select: function( e, ui ){
-                                let userId = ui.item.key;
-                                $j(this).parents('form').find('.t_user_id').val(userId);
-                                $j(this).parents('form').find('.user_id').val(userId);
-                                $j(this).parents('form').find('.shift_id').val(ui.item.shift_id);
-                                $j(this).parents('form').find('.class_id').val(ui.item.class_id);
-                                $j(this).parents('form').find('.section_id').val(ui.item.section_id);
-                                $j('.transaction-user-details').html(ui.item.details);
-                            },
-                            change: function(){},
-                            close: function (){},
-                            open: function(){}
-                        })
-                    }
+                    triggerSearchUser();
                 } else {
                     showEduPressStatus('error');
                 }
@@ -572,6 +536,8 @@ jQuery(document).ready(function(){
             error: function (){}
         })
     })
+
+
 
     // Attendance bulk status change
     $j(document).on('change', '.attendance-bulk-status', function (){
@@ -639,7 +605,8 @@ jQuery(document).ready(function(){
         let countTotal = $j('.edupress-delete-post').length;
         let thisEle = $j(this);
         let id = $j(this).data('id');
-        let data = `action=edupress_admin_ajax&ajax_action=deletePost&post_id=${id}&_wpnonce=${edupress.wpnonce}`;
+        let postType = $j(this).data('post-type');
+        let data = `action=edupress_admin_ajax&ajax_action=deletePost&post_id=${id}&post_type=${postType}&_wpnonce=${edupress.wpnonce}`;
 
         $j.ajax({
             url: edupress.ajax_url,
@@ -905,24 +872,33 @@ jQuery(document).ready(function(){
             return false
         } else {
             currentRow.remove();
+            calculateGrossAmount();
+            calculateNetAmount();
         }
     })
 
     // change in fee_amount
-    $j(document).on('change keyup keydown', '.edupress-publish-transaction .fee_amount', function(){
-        let totalAmount = 0;
-        $j(".edupress-publish-transaction .fee_amount").each(function(){
-            totalAmount += parseInt($j(this).val());
-        })
-        if(isNaN(totalAmount)) totalAmount = 0;
-        $j("input[name=amount]").val(totalAmount);
-        $j(".gross_amount").val(totalAmount);
+    $j(document).on('change keyup keydown', '.edupress-publish-transaction .fee_amount, .edupress-edit-transaction .fee_amount', function(){
+        calculateGrossAmount();
     })
 
     // Adjust discount
     $j(document).on('change keyup keydown', ".discount_type,.discount_amount,:input[name='fee_amount[]']",function(e){
+        calculateGrossAmount();
         calculateNetAmount();
     })
+
+    const calculateGrossAmount = () => {
+        let totalAmount = 0;
+        $j(".edupress-publish-transaction .fee_amount, .edupress-edit-transaction .fee_amount").each(function(){
+            let amt = parseFloat($j(this).val());
+            if(amt == '' || isNaN(amt)) amt = 0;
+            totalAmount += amt;
+        })
+        if(isNaN(totalAmount)) totalAmount = 0;
+        $j("input[name=amount]").val(totalAmount);
+        $j(".gross_amount").val(totalAmount);
+    }
 
     const calculateNetAmount = () => {
 
@@ -930,18 +906,22 @@ jQuery(document).ready(function(){
         if(isNaN(grossAmount)) grossAmount = 0;
         let discountType = $j(':input[name=discount_type]').val();
         let discountAmount = parseFloat($j(".discount_amount").val());
-        if(isNaN(discountAmount)) discountAmount = 0;
+        if(isNaN(discountAmount) || discountAmount == '') discountAmount = 0;
         let discount = 0;
         let netAmount = grossAmount;
 
-        if ( discountType === 'percentage' ){
-            $j(".discount_amount").attr('max', 100);
-            discount = grossAmount * discountAmount / 100;
-            netAmount = grossAmount - discount;
-        } else if( discountType === 'fixed' ){
-            netAmount = parseFloat(grossAmount - discountAmount);
+        if(discountAmount > 0){
+            if ( discountType === 'percentage' ){
+                $j(".discount_amount").attr('max', 100);
+                discount = grossAmount * discountAmount / 100;
+                console.log('discount', discount);
+                netAmount = grossAmount - discount;
+            } else if( discountType === 'fixed' ){
+                netAmount = parseFloat(grossAmount - discountAmount);
+            }
         }
-        if(isNaN(netAmount)) netAmount = 0;
+
+        if(isNaN(netAmount) || netAmount < 0) netAmount = 0;
         netAmount = netAmount.toFixed(2);
         $j('.t_amount').val(netAmount);
 
@@ -982,9 +962,7 @@ jQuery(document).ready(function(){
                 $j(this).parents('form').find('.t_user_id').val(userId);
             },
             change: function(){},
-            close: function (){
-
-            },
+            close: function (){},
             open: function(){}
         })
     }
@@ -1447,6 +1425,23 @@ jQuery(document).ready(function(){
         })
     }
 
+    // Insert National holidays 
+    $j(document).on('click', '.get_default_holidays', function(e){
+        preventDefault(e);
+        let holidays = $j(this).data('holidays');
+        $j("#attendance_national_holidays").val(holidays);
+    })
+
+    // decheck sms or print when transaction type outflow 
+    $j(document).on('change', ":input[name='is_inflow']", function(e){
+        let isInflow = $j(this).val() == '1' ? true : false;
+        if(isInflow){
+            $j("[name='extra_actions[]']").prop('checked', true);
+        } else {
+            $j("[name='extra_actions[]']").prop('checked', false);
+        }
+    })
+
 
 })
 ///// jQuery Ends //////
@@ -1480,6 +1475,54 @@ function examSuccessCallback( res ){
     } else {
         hideEduPressPopup();
         showEduPressStatus('error');
+    }
+}
+
+
+// trigger transaction search user
+function triggerSearchUser(){
+    let sel = $j(".edupress-publish-attendance .a_user, .edupress-publish-transaction :input.user_search, .edupress-edit-transaction :input.user_search");
+    if ( sel.length > 0 ){
+        sel.autocomplete({
+            minLength: 2,
+            source: function( request, response ){
+                let branchId = sel.parents('form').find(":input[name='branch_id']").val();
+                $j.ajax({
+                    url: edupress.ajax_url,
+                    data: {
+                        'branch_id': branchId,
+                        'action': 'edupress_admin_ajax',
+                        'ajax_action' : 'getTransactionUserDetails',
+                        'term' : request.term,
+                        '_wpnonce': edupress.wpnonce,
+                    },
+                    dataType: 'json',
+                    method: 'POST',
+                    beforeSend:function(){
+                        if( branchId === '' ){
+                            alert('Please select a branch first!');
+                            return false;
+                        }
+                    },
+                    success: function( r ){
+                        response(r);
+                    },
+                    error: function(){}
+                })
+            },
+            select: function( e, ui ){
+                let userId = ui.item.key;
+                $j(this).parents('form').find('.t_user_id').val(userId);
+                $j(this).parents('form').find('.user_id').val(userId);
+                $j(this).parents('form').find('.shift_id').val(ui.item.shift_id);
+                $j(this).parents('form').find('.class_id').val(ui.item.class_id);
+                $j(this).parents('form').find('.section_id').val(ui.item.section_id);
+                $j('.transaction-user-details').html(ui.item.details);
+            },
+            change: function(){},
+            close: function (){},
+            open: function(){}
+        })
     }
 }
 
@@ -1677,8 +1720,8 @@ function showUserProfileSuccessCallback( res ){
 }
 
 function showPopupOnCallback( res ){
-    hideEduPressLoading();
     if(res.status === 1){
+        hideEduPressLoading();
         showEduPressPopup(res.data);
     }
 }
@@ -1689,6 +1732,7 @@ function insertAttendanceUsersInPopup( res ){
 }
 
 function confirmBeforeSendCallback(){
+    hideEduPressLoading();
     return confirm('Are you sure to proceed on?');
 }
 
@@ -1708,4 +1752,17 @@ function printIdCardBeforeSend(){
         }
     }
     return true;
+}
+
+function printIdCardAfterSuccess(data){
+    const pdfUrl = data.data; // adjust if your key is different
+
+    // Create a hidden link and click it to trigger download
+    const a = document.createElement('a');
+    a.href = pdfUrl;
+    a.download = ''; // optional: set a filename here
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
 }

@@ -26,6 +26,11 @@ class Transaction extends CustomPost
     protected $post_type = 'transaction';
 
     /**
+     * Setting data 
+     */
+    protected $data;
+
+    /**
      * Initiate instance
      *
      * @return Transaction
@@ -53,18 +58,26 @@ class Transaction extends CustomPost
 
         parent::__construct( $id );
 
+        if($this->id){
+            global $wpdb; 
+            $sql = "SELECT * FROM {$this->table} WHERE id = {$this->id}";
+            $result = $wpdb->get_row($sql);
+            if($result){
+                $this->data = $result;
+                $items_sql = "SELECT * FROM {$wpdb->prefix}transaction_items WHERE transaction_id = {$this->id}";
+                $this->data->items = $wpdb->get_results($items_sql);
+            }
+        }
+
         // Filter Publish Fields
         add_filter( "edupress_publish_{$this->post_type}_fields", [ $this, 'filterPublishFields' ] );
+        add_filter( "edupress_edit_{$this->post_type}_fields", [ $this, 'filterPublishFields' ] );
 
         // Filter list query
         add_filter( "edupress_list_{$this->post_type}_query", [ $this, 'filterListQuery' ] );
 
-        // Filter list html
-        // add_filter( "edupress_list_{$this->post_type}_html", [ $this, 'filterListHtml' ] );
-
         // Filter search query
         add_filter ( "edupress_filter_{$this->post_type}_fields", [ $this, 'filterListFields' ] );
-
 
     }
 
@@ -87,7 +100,8 @@ class Transaction extends CustomPost
                 'options'   => $branch->getPosts( [], true ) ,
                 'label' => 'Branch',
                 'required' => true,
-                'id' => 'branch_id'
+                'id' => 'branch_id',
+                'value' => $this->data->branch_id ?? 0,
             )
         );
         $fields['is_inflow'] = array(
@@ -101,6 +115,7 @@ class Transaction extends CustomPost
                 'label' => 'Type',
                 'placeholder' => 'Type',
                 'required' => true,
+                'value' => $this->data->is_inflow ?? 1,
             )
         );
         $fields['account'] = array(
@@ -111,8 +126,26 @@ class Transaction extends CustomPost
                 'label' => 'Account',
                 'placeholder' => 'Select account',
                 'required'=> true,
+                'value' => $this->data->account ?? '',
             )
         );
+        $user_id = $this->data->user_id ?? 0;
+        $user_name = '';
+        if($user_id){
+            $user = new User($user_id);
+            $user_name .= $user->getMeta('first_name') . ' ' . $user->getMeta('last_name');
+            $user_name .= " | Role: " . $user->getRole();
+            if($user->getRole() == 'student'){
+                $user_name .= ' | Roll:'. $user->getMeta('roll_no');
+                $class_id = $user->getMeta('class_id');
+                $section_id = $user->getMeta('section_id');
+                if($class_id) $user_name .= " | Class: " . get_the_title($class_id);
+                if($section_id) $user_name .= " | Section: " . get_the_title($section_id);
+            }
+            $user_name .= " | Mobile: ". $user->getMeta('mobile');
+        } else {
+            $user_name .= '';
+        }
         $fields['user_search'] = array(
             'name' => 'user_search',
             'type'  => 'text',
@@ -121,6 +154,7 @@ class Transaction extends CustomPost
                 'class' => 'user_search',
                 'placeholder' => 'Type a user name',
                 'required' => true,
+                'value' => $user_name,
                 'after' => "<div class='transaction-user-details' style='width: 100%;'></div>",
             )
         );
@@ -129,6 +163,7 @@ class Transaction extends CustomPost
             'type'  => 'hidden',
             'settings' => array(
                 'class' => 'user_id',
+                'value' => $this->data->user_id ?? 0,
             )
         );
         $fields['t_time'] = array(
@@ -138,28 +173,31 @@ class Transaction extends CustomPost
                 'placeholder' => 'Select input time',
                 'required' => true,
                 'label' => 'Time',
-                'value' => current_time('mysql')
+                'value' => $this->data->t_time ?? current_time('mysql')
             )
         );
         $fields['shift_id'] = array(
             'type'      => 'hidden',
             'name'      => 'shift_id',
             'settings'  => array(
-                'class' => 'shift_id'
+                'class' => 'shift_id',
+                'value' => $this->data->shift_id ?? 0,
             )
         );
         $fields['class_id'] = array(
             'type'      => 'hidden',
             'name'      => 'class_id',
             'settings'  => array(
-                'class' => 'class_id'
+                'class' => 'class_id',
+                'value' => $this->data->class_id ?? 0,
             )
         );
         $fields['section_id'] = array(
             'type'      => 'hidden',
             'name'      => 'section_id',
             'settings'  => array(
-                'class' => 'section_id'
+                'class' => 'section_id',
+                'value' => $this->data->section_id ?? 0,
             )
         );
 
@@ -175,7 +213,7 @@ class Transaction extends CustomPost
         $years = range( $min_year, $max_year );
         $years = array_combine( $years, $years );
         $transaction_years = EduPress::generateFormElement( 'select', 't_year[]', array( 'options' => $years, 'value' => current_time('Y')) );
-        $fee_html = EduPress::generateFormElement( 'select', 'fee_type[]', array( 'options' => array_combine( $fee_names, $fee_names ), 'required'=>true ) );
+        $fee_html = EduPress::generateFormElement( 'select', 'fee_type[]', array( 'options' => array_combine( $fee_names, $fee_names ), 'required'=>true, 'placeholder'=>'Select' ) );
         $transaction_html = "
         <ul class='transaction-details'>
             <li>
@@ -185,10 +223,28 @@ class Transaction extends CustomPost
                 <div class='row-transaction-month'>". __( 'Month', 'edupress') . "</div>   
                 <div class='row-transaction-year'>". __( 'Year', 'edupress') . "</div>   
                 <div class='action-wrap'> </div> 
-            </li>
+            </li>";
+        if(!empty($this->data->items)){
+            foreach($this->data->items as $item){
+                $transaction_html .= "
+                    <li>
+                        <div class='row-transaction-fee'>". EduPress::generateFormElement( 'select', 'fee_type[]', array( 'options' => array_combine( $fee_names, $fee_names ), 'required'=>true, 'value' => $item->item_name ))."</div>
+                        <div class='row-transaction-amount'><input type='number' min='0' step='any' name='fee_amount[]' value='{$item->item_amount}' class='fee_amount' placeholder='Fee amount'  step='any' required='required' aria-required='true'></div> 
+                        <div class='row-transaction-due'><input type='number' name='fee_due[]' value='{$item->item_due}' placeholder='Due'  step='any'></div> 
+                        <div class='row-transaction-month'>". EduPress::generateFormElement( 'select', 't_month[]', array( 'options' => $months, 'value' => $item->item_month ))."</div>   
+                        <div class='row-transaction-year'>". EduPress::generateFormElement( 'select', 't_year[]', array( 'options' => $years, 'value' => $item->item_year ))."</div>   
+                        <div class='action-wrap'>
+                            <a href='javascript:void(0)' class='duplicate copy-transaction-row'>+</a> 
+                            <a href='javascript:void(0)' class='remove remove-transaction-row'>-</a>
+                        </div>
+                    </li>";
+            }
+        }
+        if(!$this->id){
+            $transaction_html .= "
             <li>
                 <div class='row-transaction-fee'>{$fee_html}</div>
-                <div class='row-transaction-amount'><input type='number' name='fee_amount[]' class='fee_amount' value='' placeholder='Fee amount'  step='any' required='required' aria-required='true'></div> 
+                <div class='row-transaction-amount'><input type='number' min='0' step='any' name='fee_amount[]' class='fee_amount' value='' placeholder='Fee amount'  step='any' required='required' aria-required='true'></div> 
                 <div class='row-transaction-due'><input type='number' name='fee_due[]' value='0' placeholder='Due'  step='any'></div> 
                 <div class='row-transaction-month'>{$transaction_months}</div>   
                 <div class='row-transaction-year'>{$transaction_years}</div>   
@@ -196,10 +252,9 @@ class Transaction extends CustomPost
                     <a href='javascript:void(0)' class='duplicate copy-transaction-row'>+</a> 
                     <a href='javascript:void(0)' class='remove remove-transaction-row'>-</a>
                 </div> 
-            </li>
-        </ul>
-        ";
-
+            </li>";
+        }
+        $transaction_html .= "</ul><script type='text/javascript'>triggerSearchUser();</script>";
         $fields['html'] = array(
             'name'  => 'transaction_details',
             'type'  => 'html',
@@ -215,7 +270,7 @@ class Transaction extends CustomPost
                 'class' => 'gross_amount',
                 'readonly'=>true,
                 'label' => 'Gross Total',
-                'value' => 0
+                'value' => $this->data->amount ?? 0
             )
         );
         $fields['discount_type'] = array(
@@ -225,16 +280,17 @@ class Transaction extends CustomPost
                 'class' => 'discount_type',
                 'label' => 'Discount Type',
                 'options' => array(
-                    'percentage' => 'Percentage',
                     'fixed' => 'Fixed',
+                    'percentage' => 'Percentage',
                 ),
-                'value' => 'percentage',
+                'value' => 'fixed',
                 'after' => EduPress::generateFormElement( 'number', 'discount_amount', array(
                     'placeholder' => 'Discount Amount',
                     'class' => 'discount_amount',
                     'value' => 0,
                     'data' => array(
                         'min' => 0,
+                        'step' => 'any'
                     )
                 ))
             )
@@ -247,21 +303,30 @@ class Transaction extends CustomPost
                 'class' => 't_amount',
                 'readonly'=>true,
                 'label' => 'Net Total',
-                'value' => 0,
+                'value' => $this->data->amount ?? 0,
+            )
+        );
+        $fields['extra_actions'] = array(
+            'name'  => 'extra_actions[]',
+            'type'  => 'checkbox',
+            'settings' => array(
+                'label' => 'Actions',
+                'options' => array('print'=> 'Print', 'sms'=>'SMS'),
+                'value' => $this->id ? [] : ['print', 'sms']
             )
         );
         $fields['method'] = array(
             'name'  => 'method',
             'type' => 'hidden',
             'settings'  => array(
-                'value' => 'Offline',
+                'value' => $this->data->method ?? 'Offline',
             )
         );
         $fields['status'] = array(
             'name'  => 'status',
             'type' => 'hidden',
             'settings'  => array(
-                'value' => 'completed',
+                'value' => $this->data->status ?? 'completed',
             )
         );
         return $fields;
@@ -349,6 +414,18 @@ class Transaction extends CustomPost
             }
         }
 
+        // check if sms exists in extract actions 
+        if(isset($data['extra_actions'])){
+            if( in_array('sms', $data['extra_actions']) ){
+                $tran = new Transaction($id);
+                $tran->sms();
+            }
+            if( in_array('print', $data['extra_actions']) ){
+                // $this->print();
+            } 
+        }
+
+
         return $id;
 
     }
@@ -395,6 +472,7 @@ class Transaction extends CustomPost
                         <th><?php _e( 'Note', 'edupress' ); ?></th>
                         <th><?php _e( 'Entry By', 'edupress' ); ?></th>
                         <th><?php _e( 'Entry Time', 'edupress' ); ?></th>
+                        <th><?php _e( 'Update Log', 'edupress' ); ?></th>
                     </tr>
                 </thead>
 
@@ -405,6 +483,8 @@ class Transaction extends CustomPost
                         $name = get_user_meta( $r->user_id, 'first_name', true );
                         $details_qry = "SELECT * FROM {$wpdb->prefix}transaction_items WHERE transaction_id = {$r->id}";
                         $details = $wpdb->get_results( $details_qry );
+                        $logs = json_decode( $r->update_log, true );
+                        $logs_data = is_array($logs) ? array_combine( array_column($logs, 'time'), array_column($logs, 'user_id') ) : [];
                         ?>
                         <tr>
                             <td><?php echo $branch_title ; ?></td>
@@ -442,8 +522,32 @@ class Transaction extends CustomPost
                                 </table>
                             </td>
                             <td><?php echo $r->t_note; ?></td>
-                            <td><?php echo get_user_meta( $r->input_by, 'first_name', true ); ?></td>
+                            <td>
+                                <?php echo get_user_meta( $r->input_by, 'first_name', true ); ?>
+                                <?php 
+                                    if( current_user_can('edit_transaction') || current_user_can('manage_options')){
+                                        echo "<div>";
+                                            echo "<a data-success_callback='showPopupOnCallback' data-post_id={$r->id} data-post_type='{$this->post_type}' class='edit-transaction edupress-ajax edupress-ajax-link' data-ajax_action='getPostEditForm' href='javascript:void(0)' data-transaction-id='{$r->id}'>".EduPress::getIcon('edit')."</a>";
+                                            echo "<a data-target='status' data-post_id={$r->id} data-post-type='{$this->post_type}' data-action='delete' class='edupress-delete-post'  href='javascript:void(0)' data-id='{$r->id}'>".EduPress::getIcon('delete')."</a>";
+                                            echo "<a data-success_callback='confirmBeforeSendCallback' data-post_id={$r->id} data-post_type='{$this->post_type}' class='sms-transaction edupress-ajax edupress-ajax-link' data-ajax_action='smsTransaction' href='javascript:void(0)' data-transaction-id='{$r->id}'>".EduPress::getIcon('sms')."</a>";
+                                            echo "<a data-success_callback='confirmBeforeSendCallback' data-post_id={$r->id} data-post_type='{$this->post_type}' class='print-transaction edupress-ajax edupress-ajax-link' data-ajax_action='printTransaction' href='javascript:void(0)' data-transaction-id='{$r->id}'>".EduPress::getIcon('print')."</a>";
+                                        echo "</div>";
+                                    }
+                                ?>
+                            </td>
                             <td><?php echo date( 'h:i a, d/m/y', strtotime($r->record_time) ) ; ?></td>
+                            <td>
+                                <?php 
+                                    if(!empty($logs_data)){
+                                        $log_html = "<div style='font-size:12px !important;'>";
+                                        foreach($logs_data as $time => $user_id){
+                                            $log_html .=   date( 'h:i a, d M, y', strtotime($time) ) . " => " . get_user_meta($user_id, 'first_name', true) . "<br>";
+                                        }
+                                        $log_html .= "</div>";
+                                        echo $log_html;
+                                    }
+                                ?>
+                            </td>
                         </tr>
                         <?php
                     }
@@ -682,6 +786,118 @@ class Transaction extends CustomPost
 
         return $users;
     }
+
+
+    /**
+     * Edit a transaction 
+     * 
+     * @return array 
+     * 
+     * 
+     * @since 1.5.6
+     * @access public 
+     */
+    public function edit( $data = [] )
+    {
+         if( !$data['post_id']) return ['status'=>0,'data'=>'ID not found.'];
+         $update_data = [];
+         $update_data['id'] = $data['post_id'];
+         $update_data['branch_id'] = $data['branch_id'];
+         $update_data['shift_id'] = $data['shift_id'];
+         $update_data['class_id'] = $data['class_id'];
+         $update_data['section_id'] = $data['section_id'];
+         $update_data['user_id'] = $data['user_id'];
+         $update_data['t_time'] = $data['t_time'];
+         $update_data['t_note'] = $data['t_note'] ?? '';
+         $update_data['amount'] = $data['amount'] ?? 0;
+         $update_data['discount'] = $data['discount'] ?? 0;
+         $update_data['method'] = $data['method'] ?? '';
+         $update_data['status'] = $data['status'] ?? '';
+         $update_data['is_inflow'] = $data['is_inflow'] ?? 1;
+
+         $logs = json_decode($this->data->update_log, true);
+         if(empty($logs) || !is_array($logs)) $logs = [];
+         $logs[] = array(
+            'time' => current_time('mysql'),
+            'user_id' => get_current_user_id(),
+            'action' => 'edit',
+            'data' => $update_data,
+         );
+         $update_data['update_log'] = json_encode($logs);
+
+         global $wpdb;
+         $update = $wpdb->update(
+            $this->table,
+            $update_data,
+            array('id' => $update_data['id'])
+         );
+         if($update){
+            // updating meta items 
+            // deleting old ones 
+            $old_qry = $wpdb->prepare("DELETE FROM {$wpdb->prefix}transaction_items WHERE transaction_id = %d", $update_data['id']);
+            $wpdb->query($old_qry);
+
+            // inserting new ones 
+            for($i = 0; $i < count($data['fee_type']); $i++){
+                $wpdb->insert(
+                    $wpdb->prefix . 'transaction_items',
+                    array(
+                        'transaction_id' => $update_data['id'],
+                        'item_name' => $data['fee_type'][$i],
+                        'item_amount' => $data['fee_amount'][$i],
+                        'item_due' => $data['fee_due'][$i],
+                        'item_month' => $data['t_month'][$i],
+                        'item_year' => $data['t_year'][$i],
+                    )
+                );
+            }
+                
+         }
+        return $update;
+    }
+
+    /**
+     * Delete a transaction 
+     * 
+     * @return int 
+     * 
+     * @since 1.0
+     * @access public 
+     */
+    public function delete()
+    {
+        if(!$this->id) return 0;
+        global $wpdb;
+        $delete = $wpdb->delete($this->table, array('id' => $this->id));
+        if($delete){
+            // deleting meta items 
+            $wpdb->delete($wpdb->prefix . 'transaction_items', array('transaction_id' => $this->id));
+        }
+        return $delete;
+    }
+
+    /**
+     * Send sms 
+     * 
+     * @return array 
+     * 
+     * @since 1.5.6
+     * @access public 
+     */
+    public function sms()
+    {
+        $mobile = get_user_meta( $this->data->user_id, 'mobile', true );
+        if(empty($mobile)) return ['status'=>0,'data'=>'Mobile number not found.'];
+        $time = date('h:i a, d/m/y', strtotime($this->data->t_time));
+        $currency_symbol = Admin::getSetting('currency_symbol'); 
+        $amount =  number_format( $this->data->amount, 2);
+        $message = "Payment Alert!\nYour payment of {$currency_symbol}{$amount} has been received on {$time}. Trx ID #{$this->data->id}. Thank you!";
+        $response = Sms::send(['mobile'=>$mobile, 'sms'=>$message]);
+        if($response['status'] == 1){
+            return ['status'=>1,'data'=>'SMS sent successfully.', 'sms_id'=>$response['sms_id'], 'sms_text' => $message, 'mobile' => $mobile ];
+        }
+        return ['status'=>0,'data'=>'SMS sending failed.', 'sms_id'=>'', 'sms_text' => $message, 'mobile' => $mobile ];
+    }   
 }
 
 Transaction::instance();

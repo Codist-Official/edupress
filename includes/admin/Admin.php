@@ -988,6 +988,28 @@ class Admin
                         'id' => 'transaction_currency_sign'
                     )
                 );
+                $fields['transaction_sms'] = array(
+                    'type'  => 'select',
+                    'name'  => 'transaction_sms',
+                    'settings' => array(
+                        'value' => Admin::getSetting('transaction_sms'),
+                        'label' => 'Send SMS',
+                        'id' => 'transaction_sms',
+                        'options' => array('active'=>'Active', 'inactive'=>'Inactive'),
+                        'placeholder' => 'Select',
+                    )
+                );
+                $fields['transaction_print'] = array(
+                    'type'  => 'select',
+                    'name'  => 'transaction_print',
+                    'settings' => array(
+                        'value' => Admin::getSetting('transaction_print'),
+                        'label' => 'Print',
+                        'id' => 'transaction_print',
+                        'options' => array('active'=>'Active', 'inactive'=>'Inactive'),
+                        'placeholder' => 'Select',
+                    )
+                );
 
 
                 break;
@@ -1194,6 +1216,23 @@ class Admin
                         'value' => Admin::getSetting('attendance_weekend_holidays'),
                         'label' => 'Attendance Weekly Holiday',
                         'id' => 'attendance_weekend_holidays',
+                    )
+                );
+                $national_holidays =  Admin::getSetting('attendance_national_holidays');
+                $holidays = ['21-02', '26-03', '14-04', '01-05', '16-12', '24-12'];
+                foreach($holidays as $k=>$day){
+                    $holidays[$k] = $day . '-' . current_time('Y');
+                }
+                $default_holidays = implode("\r\n", $holidays);
+                if(is_null($national_holidays)) $default_holidays = $national_holidays;
+
+                $fields['attendance_national_holidays'] = array(
+                    'type'  => 'textarea',
+                    'name'  => 'attendance_national_holidays',
+                    'settings' => array(
+                        'value' => $national_holidays,
+                        'label' => "National Holidays <br>Format: d-m-Y <br>Example: 11-02-2025<br><a data-holidays='{$default_holidays}' title='{$default_holidays}' href='javascript:void(0)' class='get_default_holidays'>Insert Default Holidays</a>",
+                        'id' => 'attendance_national_holidays',
                     )
                 );
 

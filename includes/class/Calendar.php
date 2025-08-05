@@ -825,6 +825,14 @@ class Calendar extends Post
         $weekend_holidays = Admin::getSetting('attendance_weekend_holidays');
         if(!is_array($weekend_holidays)) $weekend_holidays = explode(',', $weekend_holidays);
 
+        // national holidays 
+        $national_holidays = Admin::getSetting('attendance_national_holidays');
+        if(!is_array($national_holidays)) $national_holidays = explode("\r\n", $national_holidays);
+        $national_holidays = array_map(function($day){
+            return date('Y-m-d', strtotime($day));
+        }, $national_holidays);
+        $national_holidays = [];
+
         if(empty($calendar)) $calendar = [];
         if(!isset($calendar['data'])) $calendar['data'] = [];
 
@@ -837,6 +845,7 @@ class Calendar extends Post
             $status = $day_data['status'] ?? '';
             $day_formatted= new \DateTime($day);
             if(empty($status) && in_array($day_formatted->format('l'), $weekend_holidays)) $status = 'h';
+            if(in_array($day_formatted->format('d-m-Y'), $national_holidays)) $status = 'h';
             if(empty($status)) $status = 'u';
 
             if($status == 'o') $response['o'][] = $day;

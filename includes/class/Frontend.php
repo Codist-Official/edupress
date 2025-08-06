@@ -329,6 +329,7 @@ class Frontend
             $always_active_panels[] = 'result';
             $always_active_panels[] = 'grade_table';
             $always_active_panels[] = 'print';
+            $always_active_panels[] = 'transaction_report';
         }
 
         if( !in_array($panel, $always_active_panels) && !empty($panel) && !$is_active ) return __( "This feature is not active.", 'edupress' );

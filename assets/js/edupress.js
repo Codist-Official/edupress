@@ -1766,3 +1766,25 @@ function printIdCardAfterSuccess(data){
     document.body.removeChild(a);
 
 }
+
+function printDataOnCallback(data = ''){
+    // open a new window, insert data and print it 
+    const win = window.open('', '_blank');
+    win.document.open();
+    typeof data === 'string' ? win.document.write(data) : win.document.write(data.data);
+    win.document.close();
+    
+    win.onload = () => {
+        win.focus();
+        win.print();
+    }
+}
+
+function transactionSuccessCallback(data){
+    if(data.status == 1 && data.print == 1){
+        printDataOnCallback(data.data);
+    }
+    hideEduPressLoading();
+    hideEduPressPopup();
+    showEduPressStatus( data.status == 1 ? 'success': 'error');
+}

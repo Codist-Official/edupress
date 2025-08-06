@@ -200,6 +200,8 @@ class AdminAjax
 
         unset($_REQUEST['ajax_action']);
 
+        if($post_type == 'transaction') return $status;
+
         return array(
             'status'    => $status,
             'data'      => $status ? $success_msg : 'Error occurred!',
@@ -1646,6 +1648,24 @@ class AdminAjax
         $id = intval($_REQUEST['post_id']);
         $transaction = new Transaction($id);
         return $transaction->sms();
+    }
+
+    /**
+     * Print transaction 
+     * 
+     * @return array 
+     * 
+     * @since 1.5.3
+     * @access public 
+     */
+    public function printTransaction()
+    {
+        $id = intval($_REQUEST['post_id']);
+        $transaction = new Transaction($id);
+        return array(
+            'status' => 1,
+            'data' => $transaction->printPos(),
+        );
     }
 
 }

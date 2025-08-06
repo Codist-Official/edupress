@@ -1609,6 +1609,20 @@ class Admin
                     )
                 );
 
+                $fields['print_pos_printer'] = array(
+                    'type'  => 'select',
+                    'name'  => 'print_pos_printer',
+                    'settings' => array(
+                        'value' => Admin::getSetting('print_pos_printer', ''),
+                        'label' => 'POS Printer Size',
+                        'options' => array(
+                            '58' => '58 mm (POS-58)',
+                            '80' => '80 mm (POS-80)',
+                        ),
+                        'placeholder' => 'Select',
+                    )
+                );
+
                 $fields['print_show_edupress_credits'] = array(
                     'type'  => 'select',
                     'name'  => 'print_show_edupress_credits',

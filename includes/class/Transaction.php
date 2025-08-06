@@ -176,6 +176,7 @@ class Transaction extends CustomPost
                 'value' => $this->data->t_time ?? current_time('mysql')
             )
         );
+
         $fields['shift_id'] = array(
             'type'      => 'hidden',
             'name'      => 'shift_id',
@@ -184,6 +185,7 @@ class Transaction extends CustomPost
                 'value' => $this->data->shift_id ?? 0,
             )
         );
+        
         $fields['class_id'] = array(
             'type'      => 'hidden',
             'name'      => 'class_id',
@@ -306,6 +308,16 @@ class Transaction extends CustomPost
                 'value' => $this->data->amount ?? 0,
             )
         );
+        $fields['t_note'] = array(
+            'name'  => 't_note',
+            'type'  => 'textarea',
+            'settings' => array(
+                'placeholder' => 'Note',
+                'required' => false,
+                'label' => 'Note',
+                'value' => $this->data->t_note ?? ''
+            )
+        );
         $fields['extra_actions'] = array(
             'name'  => 'extra_actions[]',
             'type'  => 'checkbox',
@@ -397,7 +409,6 @@ class Transaction extends CustomPost
 
             // Inserting item details
             for( $i = 0; $i < count($data['fee_type']); $i++ ){
-
                 $item_data = array(
                     'transaction_id' => $id,
                     'item_name' => $data['fee_type'][$i],
@@ -414,19 +425,25 @@ class Transaction extends CustomPost
             }
         }
 
+        
+
+
         // check if sms exists in extract actions 
-        if(isset($data['extra_actions'])){
+        if($id && isset($data['extra_actions'])){
+            $tran = new Transaction($id);
             if( in_array('sms', $data['extra_actions']) ){
-                $tran = new Transaction($id);
                 $tran->sms();
             }
             if( in_array('print', $data['extra_actions']) ){
-                // $this->print();
+                $html = $tran->printPos();
             } 
         }
-
-
-        return $id;
+        return array(
+            'id' => $id,
+            'data' => $html,
+            'status' => $id ? 1 : 0,
+            'print' => isset($data['extra_actions']) && in_array('print', $data['extra_actions']) ? 1 : 0,
+        );
 
     }
 
@@ -529,8 +546,8 @@ class Transaction extends CustomPost
                                         echo "<div>";
                                             echo "<a data-success_callback='showPopupOnCallback' data-post_id={$r->id} data-post_type='{$this->post_type}' class='edit-transaction edupress-ajax edupress-ajax-link' data-ajax_action='getPostEditForm' href='javascript:void(0)' data-transaction-id='{$r->id}'>".EduPress::getIcon('edit')."</a>";
                                             echo "<a data-target='status' data-post_id={$r->id} data-post-type='{$this->post_type}' data-action='delete' class='edupress-delete-post'  href='javascript:void(0)' data-id='{$r->id}'>".EduPress::getIcon('delete')."</a>";
-                                            echo "<a data-success_callback='confirmBeforeSendCallback' data-post_id={$r->id} data-post_type='{$this->post_type}' class='sms-transaction edupress-ajax edupress-ajax-link' data-ajax_action='smsTransaction' href='javascript:void(0)' data-transaction-id='{$r->id}'>".EduPress::getIcon('sms')."</a>";
-                                            echo "<a data-success_callback='confirmBeforeSendCallback' data-post_id={$r->id} data-post_type='{$this->post_type}' class='print-transaction edupress-ajax edupress-ajax-link' data-ajax_action='printTransaction' href='javascript:void(0)' data-transaction-id='{$r->id}'>".EduPress::getIcon('print')."</a>";
+                                            echo "<a data-before_send_callback='confirmBeforeSendCallback' data-post_id={$r->id} data-post_type='{$this->post_type}' class='sms-transaction edupress-ajax edupress-ajax-link' data-ajax_action='smsTransaction' href='javascript:void(0)' data-transaction-id='{$r->id}'>".EduPress::getIcon('sms')."</a>";
+                                            echo "<a data-success_callback='printDataOnCallback' data-before_send_callback='confirmBeforeSendCallback' data-post_id={$r->id} data-post_type='{$this->post_type}' class='print-transaction edupress-ajax edupress-ajax-link' data-ajax_action='printTransaction' href='javascript:void(0)' data-transaction-id='{$r->id}'>".EduPress::getIcon('print')."</a>";
                                         echo "</div>";
                                     }
                                 ?>
@@ -752,10 +769,6 @@ class Transaction extends CustomPost
 
             $payment_type = $e_user->getMeta('payment_type', true );
             $payment_amount = $e_user->getMeta('payment_amount', true );
-            // if(!empty($payment_type))  $user_details .= "<br>Type: {$payment_type} ";
-            // if(!empty($payment_amount)) $user_details .= " | Amount: " . $payment_amount;
-            // $user_details .= " | Total Paid: " . $e_user->getTotalPaid();
-            // $user_details .= " | Total Due: " . $e_user->getTotalDue();
             
             $user_details .= $e_user->showTransactionDetails();
 
@@ -851,7 +864,6 @@ class Transaction extends CustomPost
                     )
                 );
             }
-                
          }
         return $update;
     }
@@ -897,7 +909,229 @@ class Transaction extends CustomPost
             return ['status'=>1,'data'=>'SMS sent successfully.', 'sms_id'=>$response['sms_id'], 'sms_text' => $message, 'mobile' => $mobile ];
         }
         return ['status'=>0,'data'=>'SMS sending failed.', 'sms_id'=>'', 'sms_text' => $message, 'mobile' => $mobile ];
-    }   
+    }
+
+
+    /**
+     * Print pos 
+     * 
+     * @return string 
+     * @since 1.5.3
+     * @access public 
+     */
+    public function printPos()
+    {
+        $user = new User($this->data->user_id);
+        $user_data = [];
+        $user_name = $user->getMeta('first_name') . ' ' . $user->getMeta('last_name');
+        $roll = $user->getMeta('roll');
+        $branch_id = $user->getMeta('branch_id');
+        $shift_id = $user->getMeta('shift_id');
+        $class_id = $user->getMeta('class_id');
+        $section_id = $user->getMeta('section_id');
+        $mobile = $user->getMeta('mobile');
+        $user_data['roll'] = $roll;
+        $user_data['branch'] = get_the_title($branch_id);
+        $user_data['shift'] = get_the_title($shift_id);
+        $user_data['class'] = get_the_title($class_id);
+        $user_data['section'] = get_the_title($section_id);
+        $user_data['mobile'] = $mobile;
+        array_filter($user_data);
+        $user_meta = implode('|', $user_data);
+        $user_details = "{$user_name} ({$user_meta})";
+
+        $institute = array(
+            'name' => Admin::getSetting('institute_name'),
+            'address' => Admin::getSetting('institute_address'),
+            'phone' => Admin::getSetting('institute_phone'),
+            'email' => Admin::getSetting('institute_email'),
+            'website' => Admin::getSetting('institute_website'),
+        );
+        ob_start();
+        ?>
+        <html>
+            <head>
+            <title>POS Receipt</title>
+                <style>                    
+                    @media all{
+                        body {
+                        width: 58mm;
+                        font-family: monospace;
+                        font-size: 12px;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    .receipt {
+                        padding: 10px;
+                    }
+                    .center {
+                        text-align: center;
+                    }
+                    .bold {
+                        font-weight: bold;
+                    }
+                    .line {
+                        border-top: 1px dashed #000;
+                        margin: 5px 0;
+                    }
+                    .transaction-pos-print{
+                        width: 100%;
+                        height: 100%;
+                        background-color: #fff;
+                    }
+                    .title{
+                        font-size: 14px;
+                        line-height: 1;
+                    }
+                    .subtitle{
+                        font-size: 12px;
+                        line-height: 1;
+                    }
+                    .meta-data{
+                        font-size:10px;
+                        line-height: 1;
+                    }
+                    .body-text{
+                        font-size:10px;
+                        line-height: 1;
+                    }
+                    .institute-details{
+                        margin: 5px 0;
+                        padding: 5px 0;
+                        border: 1px dashed #000;
+                        border-left: none;
+                        border-right: none;
+                    }
+                    .uppercase{
+                        text-transform: uppercase;
+                    }
+                    .capitalize{
+                        text-transform: capitalize;
+                    }
+                    .mt-10{
+                        margin-top: 10px;
+                    }
+                    .mb-10{
+                        margin-bottom: 10px;
+                    }
+                    .mt-20{
+                        margin-top: 20px;
+                    }
+                    ul.payment-items{
+                        margin: 0;
+                        padding: 0;
+                        list-style:none;
+                        width: 100%;
+                        height: auto;
+                        display: inline-block;
+                    }
+                    ul.payment-items li{
+                        list-style: none;
+                        margin-bottom: 5px;
+                        width: 100%;
+                        height: auto;
+                        display: inline-block;
+                        border-bottom: 1px dashed #000;
+                    }
+                    ul.payment-items li div{
+                        float: left;
+                        font-size: 9px;
+                        line-height: 1;
+                        padding: 3px;
+                        box-sizing: border-box;
+                    }
+                    ul.payment-items li .name{
+                        width: 40%;
+                    }
+                    ul.payment-items li .amount{
+                        width: 25%;
+                    }
+                    ul.payment-items li .month{
+                        width: 20%;
+                    }
+                    ul.payment-items li .due{
+                        width: 15%;
+                    }
+                    .pos-print-body{
+                        width: 100%;
+                        height: auto;
+                        display: inline-block;
+                    }
+                    .disclaimer-text{
+                        font-size: 8px;
+                    }
+                }
+                </style>
+            </head>
+            <body>
+                    <div class="pos-print-header">
+                        <div class="institute-title center"><?php echo $institute['name']; ?></div>
+                        <div class="institute-details center meta-data">
+                            <?php echo $institute['address']; ?>
+                            <?php echo $institute['phone']; ?>
+                            <?php echo $institute['email']; ?>
+                            <?php echo $institute['website']; ?>
+                         </div>
+                    </div>
+                    <div class="pos-print-body">
+                        <div class="subtitle uppercase mb-10 mt-10 center" >Payment Details</div>
+                        <div class="payer-dteails body-text">
+                            Paid For: <?php echo $user_details; ?><br>
+                            Amount: <?php echo number_format($this->data->amount, 2); ?> <span class="capitalize">(<?php echo $this->data->method;  ?>)</span><br>
+                            Trx ID: <?php echo $this->data->id; ?> | Time: <?php echo date('d/m/y h:i a', strtotime($this->data->t_time)); ?>
+                        </div>
+
+                        <div class="subtitle uppercase mb-10 mt-10 center" >Payment Items</div>
+                        <ul class="payment-items">
+                            <li class="payment-item">
+                                <div class="name">ITEM</div>
+                                <div class="amount">AMT</div>
+                                <div class="month">MNT,YR</div>
+                                <div class="due">DUE</div>
+                            </li>
+                            <?php 
+                                if(!empty($this->data->items)){
+                                    $due_total = 0;
+                                    foreach($this->data->items as $item){
+                                        $dt = new \DateTime($item->item_year . "-" . $item->item_month . "-01");
+                                        $due_total += $item->item_due;
+                                        ?>
+                                        <li class="payment-item body-text">
+                                            <div class="name"><?php echo $item->item_name; ?></div>
+                                            <div class="amount"><?php echo number_format($item->item_amount, 0); ?></div>
+                                            <div class="month"><?php echo $dt->format('M,y'); ?></div>
+                                            <div class="due"><?php echo number_format($item->item_due, 0); ?></div>
+                                        </li>
+                                        <?php
+                                    }
+                                }
+                            ?>
+                            <li class="payment-item" style='border-bottom: none !important;'>
+                                <div class="name">TOTAL</div>
+                                <div class="amount"><?php echo number_format($this->data->amount, 0); ?></div>
+                                <div class="month"></div>
+                                <div class="due"><?php echo number_format($due_total, 0); ?></div>
+                            </li>
+                        </ul>
+
+                        <?php if(!empty($this->data->t_note)): ?>
+                            <div class="note body-text mt-10">
+                                Note: <?php echo $this->data->t_note; ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class='footer-disclaimer center mt-20 '>
+                            <p class='disclaimer-text'>
+                                <strong>Disclaimer:</strong>This is a computer generated receipt. No signature is required. Generated by EduPress & printed on <?php echo current_time('h:ia,d/m/y'); ?>.
+                            </p>
+                        </div>
+
+                    </div>
+                </body>
+            </html>
+        <?php return ob_get_clean();
+    }
+
 }
 
 Transaction::instance();

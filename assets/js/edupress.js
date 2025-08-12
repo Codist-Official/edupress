@@ -1788,3 +1788,10 @@ function transactionSuccessCallback(data){
     hideEduPressPopup();
     showEduPressStatus( data.status == 1 ? 'success': 'error');
 }
+
+function printUserListAfterSuccess(data){
+    data = data.data.trim();
+    if(data != ''){
+        printDataOnCallback(data);
+    }
+}

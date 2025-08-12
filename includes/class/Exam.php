@@ -533,12 +533,12 @@ class Exam extends Post
     {
 
         $metadata = get_metadata('post', $post_id);
-        $branch_id = $metadata['branch_id'] ? $metadata['branch_id'][0] : 0;
-        $class_id = $metadata['class_id'] ? $metadata['class_id'][0] : 0;
-        $shift_id = $metadata['shift_id'] ? $metadata['shift_id'][0] : 0;
-        $section_id = $metadata['section_id'] ? $metadata['section_id'][0] : 0;
-        $subject_id = $metadata['subject_id'] ? $metadata['subject_id'][0] : 0;
-        $term_id = $metadata['term_id'] ? $metadata['term_id'][0] : 0;
+        $branch_id = isset($metadata['branch_id']) ? $metadata['branch_id'][0] : 0;
+        $class_id = isset($metadata['class_id']) ? $metadata['class_id'][0] : 0;
+        $shift_id = isset($metadata['shift_id']) ? $metadata['shift_id'][0] : 0;
+        $section_id = isset($metadata['section_id']) ? $metadata['section_id'][0] : 0;
+        $subject_id = isset($metadata['subject_id']) ? $metadata['subject_id'][0] : 0;
+        $term_id = isset($metadata['term_id']) ? $metadata['term_id'][0] : 0;
         $url = is_ssl() ? 'https://' : 'http://';
         $url .= $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         $urls = explode('?', $url);

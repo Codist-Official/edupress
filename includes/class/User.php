@@ -1313,9 +1313,9 @@ class User
 
         if ( empty($results) ) return 'No users found!';
 
-        $shift_active = Admin::getSetting('shift_active') == 'active';
-        $class_active = Admin::getSetting('class_active') == 'active';
-        $section_active = Admin::getSetting('section_active') == 'active';
+        $shift_active = EduPress::isActive('shift');
+        $class_active = EduPress::isActive('class');
+        $section_active = EduPress::isActive('section');
         $titles = [];
 
         ob_start();
@@ -2035,9 +2035,9 @@ class User
             );
         }
 
-        if(isset($conds['orderby']) && $_REQUEST['orderby'] == 'roll'){
+        if(isset($conds['orderby']) && $conds['orderby'] == 'roll'){
             $args['orderby'] = 'meta_value_num';
-            $args['order'] = 'ASC';
+            $args['order'] = $conds['order'] ?? 'ASC';
             $args['meta_key'] = 'roll';
             $args['meta_type'] = 'NUMERIC';
         }

@@ -1668,6 +1668,22 @@ class AdminAjax
         );
     }
 
+    /**
+     * Print user list 
+     * 
+     * @return array 
+     * @since 1.0
+     * @access public 
+     */
+    public function printUserList()
+    {
+        $html = PrintMaterial::printUserList($_REQUEST);
+        return array(
+            'status' => 1,
+            'data' => $html,
+        );
+    }
+
 }
 
 AdminAjax::instance();

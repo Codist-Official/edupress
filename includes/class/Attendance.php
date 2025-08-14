@@ -243,13 +243,14 @@ class Attendance extends CustomPost
         // open close stats
         $calendar = new Calendar($calendar_id);
         $calendar_stats = $calendar->getStats( $start_date, $end_date );
-        $open_days = $calendar_stats['count_open'] ?? 0;
+        $open_days = $calendar_stats['count_o'] ?? 0;
 
 
         global $wpdb;
         $qry = "SELECT * FROM {$wpdb->prefix}attendance WHERE branch_id = $branch_id ";
         if(!empty($start_date)) $qry .= " AND DATE(report_time) >= '$start_date' ";
         if(!empty($end_date)) $qry .= " AND DATE(report_time) <= '$end_date' ";
+        $qry .= " AND user_id IN (".implode(',', array_keys($all_users)).") ";
         $results = $wpdb->get_results( $qry, ARRAY_A );
         if(empty($results)) return 'No records found!';
 
@@ -258,14 +259,17 @@ class Attendance extends CustomPost
             $user_id = (int) $result['user_id'];
             $time = date('Y-m-d', strtotime($result['report_time']));
             if( !isset($logs[$user_id])) $logs[$user_id] = [];
-            if( is_array($logs[$user_id]) && is_array($calendar_stats['open']) && is_array($logs[$user_id]) && in_array($time, $calendar_stats['open']) && !in_array($time, $logs[$user_id]) ) $logs[$user_id][] = $time;
+            if( is_array($logs[$user_id]) && !in_array($time, $logs[$user_id]) ) $logs[$user_id][] = $time;
         }
         $start = new \DateTime($start_date);
         $end = new \DateTime($end_date);
-        // $end->modify(modifier: '+1 day');
+        $end->modify(modifier: '+1 day');
         $interval = new \DateInterval('P1D');
         $period = new \DatePeriod($start, $interval, $end);
-        $total_days = $start->diff($end)->days + 1;
+        $total_days = $start->diff($end)->days;
+        $count_open = $calendar_stats['count_o'] ?? 0;
+        $count_holiday = $calendar_stats['count_h'] ?? 0;
+        $count_closed = $calendar_stats['count_c'] ?? 0;
 
         $summary_json = [];
 
@@ -298,25 +302,17 @@ class Attendance extends CustomPost
                                     if(empty($month)) $month = $month_c;
                                     if($month !== $month_c) $month = $month_c;
                                     $print_month = !in_array($month, $printed_months) ? $month : ' ';
-                                    $is_open = isset($calendar_stats['open'])  && in_array( $day_formatted, $calendar_stats['open']);
-                                    $is_close = isset($calendar_stats['close']) && in_array( $day_formatted, $calendar_stats['close']);
-                                    $undecided = isset($calendar_stats['undecided']) && in_array( $day_formatted, $calendar_stats['undecided']);
-                                    $status_text = '';
-                                    if($is_open):
-                                        $status_text = 'open';
-                                    elseif($is_close):
-                                        $status_text = 'close';
-                                    else:
-                                        $status_text = 'na';
-                                    endif;
-
-                                    echo "<th style='text-align: center'>{$print_month}<br>{$day->format('d')}<br><span class='attendance-day-status {$status_text}'> &nbsp; </span></th>";
+                                    $status = $calendar_stats[$day_formatted]['status'];
+ 
+                                    echo "<th style='text-align: center'>{$print_month}<br>{$day->format('d')}<br><span class='attendance-day-status {$status}'> &nbsp; </span></th>";
                                     $printed_months[]= $month;
                                 }
                             }
                         ?>
                         <th style="text-align: center; font-size: 12px;"><?php _e('Total', 'edupress'); ?></th>
                         <th style="text-align: center; font-size: 12px;"><?php _e('Open', 'edupress'); ?></th>
+                        <th style="text-align: center; font-size: 12px;"><?php _e('Close', 'edupress'); ?></th>
+                        <th style="text-align: center; font-size: 12px;"><?php _e('Holidays', 'edupress'); ?></th>
                         <th style="text-align: center; font-size: 12px;"><?php _e('Present', 'edupress'); ?></th>
                         <th style="text-align: center; font-size: 12px;"><?php _e('Absent', 'edupress'); ?></th>
                         <th style="text-align: center; font-size: 12px;"><?php _e('Presence<br>%', 'edupress'); ?></th>
@@ -325,9 +321,9 @@ class Attendance extends CustomPost
                 <?php
                     $branch_title = get_the_title($branch_id);
                     foreach($all_users as $k=>$v){
-//                        $intersect = isset($calendar_stats['open']) && is_array($logs[$k]) ? array_intersect( $calendar_stats['open'], $logs[$k] ) : [];
                         $total_present = isset($logs[$k]) && is_countable($logs[$k]) ? count($logs[$k]) : 0;
                         $total_absent = $open_days  - $total_present;
+                        if($total_absent < 0) $total_absent = 0;
                         $presence_percentage = $open_days > 0 ? number_format( $total_present * 100 / $open_days, 2) : 0;
                         $user_first_name = get_user_meta( $k, 'first_name', true);
                         $summary_json[$k] = "Attendance Report\n\nName: {$user_first_name}\nDuration: {$start->format('d/m/y')} - {$end->format('d/m/y')}\nOpen: {$open_days} days\nPresent: {$total_present} days\nAbsent: {$total_absent} days\nPresence: {$presence_percentage}%";
@@ -343,25 +339,17 @@ class Attendance extends CustomPost
                             if($details){
                                 foreach($period as $day){
                                     $day_formatted = $day->format('Y-m-d');
-                                    $is_open = isset($calendar_stats['open']) && in_array( $day_formatted, $calendar_stats['open'] );
-                                    $is_close = isset($calendar_stats['close'])  && in_array( $day_formatted, $calendar_stats['close'] );
-                                    $is_undecided = isset($calendar_stats['undecided']) && in_array( $day_formatted, $calendar_stats['undecided'] );
+                                    $status = $calendar_stats[$day_formatted]['status'];
                                     $is_present = isset($logs[$k]) && is_array($logs[$k]) && in_array($day_formatted, $logs[$k]);
-
-                                    $icon = "";
-
-                                    if($is_close){
-                                        $icon = "closed";
-                                    } else {
-                                        $icon = $is_present ? "present" : "absent";
-                                    }
-
+                                    $icon = $is_present ? "present" : "absent";
                                     echo "<td style='text-align: center'><span class='attendance-{$icon}'></span></td>";
                                 }
                             }
                             ?>
                             <td style="text-align: center"><?php echo $total_days; ?></td>
-                            <td style="text-align: center"><?php echo $open_days; ?></td>
+                            <td style="text-align: center"><?php echo $count_open; ?></td>
+                            <td style="text-align: center"><?php echo $count_closed; ?></td>
+                            <td style="text-align: center"><?php echo $count_holiday; ?></td>
                             <td style="text-align: center"><?php echo $total_present; ?></td>
                             <td style="text-align: center"><?php echo $total_absent; ?></td>
                             <td style="text-align: center"><?php echo $presence_percentage; ?>%</td>

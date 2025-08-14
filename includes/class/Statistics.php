@@ -69,7 +69,7 @@ class Statistics
                                 <div class="icon-wrap"><?php echo EduPress::getIcon($v['icon'], '', '3x'); ?></div>
                                 <div class="title"><?php echo $v['title']; ?></div>
                             </div>
-                            <div class="count-wrap"><?php echo in_array($k, array('setting', 'support', 'result')) ? '' : self::countPosts($k  ); ?></div>
+                            <div class="count-wrap"><?php echo in_array($k, array('setting', 'support', 'result', 'print')) ? '' : self::countPosts($k  ); ?></div>
                         </a>
                     </li>
                     <?php

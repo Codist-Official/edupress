@@ -819,7 +819,6 @@ class Calendar extends Post
         $response['o'] = [];
         $response['c'] = [];
         $response['h'] = [];
-        $response['u'] = [];
 
         $calendar = maybe_unserialize(get_post_meta( $this->id, 'academic_calendar', true ) );
         $weekend_holidays = Admin::getSetting('attendance_weekend_holidays');
@@ -846,18 +845,16 @@ class Calendar extends Post
             $day_formatted= new \DateTime($day);
             if(empty($status) && in_array($day_formatted->format('l'), $weekend_holidays)) $status = 'h';
             if(in_array($day_formatted->format('d-m-Y'), $national_holidays)) $status = 'h';
-            if(empty($status)) $status = 'u';
+            if(empty($status)) $status = 'o';
 
             if($status == 'o') $response['o'][] = $day;
             if($status == 'c') $response['c'][] = $day;
             if($status == 'h') $response['h'][] = $day;
-            if($status == 'u') $response['u'][] = $day;
          }
 
         $response['count_o']= count($response['o']);
         $response['count_c']= count($response['c']);
         $response['count_h']= count($response['h']);
-        $response['count_u']= count($response['u']);
         return $response;
     }
 

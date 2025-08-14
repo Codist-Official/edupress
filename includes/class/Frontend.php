@@ -273,11 +273,9 @@ class Frontend
 
         ob_start();
         ?>
-
         <div class='frontend-menu-wrap'>
             <?php echo $this->getMenu(); ?>
         </div>
-
         <?php
         return ob_get_clean();
 

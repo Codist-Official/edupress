@@ -2920,8 +2920,8 @@ class User
                 <tr>
                     <th><?php _e( 'Holiday', 'edupress' ); ?> </th>
                     <td><?php echo $data['h'] ; ?> days</td>
-                    <th><?php _e( 'No data', 'edupress' ); ?> </th>
-                    <td><?php echo (int) $data['u'] ; ?> days</td>
+                    <th> </th>
+                    <td> </td>
                 </tr>
                 <tr>
                     <th><?php _e( 'Present', 'edupress' ); ?></th>

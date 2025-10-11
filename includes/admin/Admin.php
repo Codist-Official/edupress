@@ -912,13 +912,18 @@ class Admin
                 $days_options = array_combine($days, $days);
                 $days_options = array_map(function($day){ return $day . ' Days'; }, $days_options);
                 $fields['sms_store_log'] = array(
-                    'type'  => 'select',
+                    'type'  => 'number',
                     'name'  => 'sms_store_log',
                     'settings' => array(
-                        'options' => $days_options,
                         'label' => 'Store log for last x days',
                         'id' => 'sms_store_log',
-                        'value' => Admin::getSetting('sms_store_log', 45),
+                        'data' => array(
+                            'min' => 30,
+                            'max' => 365,
+                            'step' => 1,
+                        ),
+                        'after' => 'Default is 30 days',
+                        'value' => Admin::getSetting('sms_store_log', 30),
                     )
                 );
 
@@ -1197,13 +1202,18 @@ class Admin
                 $days_options = array_combine($days, $days);
                 $days_options = array_map(function($day){ return $day . ' Days'; }, $days_options);
                 $fields['attendance_store_log'] = array(
-                    'type'  => 'select',
+                    'type'  => 'number',
                     'name'  => 'attendance_store_log',
                     'settings' => array(
-                        'options' => $days_options,
                         'label' => 'Store log for last x days',
                         'id' => 'attendance_store_log',
-                        'value' => Admin::getSetting('attendance_store_log', 45),
+                        'data' => array(
+                            'min' => 30,
+                            'max' => 365,
+                            'step' => 1,
+                        ),
+                        'after' => 'Default is 30 days',
+                        'value' => Admin::getSetting('attendance_store_log', 30),
                     )
                 );
 

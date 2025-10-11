@@ -1,6 +1,4 @@
 <?php
-namespace EduPress;
-
 defined( 'ABSPATH' ) || die();
 class AjaxUpload
 {
@@ -23,18 +21,15 @@ class AjaxUpload
 
         add_action('wp_ajax_my_upload_action', [ $this, 'uploadCallback' ]);
         add_action('wp_ajax_nopriv_my_upload_action', [ $this, 'uploadCallback' ] );
-
-        add_action( 'wp_head', [ $this, 'headHtml' ] );
-
-        add_action( 'admin_enqueue_scripts', [ $this, 'my_enqueue' ] );
-
-
+        add_action('wp_head', [ $this, 'headHtml' ] );
+        add_action('admin_enqueue_scripts', [ $this, 'my_enqueue' ] );
+        wp_localize_script('jquery', 'ajax_upload', array());
     }
 
     public function uploadCallback() {
 
         // Check if the nonce is set
-        if ( isset( $_POST['_wpnonce'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'edupress' ) ) {
+        if ( isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'ajax_file_upload' ) ) {
 
             $uploaded_files = $_FILES['files'];
             $attachments = array();
@@ -43,7 +38,6 @@ class AjaxUpload
             foreach ($uploaded_files['name'] as $key => $value) {
 
                 if ($uploaded_files['name'][$key]) {
-
                     $file = array(
                         'name'     => $uploaded_files['name'][$key],
                         'type'     => $uploaded_files['type'][$key],
@@ -89,15 +83,12 @@ class AjaxUpload
             $attachments['ids'] = implode(',', $ids );
 
             // Return array of attachment IDs
-            echo json_encode($attachments);
+            return wp_send_json_success($attachments);
 
         } else {
             // If nonce is not set
-            echo 'Security check failed!';
+            return wp_send_json_error('Security check failed!');
         }
-
-        // Always die in functions echoing AJAX content
-        wp_die();
 
     }
 
@@ -109,7 +100,7 @@ class AjaxUpload
         <script>
 
             if( typeof $j === 'undefined' ) var $j = jQuery;
-
+            ajax_upload._wpnonce = '<?php echo wp_create_nonce('ajax_file_upload'); ?>';
             jQuery(document).ready(function(){
 
                 $j(document).on('change', '.wp_ajax_upload', function(e){
@@ -117,13 +108,14 @@ class AjaxUpload
 
                     var targetName = $j(this).data('target-name');
                     var targetClass = $j(this).data('target-class');
+                    var uniqid = $j(this).data('uniqid');
                     var files_data = $j(this).prop('files');
                     var form_data = new FormData();
                     $j.each(files_data, function(i, file){
                         form_data.append('files[]', file);
                     });
                     form_data.append('action', 'my_upload_action');
-                    form_data.append('_wpnonce', edupress.wpnonce );
+                    form_data.append('_wpnonce', ajax_upload._wpnonce  );
 
                     $j.ajax({
                         url: edupress.ajax_url,
@@ -134,20 +126,23 @@ class AjaxUpload
                         dataType:'JSON',
                         beforeSend: function(){
                             console.log(form_data);
-                            showEduPressLoading();
+                            if(ajax_upload.loading){
+                                ajax_upload.loading.show();
+                            }
                         },
                         success: function(response){
-                            hideEduPressLoading();
+                            if(ajax_upload.loading){
+                                ajax_upload.loading.hide();
+                            }
                             $j(`:input[name=${targetName}]`).val(response.ids);
                             $j(`.${targetClass}`).html('');
                             if( $j(`.${targetClass}`).length > 0 ){
-                                $j.each( response, function( k, v) {
+                                $j.each( response.data, function( k, v) {
                                     if ( k !== 'ids' ) {
                                         $j(`.${targetClass}`).append(`<img src="${v.url}">`);
                                     }
                                 })
                             }
-
                         }
                     });
                 });

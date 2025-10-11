@@ -412,11 +412,12 @@ class PrintMaterial{
         if(!EduPress::isActive('section')) unset($column_options['section_id']);
 
         $fields['columns'] = array(
-            'type' => 'checkbox',
+            'type' => 'select',
             'name' => 'columns[]',
             'settings' => array(
                 'label' => 'Columns',
-                'options' => $column_options
+                'options' => $column_options,
+                'multiple' => true,
             )
         ); 
 

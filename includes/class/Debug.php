@@ -44,7 +44,8 @@ class Debug
      */
     public function debug()
     {
-        echo PrintMaterial::getBulkIdCardHtml(['print_type' => 'class_wise', 'class_id' => 44]);
+        // echo PrintMaterial::getBulkIdCardHtml(['print_type' => 'class_wise', 'class_id' => 44]);
+        var_dump(Attendance::scheduleDeleteLog());
     }
 
 }

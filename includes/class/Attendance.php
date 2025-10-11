@@ -1133,9 +1133,6 @@ class Attendance extends CustomPost
                 )
             );
         }
-
-
-
         ob_start();
         ?>
         <h3 class="text-center"><?php echo __('Add Manual Attendance', 'edupress'); ?></h3>
@@ -1153,11 +1150,11 @@ class Attendance extends CustomPost
             <div class="form-column">
                 <div class="label-wrap"><label> &nbsp; </label></div>
                 <div class="value-wrap">
-                    <?php 
-                        echo EduPress::generateFormElement('submit', 'submit', array( 'value' => 'Show' )); 
-                        echo EduPress::generateFormElement('hidden', 'ajax_action', array( 'value' => 'showUsersToAddManualAttendance' )); 
-                        echo EduPress::generateFormElement('hidden', 'action', array( 'value' => 'edupress_admin_ajax' )); 
-                        echo EduPress::generateFormElement( 'hidden', 'success_callback', array( 'value' => 'insertAttendanceUsersInPopup' ) ); 
+                    <?php
+                        echo EduPress::generateFormElement('submit', 'submit', array('value' => 'Show')); 
+                        echo EduPress::generateFormElement('hidden', 'ajax_action', array('value' => 'showUsersToAddManualAttendance')); 
+                        echo EduPress::generateFormElement('hidden', 'action', array('value' => 'edupress_admin_ajax')); 
+                        echo EduPress::generateFormElement('hidden', 'success_callback', array('value' => 'insertAttendanceUsersInPopup') ); 
                         wp_nonce_field('edupress', '_wpnonce');
                     ?>
                 </div>
@@ -1280,6 +1277,7 @@ class Attendance extends CustomPost
      *
      * @since 1.0
      * @access public
+     * @static
      */
     public static function deleteLog($branch_id, $date)
     {
@@ -1293,10 +1291,12 @@ class Attendance extends CustomPost
         self::saveLogSummary($branch_id, $date_format);
         
         global $wpdb;
-        $table = $wpdb->prefix . 'attendance';
-        $qry = $wpdb->prepare("DELETE FROM {$table} WHERE branch_id = %d AND DATE(report_time) = %s", $branch_id, $date_format);
-        $wpdb->query($qry);
+        // delete with mysql query 
+        $qry = "DELETE FROM {$wpdb->prefix}attendance WHERE branch_id = %d AND DATE(report_time) = %s";
+        $deleted = $wpdb->query($wpdb->prepare($qry, $branch_id, $date_format));
+        $res = $deleted ? $deleted : $wpdb->last_error;
         $wpdb->flush();
+        return $res;
 
     }
 
@@ -1311,29 +1311,31 @@ class Attendance extends CustomPost
     public static function scheduleDeleteLog()
     {
         global $wpdb;
-        $qry = $wpdb->prepare("SELECT DISTINCT(branch_id) as branch_id, MIN(DATE(report_time)) as min_date, MAX(DATE(report_time)) as max_date FROM {$wpdb->prefix}attendance WHERE DATE(report_time) < %s", current_time('Y-m-d'));
-        $rows = $wpdb->get_results($qry);
-        foreach($rows as $row){
-            $start_date = $row->min_date;
-            $end_date = $row->max_date;
-            $branch_id = $row->branch_id;
-            $store_log = Admin::getSetting('attendance_store_log', 45);
-    
-            $start_date = new \DateTime($start_date);
-            $end_date = new \DateTime($end_date);
-            $end_date = $end_date->modify('-' . $store_log . ' days');
-    
+
+        $store_log = Admin::getSetting('attendance_store_log', 45);
+        $branch = new Branch();
+        $branches = $branch->getPosts( [], true );
+        $current_date = current_time('Y-m-d');
+        $end_date = new \DateTime($current_date);
+        $end_date->modify('-' . $store_log . ' days');
+
+        // Getting start date from attendnace table 
+        $start_date = $wpdb->get_var("SELECT MIN(DATE(report_time)) FROM {$wpdb->prefix}attendance");
+        $start_date = new \DateTime($start_date);
+
+        var_dump('start date: ' . $start_date->format('Y-m-d'));
+        var_dump('end date: ' . $end_date->format('Y-m-d'));
+
+        foreach($branches as $k=>$v){
             $period = new \DatePeriod($start_date, new \DateInterval('P1D'), $end_date);
             foreach($period as $date){
-                $date_format = $date->format('Y-m-d');
-                self::deleteLog($branch_id, $date_format);
+                $deleted = self::deleteLog($k, $date->format('Y-m-d'));
+                if($deleted > 0) echo $date->format('Y-m-d') . ' - ' . $deleted . ' logs deleted<br>';
+                else var_dump($deleted);
             }
         }
+
     }
-
-
-
-
 }
 
 Attendance::instance();

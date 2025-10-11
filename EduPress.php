@@ -660,16 +660,19 @@ class EduPress
         $data = $settings['data'] ?? '';
         $before = $settings['before'] ?? '';
         $after = $settings['after'] ?? '';
+        $multiple = $settings['multiple'] ?? false;
 
         if ( !empty($options) && !is_array($options) ) $options = explode( ',', $options );
 
         $required_string = '';
         $readonly_string = '';
         $disabled_string = '';
+        $multiple_string = '';
 
         if( $required ) $required_string = " required='required' aria-required='true' ";
         if( $readonly ) $readonly_string = " readonly='readonly' aria-readonly='true' ";
         if( $disabled ) $disabled_string = " disabled='disabled' aria-disabled='true' ";
+        if( $multiple ) $multiple_string = " multiple='multiple' ";
 
         $data_string = '';
         if( !empty( $data ) ){
@@ -708,7 +711,7 @@ class EduPress
             case 'select':
             case 'dropdown':
 
-                $html .= "<select id='{$id}' class='{$class}' name='{$name}' {$readonly_string} {$disabled_string} {$required_string} {$data_string}>";
+                $html .= "<select id='{$id}' class='{$class}' name='{$name}' {$readonly_string} {$disabled_string} {$required_string} {$data_string} {$multiple_string}>";
 
                 if( !empty($placeholder) ) $html .= "<option value=''>".__( $placeholder, 'edupress')."</option>";
                 if( !is_array($options) ) $options = explode(',', $options);
@@ -1460,15 +1463,15 @@ class EduPress
     public function wpCustomCronIntervals( $schedules )
     {
         $schedules['ep_every_five_minutes'] = array(
-            'interval' => 300, // 5 minutes in seconds
+            'interval' => 60 * 5, // 5 minutes in seconds
             'display'  => esc_html__('Every 5 Minutes'),
         );
         $schedules['ep_every_hour'] = array(
-            'interval' => 60 * 60, // 5 minutes in seconds
+            'interval' => 60 * 60, // 1 hour in seconds
             'display'  => esc_html__('Every Hour'),
         );
         $schedules['ep_every_day'] = array(
-            'interval' => 60 * 60 * 24, // 5 minutes in seconds
+            'interval' => 60 * 60 * 24, // 1 day in seconds
             'display'  => esc_html__('Every Day'),
         );
         return $schedules;
@@ -1538,10 +1541,8 @@ class EduPress
      */
     public function epDailyCronTask()
     {
-
         Attendance::scheduleDeleteLog();
         Sms::scheduleDeleteLog();
-
     }
 
 

@@ -79,15 +79,16 @@ jQuery(document).ready(function(){
         preventDefault(e);
 
         let data = $j(this).serialize();
+        let params = new URLSearchParams(data);
         let isEditPost = $j(this).hasClass('edupress-edit-post-form');
         let ele = $j(this);
 
-        let beforeSendCallback = $j(this).find(":input[name='before_send_callback']").val();
-        let successCallback = $j(this).find(":input[name='success_callback']").val();
-        let errorCallback = $j(this).find(":input[name='error_callback']").val();
+        let beforeSendCallback = params.get('before_send_callback');
+        let successCallback = params.get('success_callback');
+        let errorCallback = params.get('error_callback');
 
         // check if ajax_action equals to saveEduPressAdminSettingsForm
-        let refreshPage = $j(this).find(":input[name='ajax_action']").val() === 'saveEduPressAdminSettingsForm';
+        let refreshPage = params.get('ajax_action') === 'saveEduPressAdminSettingsForm';
 
         $j.ajax({
             url: edupress.ajax_url,
@@ -145,20 +146,18 @@ jQuery(document).ready(function(){
     $j(document).on('click', '.edupress-ajax-link', function (e){
         preventDefault(e);
 
-        let beforeSendCallback = $j(this).data('before_send_callback');
-        let successCallback = $j(this).data('success_callback');
-        let errorCallback = $j(this).data('error_callback');
+        let link = $j(this);
+        let data = link.data();
+        let params = new URLSearchParams(data);
+
+        let beforeSendCallback = params.get('before_send_callback');
+        let successCallback = params.get('success_callback');
+        let errorCallback = params.get('error_callback');
 
         clog(`BeforeSend: ${beforeSendCallback} Success: ${successCallback} Error: ${errorCallback}`);
 
-        let ele = $j(this);
-
-        let data = `action=edupress_admin_ajax&_wpnonce=${edupress.wpnonce}`;
-
-        let dataAttr = $j(this).data();
-        $j.each( dataAttr, function( k, v ){
-            data += `&${k}=${v}`;
-        })
+        data.action = 'edupress_admin_ajax';
+        data._wpnonce = edupress.wpnonce;
 
         $j.ajax({
             url: edupress.ajax_url,
@@ -168,7 +167,7 @@ jQuery(document).ready(function(){
             beforeSend: function (){
                 clog(data);
                 if( typeof window[beforeSendCallback] !== 'undefined' && typeof window[beforeSendCallback] === 'function' ){
-                    let r = window[beforeSendCallback]( { data: data }, ele );
+                    let r = window[beforeSendCallback]( { data: data } );
                     if( !r ) return false;
                 } else {
                     showEduPressLoading();
@@ -177,7 +176,7 @@ jQuery(document).ready(function(){
             success: function (res, xhr ){
                 clog(res);
                 if( typeof window[successCallback] !== 'undefined' && typeof window[successCallback] === 'function' ){
-                    window[successCallback](res, xhr, ele);
+                    window[successCallback](res, xhr);
                 } else {
                     hideEduPressLoading();
                     if( res.status === 1 ){
@@ -202,18 +201,15 @@ jQuery(document).ready(function(){
     $j(document).on('submit', '.edupress-ajax-form', function (e){
         preventDefault(e);
 
-        let beforeSendCallback = $j(this).find(":input[name='before_send_callback']").val();
-        let successCallback = $j(this).find(":input[name='success_callback']").val();
-        let errorCallback = $j(this).find(":input[name='error_callback']").val();
+        let form = $j(this);
+        let data = form.serialize();
+        let params = new URLSearchParams(data);
+
+        let beforeSendCallback = params.get('before_send_callback');
+        let successCallback = params.get('success_callback');
+        let errorCallback = params.get('error_callback');
 
         clog(`BeforeSend: ${beforeSendCallback} Success: ${successCallback} Error: ${errorCallback}`);
-
-        let ele = $j(this);
-        let data = $j(this).serialize();
-        let dataAttr = $j(this).data();
-        $j.each( dataAttr, function( k, v ){
-            data += `&${k}=${v}`;
-        })
 
         $j.ajax({
             url: edupress.ajax_url,
@@ -391,14 +387,24 @@ jQuery(document).ready(function(){
     $j(document).on('click', '.edupress-edit-post', function (e){
         preventDefault(e);
 
-        let beforeSendCallback = $j(this).data('before-send-callback');
-        let successCallback = $j(this).data('success-callback');
-        let errorCallback = $j(this).data('error-callback');
+        let link = $j(this);
+        let linkData = link.data();
+        let params = new URLSearchParams(linkData);
 
-        let postId = $j(this).data('id');
-        let postType = $j(this).data('post-type');
+        let beforeSendCallback = params.get('before-send-callback');
+        let successCallback = params.get('success-callback');
+        let errorCallback = params.get('error-callback');
+
+        let postId = params.get('id');
+        let postType = params.get('post-type');
         let title = 'Update ' + postType.replace(/_/g, ' ');
-        let data = `action=edupress_admin_ajax&ajax_action=getPostEditForm&post_id=${postId}&post_type=${postType}&_wpnonce=${edupress.wpnonce}`;
+        let data = {
+            action: 'edupress_admin_ajax',
+            ajax_action: 'getPostEditForm',
+            post_id: postId,
+            post_type: postType,
+            _wpnonce: edupress.wpnonce
+        }
 
         $j.ajax({
             url: edupress.ajax_url,

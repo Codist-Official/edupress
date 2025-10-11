@@ -447,14 +447,16 @@ class User
         switch($type){
             case 'start_date':
                 $start_date = $this->getMeta('start_date');
-                if(!$start_date) return '';
+                if(empty($start_date)) $start_date = $this->getUser()->user_registered;
                 return date('Y-m-d', strtotime($start_date));
             case 'end_date':
                 $end_date = $this->getMeta('end_date');
-                if(!$end_date) return '';
+                $class_end_date = get_post_meta($this->getMeta('class_id'), 'end_date', true);
+                $section_end_date = get_post_meta($this->getMeta('section_id'), 'end_date', true);
+                if(empty($end_date)) $end_date = !empty($section_end_date) ? $section_end_date : $class_end_date;
                 return date('Y-m-d', strtotime($end_date));
             case 'register_date':
-                return date('Y-m-d', strtotime($this->getMeta('user_registered')));
+                return date('Y-m-d', strtotime($this->getUser()->user_registered));
             default:
                 break;
         }
@@ -482,9 +484,7 @@ class User
 
                 <?php
                 foreach ($fields as $field) {
-
                     if( $field['type'] == 'submit') continue;
-
                     ?>
                     <div class="form-column">
                         <div class="label-wrap"><label for="<?php echo $field['settings']['id'] ?? ''; ?>"><?php _e($field['settings']['label'] ?? '', 'edupress'); ?></label></div>
@@ -496,8 +496,8 @@ class User
                     <div class="label-wrap"> &nbsp; </div>
                     <div class="value-wrap">
                         <?php
-                        echo EduPress::generateFormElement( 'submit', '', array('value'=>'Filter'));
-                        echo EduPress::generateFormElement( 'hidden', 'panel', array('value'=>$this->post_type));
+                            echo EduPress::generateFormElement( 'submit', '', array('value'=>'Filter'));
+                            echo EduPress::generateFormElement( 'hidden', 'panel', array('value'=>$this->post_type));
                         ?>
                     </div>
                 </div>
@@ -1073,6 +1073,32 @@ class User
         $settings['optional_subject_id'] = $this->getMeta('optional_subject_id');
 
         $fields = $this->getPublishFields($settings);
+        if($this->getRole() == 'student'){
+            $fields['start_date'] = array(
+                'name'  => 'start_date',
+                'type'  => 'date',
+                'settings'=>array(
+                    'label' => 'Academic Start Date',
+                    'value' => isset($settings['start_date']) && !empty($settings['start_date']) ? date('Y-m-d', strtotime($settings['start_date'])) : date('Y-m-d', strtotime($this->getUser()->user_registered)),
+                )
+            );
+            $end_date = '';
+            if(!empty($settings['section_id'])){
+                $section_end = get_post_meta($settings['section_id'], 'end_date', true);
+                $end_date = !empty($section_end) ? date('Y-m-d', strtotime($section_end)) : '';
+            } else {
+                $class_end = get_post_meta($settings['class_id'], 'end_date', true);
+                $end_date = !empty($class_end) ? date('Y-m-d', strtotime($class_end)) : '';
+            }
+            $fields['end_date'] = array(
+                'name'  => 'end_date',
+                'type'  => 'date',
+                'settings'=>array(
+                    'label' => 'Academic End Date',
+                    'value' => $end_date,
+                )
+            );
+        }
         $photo = "";
         $photo_id = $this->getMeta('avatar_id');
         if($photo_id) {
@@ -2867,7 +2893,6 @@ class User
         $res['o'] = $cal_stats['count_o'];
         $res['c'] = $cal_stats['count_c'];
         $res['h'] = $cal_stats['count_h'];
-        $res['u'] = $cal_stats['count_u'];
         $res['present_data'] = [];
 
         // Finding user logs
@@ -2987,25 +3012,11 @@ class User
      */
     public function getTransactionDetails()
     {
-        $reg_date = $this->getUser()->user_registered;
-        $reg_date_formatted = date('Y-m-d', strtotime($reg_date));
-        $start_date = '';
-        if(EduPress::isActive('section')){
-            $class_post_id = $this->getMeta('section_id');
-        } else if (EduPress::isActive('class')){
-            $class_post_id = $this->getMeta('class_id');
-        } else if(EduPress::isActive('shift')){
-            $class_post_id = $this->getMeta('shift_id');
-        }
+        $start_date = $this->getDate('start_date');
+        $end_date = $this->getDate('end_date');
 
-        $start_date = get_post_meta($class_post_id,'start_date', true);
-        $end_date = get_post_meta($class_post_id,'end_date', true);
-
-        $start_date_formatted = date('Y-m-d', strtotime($start_date));
-        $end_date_formatted = date('Y-m-d', strtotime($end_date));
-        
-        $dt1 = $reg_date_formatted < $start_date_formatted ? $start_date_formatted : $reg_date_formatted;
-        $dt2 = !empty($end_date_formatted) && $end_date_formatted > $dt1 ? $end_date_formatted : '';
+        $dt1 = $start_date;
+        $dt2 = !empty($end_date) && $end_date > $dt1 ? $end_date : '';
         
         $dt1 = new \DateTime($dt1);
         if(!empty($dt2)){

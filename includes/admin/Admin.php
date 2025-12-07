@@ -438,6 +438,8 @@ class Admin
 
         $devices = $body['body_response']['data']['devices'];
 
+        if(!is_array($devices)) return [];
+
         return array_combine( $devices, $devices );
 
     }

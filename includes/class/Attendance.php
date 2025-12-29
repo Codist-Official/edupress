@@ -680,7 +680,7 @@ class Attendance extends CustomPost
     {
         $data = self::prepareSyncRequest();
 
-        if( $data['status'] !== 200 ) return $data['body_response']['message'];
+        if( isset($data['status']) && $data['status'] !== 200 ) return $data['body_response']['message'];
 
         if(empty($data['body_response']['data'])) return 'No data found';
 
@@ -712,6 +712,9 @@ class Attendance extends CustomPost
             } else if($user_id && $insert){
 
                 if( $sms_notif !== 'active' && $admin_notif !== 'active') continue;
+                // if report time is not today then skip 
+                if(date('Y-m-d', strtotime($data['report_time'])) !== current_time('Y-m-d')) continue;
+
 
                 $aid = $wpdb->insert_id;
 
@@ -728,6 +731,16 @@ class Attendance extends CustomPost
 
                 $notifs = ['guardian_notification','admin_notification'];
                 foreach($notifs as $notif){
+
+                    // skip if previous sms sending inactive
+                    $today = current_time('Y-m-d');
+                    $report_time = date('Y-m-d', strtotime($data['report_time']));
+                    if($report_time < $today){
+                        // checking if sending enabled 
+                        $old_sms_enabled = Admin::getSetting('attendance_send_previous_days_sms') == 'active';
+                        if(!$old_sms_enabled) continue;
+                    }
+
 
                     if($notif == 'guardian_notification'){
 
@@ -822,12 +835,15 @@ class Attendance extends CustomPost
         $body['device_id'] = implode(',', $ids);
 
         $endpoint = EduPress::getApiBaseUrl() . '/logs';
+
+        if(current_user_can('manage_options')){ echo $endpoint; }
+        
         $args = array(
             'method' => 'GET',
             'body' => $body,
         );
 
-        $response = wp_remote_get($endpoint, $args);
+        $response = wp_remote_post($endpoint, $args);
 
         // Check for errors
         if(is_wp_error($response)) {

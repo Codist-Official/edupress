@@ -1346,7 +1346,16 @@ class User
 
         ob_start();
         ?>
-        <div class="count-results"><?php _e( 'Total ' .$qry->get_total() . ' users found!', 'edupress') ; ?> </div>
+        <div class="ep-flex-wrap">
+            <div class="ep-flex-8 ep-mb-flex-12">
+                <div class="count-results"><?php _e( 'Total ' .$qry->get_total() . ' users found!', 'edupress') ; ?> </div>
+            </div>
+            <div class="ep-flex-4 ep-mb-flex-12">
+                <?php if(EduPress::isActive('attendance')) : ?>
+                    <button class="ep-mt-sm generate_attendance_ids" type="button"><?php _e('Sync User Attendance IDs', 'edupress'); ?></button>
+                <?php endif; ?>
+            </div>
+        </div>
         <div class="edupress-table-wrap">
             <table class="edupress-table edupress-list edupress-master-table tablesorter" data-post-type="user">
 
@@ -3080,9 +3089,9 @@ class User
         $response['amount'] = $payment_amount;
         $response['total_paid'] = $total_paid;
         $response['total_due'] = $total_due;
-        $response['start_date'] = $start_date_formatted;
-        $response['end_date'] = $end_date_formatted;
-        $response['post_id'] = $class_post_id;
+        $response['start_date'] = $start_date_formatted ?? null;
+        $response['end_date'] = $end_date_formatted ?? null;
+        $response['post_id'] = $class_post_id ?? null;
         $response['user_id'] = $this->id;
         $response['query'] = $qry;
         $response['months'] = count($months);

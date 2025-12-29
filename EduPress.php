@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.5.8
+Version: 1.5.9
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -333,8 +333,9 @@ class EduPress
     public static function getApiBaseUrl()
     {
 
-        $domain = str_contains($_SERVER['HTTP_HOST'], 'localhost') ? "http://localhost/api.edupressbd.com" : "http://api.edupressbd.com";
+        $domain = str_contains($_SERVER['HTTP_HOST'], 'localhost') ? "http://localhost/api.edupressbd.com" : Admin::getSetting('attendance_api_endpoint', 'http://api.edupressbd.com');
         return $domain .'/wp-json/edupress_sync/v1';
+
 
     }
 

@@ -475,7 +475,7 @@ class Sms extends CustomPost
         $offset = $paged > 1 ? $this->posts_per_page * ($paged - 1) : 0;
 
         $qry = "SELECT * FROM {$this->table} WHERE 1 = 1 ";
-        if( $status == 'fail' ) $qry .= " AND response_code != 202 ";
+        if( $status == 'failed' ) $qry .= " AND response_code != 202 ";
         if( $status == 'success' ) $qry .= " AND response_code = 202 ";
         $qry .= " ORDER BY ID DESC LIMIT {$this->posts_per_page} ";
 

@@ -96,6 +96,87 @@
   }
 }
 
+.ep-mt{
+  &-xs{
+      margin-top: 5px !important;
+  }
+  &-sm{
+      margin-top: 10px !important;
+  }
+  &-md{
+      margin-top: 20px !important;
+  }
+  &-lg{
+      margin-top: 30px !important;
+  }
+  &-xl{
+      margin-top: 40px !important;
+  }
+  &-xxl{
+      margin-top: 50px !important;
+  }
+}
+.ep-mb{
+  &-xs{
+      margin-bottom: 5px !important;
+  }
+  &-sm{
+      margin-bottom: 10px !important;
+  }
+  &-md{
+      margin-bottom: 20px !important;
+  }
+  &-lg{
+      margin-bottom: 30px !important;
+  }
+  &-xl{
+      margin-bottom: 40px !important; 
+  }
+  &-xxl{
+      margin-bottom: 50px !important;
+  }
+}
+
+.ep-pt{
+  &-xs{
+      padding-top: 5px !important;
+  }
+  &-sm{
+      padding-top: 10px !important;
+  }
+  &-md{
+      padding-top: 20px !important;
+  }
+  &-lg{
+      padding-top: 30px !important;
+  }
+  &-xl{
+      padding-top: 40px !important;
+  }
+  &-xxl{
+      padding-top: 50px !important;
+  }
+}
+.ep-pb{
+  &-xs{
+      padding-bottom: 5px !important;
+  }
+  &-sm{
+      padding-bottom: 10px !important;
+  }
+  &-md{
+      padding-bottom: 20px !important;
+  }
+  &-lg{
+      padding-bottom: 30px !important;
+  }
+  &-xl{
+      padding-bottom: 40px !important;
+  }
+  &-xxl{
+      padding-bottom: 50px !important;
+  }
+}
 
 /* Status */
 .edupress-status-wrap{
@@ -354,7 +435,7 @@ form.edupress-send-sms-form{
 .edupress-pagination{
   width: 100%;
   height: auto;
-  margin: 50px auto;
+  margin: 25px auto;
   padding-bottom: 100px;
   ul.page-numbers{
     margin: 0 auto;
@@ -581,7 +662,7 @@ ul.exam-mark-details{
 
 .count-results{
   padding: 10px;
-  margin: 25px 0;
+  margin: 15px 0;
   border: 1px dotted $secondary-color;
   background-color: $color-white;
   font-weight: 500;

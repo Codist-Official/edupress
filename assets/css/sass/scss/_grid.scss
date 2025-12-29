@@ -1,0 +1,57 @@
+.ep-grid,
+form.ep-grid{
+    &-12{ grid-template-columns: repeat(12, 1fr); }
+    &-11{ grid-template-columns: repeat(11, 1fr); }
+    &-10{ grid-template-columns: repeat(10, 1fr); }
+    &-9{ grid-template-columns: repeat(9, 1fr); }
+    &-8{ grid-template-columns: repeat(8, 1fr); }
+    &-7{ grid-template-columns: repeat(7, 1fr); }
+    &-6{ grid-template-columns: repeat(6, 1fr); }
+    &-5{ grid-template-columns: repeat(5, 1fr); }
+    &-4{ grid-template-columns: repeat(4, 1fr); }
+    &-3{ grid-template-columns: repeat(3, 1fr); }
+    &-2{ grid-template-columns: repeat(2, 1fr); }
+    &-1{ grid-template-columns: repeat(1, 1fr); }
+}
+div[class*="ep-grid-"],
+form[class*="ep-grid-"],
+div[class*="ep-mb-grid-"],
+form[class*="ep-mb-grid-"]{
+    display: grid;
+    gap: var(--ep-gap);
+    overflow: hidden;
+    align-items: stretch;
+    .ep-gap-2x{
+        gap: calc(var(--ep-gap) * 2) var(--ep-gap);
+    }
+}
+
+form[class*="ep-grid-"],
+form[class*="ep-mb-grid-"]{
+    align-items: flex-start !important;
+}
+
+.ep-grid-ad{
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 768px){
+    .ep-mb-grid{
+        &-12{ grid-template-columns: repeat(12, 1fr) !important; }
+        &-11{ grid-template-columns: repeat(11, 1fr) !important; }
+        &-10{ grid-template-columns: repeat(10, 1fr) !important; }
+        &-9{ grid-template-columns: repeat(9, 1fr) !important; }
+        &-8{ grid-template-columns: repeat(8, 1fr) !important; }
+        &-7{ grid-template-columns: repeat(7, 1fr) !important; }
+        &-6{ grid-template-columns: repeat(6, 1fr) !important; }
+        &-5{ grid-template-columns: repeat(5, 1fr) !important; }
+        &-4{ grid-template-columns: repeat(4, 1fr) !important; }
+        &-3{ grid-template-columns: repeat(3, 1fr) !important; }
+        &-2{ grid-template-columns: repeat(2, 1fr) !important; }
+        &-1{ grid-template-columns: repeat(1, 1fr) !important; }    
+    }
+    div[class*="ep-mb-grid-"],
+    form[class*="ep-mb-grid-"]{
+        gap: calc(var(--ep-gap) / 2);
+    }
+}

@@ -623,6 +623,11 @@ class Admin
                         'label' => 'Global Print Button'
                     )
                 );
+
+                // only admin can set this features 
+                if(!current_user_can('manage_options')){
+                    unset($fields['exam_active'], $fields['transaction_active'], $fields['term_active'], $fields['subject_active'], $fields['notice_active']);
+                }
                 break;
                 
             case 'institute':
@@ -1041,6 +1046,20 @@ class Admin
                     )
                 );
 
+                $fields['attendance_api_endpoint'] = array(
+                    'type'  => 'select',
+                    'name'  => 'attendance_api_endpoint',
+                    'settings' => array(
+                        'value' => Admin::getSetting('attendance_api_endpoint', 'http://api.edupressbd.com'),
+                        'label' => "Attendance API Endpoint",
+                        'id' => 'attendance_api_endpoint',
+                        'options' => array(
+                            'http://api.edupressbd.com' => 'api.edupressbd.com',
+                            'http://api2.edupressbd.com' => 'api2.edupressbd.com',
+                        )
+                    )
+                );
+
                 $fields['attendance_device_count'] = array(
                     'type'  => 'select',
                     'name'  => 'attendance_device_count',
@@ -1186,6 +1205,16 @@ class Admin
                         'label' => 'Admin SMS format',
                         'placeholder' => $default_text,
                         'id' => 'attendance_sms_format_to_admin',
+                    )
+                );
+
+                $fields['attendance_send_previous_days_sms'] = array(
+                    'type'  => 'select',
+                    'name'  => 'attendance_send_previous_days_sms',
+                    'settings' => array(
+                        'options' => array('active' => 'Yes', 'inactive' => 'No'),
+                        'value' => Admin::getSetting('attendance_send_previous_days_sms', 'inactive'),
+                        'label' => 'Send previous days attendance SMS',
                     )
                 );
 

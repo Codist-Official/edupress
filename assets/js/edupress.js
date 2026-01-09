@@ -103,7 +103,7 @@ jQuery(document).ready(function(){
                 }
                 showEduPressLoading();
             },
-            success: function ( res, xhr, ele ){
+            success: function ( res, xhr ){
                 hideEduPressLoading();
                 clog(res);
                 if( res.status > 0 ){

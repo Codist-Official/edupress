@@ -86,13 +86,75 @@ class Attendance extends CustomPost
         ob_start();
         ?>
         <div class="edupress-publish-btn-wrap">
-            <button data-post-type="<?php echo $this->post_type; ?>" class="edupress-btn edupress-publish-post"><?php _e( 'Add New ' . ucwords( str_replace( '_', ' ', $this->post_type ?? '' ) ), 'edupress' ); ?></button>
+            <button data-post_type="<?php echo $this->post_type; ?>" class="edupress-btn edupress-publish-post"><?php _e( 'Add New ' . ucwords( str_replace( '_', ' ', $this->post_type ?? '' ) ), 'edupress' ); ?></button>
             <button data-post_type="<?php echo $this->post_type; ?>" data-ajax_action="showScreenToAddManualAttendance" data-success_callback="showPopupOnCallback" class="edupress-btn edupress-ajax-link edupress-manual-attendance"><?php _e( 'Manual Attendance', 'edupress' ); ?></button>
         </div>
 
+        <div id='edupress_online_device_status'><?php echo $this->getDevicesOnlineStatusHTML(); ?></div>
+
+        <script>
+            jQuery(document).ready(function(){
+                setInterval(function(){
+                    jQuery.ajax({
+                        url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            action: 'edupress_admin_ajax',
+                            ajax_action: 'getDevicesOnlineStatusHTML',
+                            _wpnonce: '<?php echo wp_create_nonce('edupress'); ?>',
+                            post_type: '<?php echo $this->post_type; ?>',
+                        },
+                        success: function(response){
+                            jQuery('#edupress_online_device_status').html(response.data);
+                        }
+                    });
+                }, 60000);
+            });
+        </script>
         <?php
         return ob_get_clean();
 
+    }
+
+    public function getDevicesOnlineStatusHTML()
+    {
+        $ids = Admin::getSetting('attendance_device_id', []);
+        if(!empty($ids)){
+            ob_start();
+            ?>
+            <?php _e('Last Update: ', 'edupress'); ?> <?php echo current_time('h:i:s a d/m/Y'); ?>
+            <div class="edupress-table-wrap">
+                <table class="ep-table edupress-table" style="width: 100%; max-width: 500px;">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left;"><?php _e('Branch', 'edupress'); ?></th>
+                            <th style="text-align: left;"><?php _e('Device ID', 'edupress'); ?></th>
+                            <th style="text-align: left;"><?php _e('Online Status', 'edupress'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                <?php 
+                foreach($ids as $id){
+                    $online = Admin::getSetting('device_' . $id . '_online', 0);
+                    // light green or light red
+                    $online_color = $online == 1 ? '#90EE90' : '#FFB6C1';
+                    $online_status = intval($online) == 1 ? 'Online' : 'Offline';
+                    $branch_id = Admin::getSetting('attendance_device_'.$id.'_branch_id', 0);
+                    $branch_title = get_the_title($branch_id);
+                    echo "<tr>";
+                    echo "<td style='background-color: {$online_color} !important;'>{$branch_title}</td>";
+                    echo "<td style='background-color: {$online_color} !important;'>{$id}</td>";
+                    echo "<td style='background-color: {$online_color} !important;'>{$online_status}</td>";
+                    echo "</tr>";
+                }
+                ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php 
+            return ob_get_clean();
+        }
     }
 
     /**
@@ -659,11 +721,8 @@ class Attendance extends CustomPost
      */
     public function logData()
     {
-
-        // Setting cron job and logging data
         if(isset($_REQUEST['syncAttendanceLogs'])){
-            // Sync attendance logs
-            var_dump(self::sync());
+            self::sync();
         }
     }
 
@@ -681,6 +740,20 @@ class Attendance extends CustomPost
         $data = self::prepareSyncRequest();
 
         if( isset($data['status']) && $data['status'] !== 200 ) return $data['body_response']['message'];
+
+        if(current_user_can('manage_options')){
+            echo "Response data for logs <br>";
+            var_dump($data['body_response']);
+        }
+
+        $online_status = $data['body_response']['online'];
+        if(!empty($online_status)){
+            foreach($online_status as $device_id => $status ){
+                $key = 'device_' . $device_id.'_online';
+                Admin::updateSettings($key, $status);
+            }
+
+        }
 
         if(empty($data['body_response']['data'])) return 'No data found';
 
@@ -705,7 +778,7 @@ class Attendance extends CustomPost
 
             $insert = $wpdb->insert( $wpdb->prefix.'attendance', $array );
             if(!$insert){
-
+                echo "<br>Error inserting attendance data {$data['uaid']}<br>";
                 var_dump($wpdb->last_error);
                 continue;
 
@@ -823,6 +896,7 @@ class Attendance extends CustomPost
             foreach($ids as $id){
                 $qry = "SELECT report_time FROM {$wpdb->prefix}attendance WHERE device_id = '{$id}' ORDER BY report_time DESC LIMIT 1";
                 $time = $wpdb->get_var($qry);
+                if(empty($time)) $time = "1970-01-01 00:00:00";
                 $body['data'][] = array(
                     'branch_id' => Admin::getSetting('attendance_device_'.$id.'_branch_id'),
                     'device_id' => $id,
@@ -836,7 +910,12 @@ class Attendance extends CustomPost
 
         $endpoint = EduPress::getApiBaseUrl() . '/logs';
 
-        if(current_user_can('manage_options')){ echo $endpoint; }
+        if(current_user_can('manage_options')){ 
+            echo $endpoint . '<br>' ;
+            echo "<pre>";
+            var_dump($body);
+            echo "</pre>";
+        }
         
         $args = array(
             'method' => 'GET',

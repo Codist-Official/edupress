@@ -1684,6 +1684,15 @@ class AdminAjax
         );
     }
 
+    public function getDevicesOnlineStatusHTML()
+    {
+        $attendance = new Attendance();
+        return array(
+            'status' => 1,
+            'data' => $attendance->getDevicesOnlineStatusHTML(),
+        );
+    }
+
 }
 
 AdminAjax::instance();

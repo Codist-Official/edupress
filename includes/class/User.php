@@ -479,8 +479,8 @@ class User
 
         ob_start();
         ?>
-        <div class="edupress-filter-list-wrap" data-post-type="<?php echo $this->post_type; ?>">
-            <form data-post-type="<?php echo $this->post_type; ?>" action="" method="GET" class="edupress-form edupress-filter-list">
+        <div class="edupress-filter-list-wrap" data-post_type="<?php echo $this->post_type; ?>">
+            <form data-post_type="<?php echo $this->post_type; ?>" action="" method="GET" class="edupress-form edupress-filter-list">
 
                 <?php
                 foreach ($fields as $field) {
@@ -888,8 +888,6 @@ class User
         }
 
         return $fields;
-
-
     }
 
     /**
@@ -956,10 +954,11 @@ class User
                         <?php
                             foreach($value_av as $k){
                                 $k['settings']['disabled'] = true;
+                                if(!isset($k['settings']['id'])) $k['settings']['id'] = $k['name'];
                                 $name = str_replace('[]', '', $k['name']);
                                 ?>
                                 <td>
-                                    <label for=""><?php _e( $k['settings']['label'] ?? '', 'edupress' ); ?></label>
+                                    <label for="<?php echo $k['name'] ?? ''; ?>"><?php _e( $k['settings']['label'] ?? '', 'edupress' ); ?></label>
                                     <?php echo EduPress::generateFormElement( $k['type'], $name, $k['settings'] ); ?>
                                 </td>
                                 <?php
@@ -1138,8 +1137,6 @@ class User
                 );
             }
         }
-
-
         $fields['status'] = array(
             'type' => 'select',
             'name' => 'status',
@@ -1181,13 +1178,12 @@ class User
             $only_manager_fields = array('role', 'branch_id', 'shift_id', 'class_id', 'section_id', 'payment_type', 'payment_amount', 'roll', 'mobile', 'status' );
             foreach( $fields as $k => $field ){
 
+                if(!isset($field['settings']['id'])) $field['settings']['id'] = $field['name'];
+
                 if( $field['type'] == 'submit' ) continue;
-
                 if ( $field['type'] == 'hidden' ) {
-
                     echo EduPress::generateFormElement( $field['type'], $field['name'], $field['settings'] );
                     continue;
-
                 }
 
                 if( !User::currentUserCan('edit', 'user') && in_array( $field['name'], $only_manager_fields ) ) continue;
@@ -1196,7 +1192,7 @@ class User
                 ?>
 
                 <div class="form-row">
-                    <div class="label-wrap"><label for="<?php echo $field['settings']['id'] ?? ''; ?>"><?php _e( $label, 'edupress' ); ?></label></div>
+                    <div class="label-wrap"><label for="<?php echo $field['name'] ?? ''; ?>"><?php _e( $label, 'edupress' ); ?></label></div>
                     <div class="value-wrap"><?php echo EduPress::generateFormElement( $field['type'], $field['name'], $field['settings'] ); ?></div>
                 </div>
 
@@ -1357,13 +1353,13 @@ class User
             </div>
         </div>
         <div class="edupress-table-wrap">
-            <table class="edupress-table edupress-list edupress-master-table tablesorter" data-post-type="user">
+            <table class="edupress-table edupress-list edupress-master-table tablesorter" data-post_type="user">
 
                 <thead>
                     <tr>
                         <th class="no-print">
                             <span class="no-print">
-                                <input data-post-type="<?php echo $this->post_type; ?>" type="checkbox" name="edupress-select-bulk-delete" class="edupress-bulk-select-all" id="edupress-select-bulk-delete">
+                                <input data-post_type="<?php echo $this->post_type; ?>" type="checkbox" name="edupress-select-bulk-delete" class="edupress-bulk-select-all" id="edupress-select-bulk-delete">
                                 <!--                            <label for="edupress-select-bulk-delete">--><?php //_e('All', 'edupress'); ?><!--</label>-->
                                 <span style="float:right">
                                     <a title="Bulk Delete" href="javascript:void(0)" class="edupress-bulk-delete"><?php echo EduPress::getIcon('delete'); ?></a>
@@ -1413,7 +1409,7 @@ class User
                                 $user_visible_id = $this->getMeta('attendance_id');
                             }
                         ?>
-                        <input <?php echo $disable_own; ?> data-id="<?php echo $this->id; ?>" data-post-type="<?php echo $this->post_type; ?>" type="checkbox" name="edupress-bulk-delete-post[]" class="edupress-bulk-select-item no-print" value="<?php echo $this->id; ?>" id="id_<?php echo $this->id; ?>">
+                        <input <?php echo $disable_own; ?> data-id="<?php echo $this->id; ?>" data-post_type="<?php echo $this->post_type; ?>" type="checkbox" name="edupress-bulk-delete-post[]" class="edupress-bulk-select-item no-print" value="<?php echo $this->id; ?>" id="id_<?php echo $this->id; ?>">
                         <label for="id_<?php echo $this->id; ?>"><?php echo $user_visible_id; ?></label>
 
                     </td>
@@ -2288,12 +2284,13 @@ class User
                 <form action="" class="<?php echo EduPress::getClassNames(array('edupress-update-user-profile'), 'form'); ?>">
                     <?php
                     foreach($fields as $k => $v){
+                        if(!isset($v['settings']['id'])) $v['settings']['id'] = $v['name'];
                         ?>
                         <div class="form-row">
 
                             <?php if( $v['type'] !== 'html' ): ?>
                             <div class="label-wrap">
-                                <label for=""><?php _e( $v['settings']['label'] ?? ''); ?></label>
+                                <label for="<?php echo $v['name'] ?? ''; ?>"><?php _e( $v['settings']['label'] ?? ''); ?></label>
                             </div>
                             <?php endif; ?>
 

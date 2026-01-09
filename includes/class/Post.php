@@ -331,6 +331,8 @@ class Post
             <?php
             foreach( $fields as $k => $field ){
 
+                if(!isset($field['settings']['id'])) $field['settings']['id'] = $field['name'];
+
                 if( $field['type'] == 'submit' ) continue;
 
                 if ( $field['type'] == 'hidden' ) {
@@ -344,10 +346,8 @@ class Post
                 ?>
 
                 <div class="form-row <?php echo $field['name'] ?? ''; ?>">
-
                     <div class="label-wrap"><label for="<?php echo $field['settings']['id'] ?? ''; ?>"><?php _e( $label, 'edupress' ); ?></label></div>
                     <div class="value-wrap"><?php echo EduPress::generateFormElement( $field['type'], $field['name'], $field['settings'] ); ?></div>
-
                 </div>
 
                 <?php
@@ -357,9 +357,7 @@ class Post
             <div class="form-row">
                 <div class="label-wrap"></div>
                 <div class="value-wrap">
-
                     <?php
-
                         echo EduPress::generateFormElement( 'submit', 'submit', array( 'value' => $action == 'edit' ? 'Update' : 'Publish' ) );
                         echo EduPress::generateFormElement( 'hidden', 'action', array( 'value' => 'edupress_admin_ajax' ) );
                         echo EduPress::generateFormElement( 'hidden', 'ajax_action', array( 'value' => $action.'Post' ) );
@@ -389,9 +387,7 @@ class Post
                         if( !empty($error_callback) ):
                             echo EduPress::generateFormElement( 'hidden', 'error_callback', array( 'value' => $error_callback ) );
                         endif;
-
-
-                    wp_nonce_field( 'edupress' );
+                        wp_nonce_field( 'edupress' );
 
                     ?>
                 </div>
@@ -619,13 +615,15 @@ class Post
         ob_start();
         echo apply_filters( "edupress_filter_{$this->post_type}_before_form_html", '' );
         ?>
-        <div class="edupress-filter-list-wrap" data-post-type="<?php echo $this->post_type; ?>">
-            <form data-post-type="<?php echo $this->post_type; ?>" action="" method="GET" class="edupress-form edupress-filter-list">
+        <div class="edupress-filter-list-wrap" data-post_type="<?php echo $this->post_type; ?>">
+            <form data-post_type="<?php echo $this->post_type; ?>" action="" method="GET" class="edupress-form edupress-filter-list">
 
                 <?php
 
                     $hidden_fields = [];
                     foreach ($fields as $field) {
+
+                        if(!isset($field['settings']['id'])) $field['settings']['id'] = $field['name'];
 
                         if( $field['type'] === 'submit' ) continue;
                         if( $field['type'] === 'hidden' ) {
@@ -759,7 +757,7 @@ class Post
         ob_start();
         ?>
         <div class="edupress-publish-btn-wrap">
-            <button data-post-type="<?php echo $this->post_type; ?>" class="edupress-btn edupress-publish-post"><?php _e( 'Add New ' . ucwords( str_replace( '_', ' ', $this->post_type ) ), 'edupress' ); ?></button>
+            <button data-post_type="<?php echo $this->post_type; ?>" class="edupress-btn edupress-publish-post"><?php _e( 'Add New ' . ucwords( str_replace( '_', ' ', $this->post_type ) ), 'edupress' ); ?></button>
         </div>
 
         <?php
@@ -795,14 +793,14 @@ class Post
         ob_start();
         ?>
         <div class="edupress-table-wrap">
-            <table class="<?php echo $this->draggable ? 'draggable' : ''; ?> edupress-table edupress-master-table edupress-post-list tablesorter" data-post-type="<?php echo $this->post_type; ?>">
+            <table class="<?php echo $this->draggable ? 'draggable' : ''; ?> edupress-table edupress-master-table edupress-post-list tablesorter" data-post_type="<?php echo $this->post_type; ?>">
                 <thead>
                     <tr>
                         <?php if( User::currentUserCan('delete', $this->post_type ) ): ?>
                             <th class="no-print">
-                                <input id="select_all" title="Select All" type="checkbox"  class="edupress-bulk-select-all" data-post-type="<?php echo $this->post_type; ?>">
+                                <input id="select_all" title="Select All" type="checkbox"  class="edupress-bulk-select-all" data-post_type="<?php echo $this->post_type; ?>">
                                 <label for="select_all"><?php _e( 'All', 'edupress' ); ?></label>
-                                <a style="float: right" href="javascript:void(0)" class="edupress-bulk-delete" data-post-type="<?php echo $this->post_type;?>"><?php echo EduPress::getIcon('delete'); ?></a>
+                                <a style="float: right" href="javascript:void(0)" class="edupress-bulk-delete" data-post_type="<?php echo $this->post_type;?>"><?php echo EduPress::getIcon('delete'); ?></a>
                             </th>
                         <?php endif; ?>
 
@@ -823,13 +821,13 @@ class Post
                     <?php $this->id = $qry->post->ID; ?>
                     <?php $this->setPost($qry->post); ?>
                     <?php $this->setMetadata( get_metadata('post', $qry->post->ID) ); ?>
-                    <tr draggable="<?php echo $this->draggable? 'true' : 'false'; ?>"  data-post-type="<?php echo $this->post_type; ?>"  data-post-id="<?php echo $this->id; ?>" data-id="<?php echo $this->id; ?>">
+                    <tr draggable="<?php echo $this->draggable? 'true' : 'false'; ?>"  data-post_type="<?php echo $this->post_type; ?>"  data-post-id="<?php echo $this->id; ?>" data-id="<?php echo $this->id; ?>">
 
                         <?php
                         if( User::currentUserCan( 'delete', $this->post_type ) ){
                             ?>
                             <td class="no-print">
-                                <input id="id_<?php echo $this->id; ?>" type="checkbox" class="edupress-bulk-select-item" name="edupress-bulk-delete-post[]" data-id="<?php echo $this->id; ?>" data-post-type="<?php echo $this->post_type; ?>">
+                                <input id="id_<?php echo $this->id; ?>" type="checkbox" class="edupress-bulk-select-item" name="edupress-bulk-delete-post[]" data-id="<?php echo $this->id; ?>" data-post_type="<?php echo $this->post_type; ?>">
                                 <label for="id_<?php echo $this->id; ?>"><?php echo $this->id; ?></label>
                             </td>
                             <?php
@@ -862,11 +860,11 @@ class Post
                                 <?php
 
                                     if( User::currentUserCan( 'edit', $this->post_type ) ) {
-                                        $edit_action_html .= "<a data-target='popup' class='edupress-edit-post' data-action='edit' data-post-type='{$this->post_type}' data-id='{$this->id}' href='javascript:void(0)'>". EduPress::getIcon('update') ."</a> ";
+                                        $edit_action_html .= "<a data-target='popup' class='edupress-edit-post' data-action='edit' data-post_type='{$this->post_type}' data-id='{$this->id}' href='javascript:void(0)'>". EduPress::getIcon('update') ."</a> ";
                                     }
 
                                     if( User::currentUserCan( 'delete', $this->post_type ) ) {
-                                        $edit_action_html .= " <a data-target='status' class='edupress-delete-post' data-action='delete' data-post-type='{$this->post_type}'  data-id='{$this->id}'  href='javascript:void(0)'>". EduPress::getIcon('delete') ."</a>";
+                                        $edit_action_html .= " <a data-target='status' class='edupress-delete-post' data-action='delete' data-post_type='{$this->post_type}'  data-id='{$this->id}'  href='javascript:void(0)'>". EduPress::getIcon('delete') ."</a>";
                                     }
 
                                     echo apply_filters( "edupress_list_{$this->post_type}_action_html", $edit_action_html, $this->id );

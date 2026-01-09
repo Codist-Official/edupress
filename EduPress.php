@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.5.9
+Version: 1.5.10
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -468,14 +468,14 @@ class EduPress
                     $value .= "<a data-uid='calendarEditBtnUid' data-post_type='calendar' data-success_callback='editCalendarSuccessCallback' data-post_id='{$post->ID}' data-ajax_action='getPostEditForm' href='javascript:void(0)' class='showEditCalendarScreen edupress-ajax edupress-ajax-link'>".EduPress::getIcon('edit')."</a>";
                 endif;
                 if(User::currentUserCan('delete', 'calendar')):
-                    $value .= "<a data-post-type='calendar' data-before_send_callback='deleteCalendarBeforeSendCallback' data-success_callback='deleteCalendarSuccessCallback' data-action='edupress_admin_ajax' data-id='{$post->ID}' data-post_id='{$post->ID}' data-ajax_action='deleteCalendar' href='javascript:void(0)' class='edupress-ajax edupress-ajax-link'>".EduPress::getIcon('delete')."</a>";
+                    $value .= "<a data-post_type='calendar' data-before_send_callback='deleteCalendarBeforeSendCallback' data-success_callback='deleteCalendarSuccessCallback' data-action='edupress_admin_ajax' data-id='{$post->ID}' data-post_id='{$post->ID}' data-ajax_action='deleteCalendar' href='javascript:void(0)' class='edupress-ajax edupress-ajax-link'>".EduPress::getIcon('delete')."</a>";
                 endif;
                 $value .= "<a data-uid='calendarEditBtnUid' data-post_type='calendar' data-success_callback='editCalendarSuccessCallback' data-post_id='{$post->ID}' data-ajax_action='getPostEditForm' href='javascript:void(0)' class='showEditCalendarScreen edupress-ajax edupress-ajax-link'>".EduPress::getIcon('view')."</a>";
             }
             
         } else if ( $k == 'view_action' && $post->post_type == 'notice'){
 
-            $value = "<a href='javascript:void(0)' class='edupress-ajax-link' data-success_callback='showPopupOnCallback' data-ajax_action='viewPost' data-post-type='{$post->post_type}' data-id='{$post->ID}' href='javascript:void(0)'>View</a> ";
+            $value = "<a href='javascript:void(0)' class='edupress-ajax-link' data-success_callback='showPopupOnCallback' data-ajax_action='viewPost' data-post_type='{$post->post_type}' data-id='{$post->ID}' href='javascript:void(0)'>View</a> ";
 
         } else {
 

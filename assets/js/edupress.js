@@ -386,18 +386,15 @@ jQuery(document).ready(function(){
     // Ajax link for edit post
     $j(document).on('click', '.edupress-edit-post', function (e){
         preventDefault(e);
-
-        let link = $j(this);
-        let linkData = link.data();
-        let params = new URLSearchParams(linkData);
-
-        let beforeSendCallback = params.get('before-send-callback');
-        let successCallback = params.get('success-callback');
-        let errorCallback = params.get('error-callback');
+        let params = new URLSearchParams($j(this).data());
+        clog(params);
+        let beforeSendCallback = params.get('before_send_callback');
+        let successCallback = params.get('success_callback');
+        let errorCallback = params.get('error_callback');
 
         let postId = params.get('id');
-        let postType = params.get('post-type');
-        let title = 'Update ' + postType.replace(/_/g, ' ');
+        let postType = params.get('post_type');
+        let title = typeof postType === 'string' ? 'Update ' + postType.replace(/_/g, ' ') : 'Update';
         let data = {
             action: 'edupress_admin_ajax',
             ajax_action: 'getPostEditForm',
@@ -518,7 +515,7 @@ jQuery(document).ready(function(){
     $j(document).on('click', '.edupress-publish-post', function (e){
 
         preventDefault(e);
-        let postType = $j(this).data('post-type');
+        let postType = $j(this).data('post_type');
         let data = `action=edupress_admin_ajax&ajax_action=getPostPublishForm&post_type=${postType}&_wpnonce=${edupress.wpnonce}`;
 
         $j.ajax({
@@ -1344,13 +1341,13 @@ jQuery(document).ready(function(){
     })
 
     let draggedItem = null;
-    let dragSelector = "table.draggable[data-post-type='subject'] tbody tr";
+    let dragSelector = "table.draggable[data-post_type='subject'] tbody tr";
 
     // Drag Drop to Save Order
     $j(document).on('dragstart', dragSelector, function(e){
         draggedItem = $j(this);
         $j(this).addClass('dragging');
-        setTimeout( () => $j(this).hide(), 0 );
+        setTimeout( () => $j(this).hide(), 0 ); 
     });
 
     // Dragend

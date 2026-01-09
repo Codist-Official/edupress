@@ -1056,6 +1056,7 @@ class Admin
                         'options' => array(
                             'http://api.edupressbd.com' => 'api.edupressbd.com',
                             'http://api2.edupressbd.com' => 'api2.edupressbd.com',
+                            'http://api3.edupressbd.com' => 'api3.edupressbd.com',
                         )
                     )
                 );

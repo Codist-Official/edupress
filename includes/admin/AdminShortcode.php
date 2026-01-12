@@ -61,6 +61,7 @@ class AdminShortcode
         $method = $params['action'];
 
         if( method_exists( $this, $method ) ) return $this->$method();
+        return $this->showFrontendPanel();
         
     }
 

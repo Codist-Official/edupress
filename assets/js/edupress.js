@@ -204,6 +204,7 @@ jQuery(document).ready(function(){
         let form = $j(this);
         let data = form.serialize();
         let params = new URLSearchParams(data);
+        let ele = $j(this);
 
         let beforeSendCallback = params.get('before_send_callback');
         let successCallback = params.get('success_callback');

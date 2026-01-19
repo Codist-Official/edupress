@@ -8,6 +8,7 @@
   position: fixed;
   overflow: hidden;
   left: 0;
+  top: 0;
   display: inline-block;
   .topbar-wrap{
     width: 100%;
@@ -232,12 +233,9 @@ ul.top-breadcrumb-bar{
   .edupress-frontend-panel-wrap{
     width: 100%;
     height: auto;
-    padding: 0;
-    position: relative;
-    left: 0;
     .topbar-wrap{
       position: relative;
-      .institute-title{
+      .institute-title{ 
         display: none;
       }
     }

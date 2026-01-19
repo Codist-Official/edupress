@@ -41,14 +41,17 @@ class Statistics
 
         $types =  EduPress::getFeatureList();
 
-        $types_always_active = [ 'grade_table', 'user', 'setting', 'result' ];
+        $types_always_active = [  'user', 'setting' ];
+        if(EduPress::isActive('exam')){
+            $types_always_active[] = 'result';
+            $types_always_active[] = 'grade_table';
+        }
 
         $menus = [];
 
         foreach( $types as $k => $v ){
 
-            if( !in_array( $k, $types_always_active ) && Admin::getSetting(strtolower($k).'_active') === 'inactive' ) continue;
-
+            if( !in_array( $k, $types_always_active ) && EduPress::isActive($k) == false ) continue;
             if( User::currentUserCan( 'read', $k ) ) $menus[$k] = $v;
             
         }

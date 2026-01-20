@@ -6,11 +6,11 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.6.1
+Version: 1.6.3
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
-Tested up to: 6.5.2
+Tested up to: 6.5.1
 */
 
 defined( 'ABSPATH' ) || die(); 

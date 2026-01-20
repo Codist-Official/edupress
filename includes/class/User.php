@@ -243,7 +243,6 @@ class User
      */
     public static function currentUserCan( $action, $post_type )
     {
-        $cap = trim(strtolower($action . '_' . $post_type));
         if($post_type === 'user') $post_type = 'people';
         if($post_type === 'term') $post_type = 'exam_term';
         if( in_array( $post_type, array( 'exam', 'result', 'calendar', 'notice' ) ) && $action == 'read' ) return true;
@@ -264,9 +263,7 @@ class User
      */
     public static function getCapabilityErrorMsg( $action,  $post_type )
     {
-
         return __( "Sorry! You are not authorized to $action $post_type", 'edupress' );
-
     }
 
     /**
@@ -278,7 +275,6 @@ class User
      */
     public function addCustomRoles()
     {
-
         // Student
         add_role(
             'student',
@@ -460,7 +456,6 @@ class User
             default:
                 break;
         }
-
     }
 
     /**
@@ -501,7 +496,6 @@ class User
                         ?>
                     </div>
                 </div>
-
             </form>
         </div>
 
@@ -510,7 +504,6 @@ class User
         $html = apply_filters( "edupress_filter_{$this->post_type}_form_html", $html );
 
         if ( !$wrap ) return $html;
-
         return EduPress::wrapInContentBox( 'Filter Users', $html );
 
     }
@@ -530,10 +523,6 @@ class User
         $branch = new Branch();
         $branch_options = $branch->getPosts( [], true );
         $branch_id = sanitize_text_field($_REQUEST['branch_id'] ?? '');
-        $shift_id = sanitize_text_field($_REQUEST['shift_id'] ?? '');
-        $class_id = sanitize_text_field($_REQUEST['class_id'] ?? '');
-        $section_id = sanitize_text_field($_REQUEST['section_id'] ?? '');
-
 
         $fields['branch_id'] = array(
             'type' => 'select',

@@ -10,7 +10,7 @@ Version: 1.6.1
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
-Tested up to: 6.5.1
+Tested up to: 6.5.2
 */
 
 defined( 'ABSPATH' ) || die(); 

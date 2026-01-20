@@ -134,7 +134,7 @@ class AjaxUpload
                             if(ajax_upload.loading){
                                 ajax_upload.loading.hide();
                             }
-                            $j(`:input[name=${targetName}]`).val(response.ids);
+                            $j(`:input[name='${targetName}']`).val(response.data.ids);
                             $j(`.${targetClass}`).html('');
                             if( $j(`.${targetClass}`).length > 0 ){
                                 $j.each( response.data, function( k, v) {

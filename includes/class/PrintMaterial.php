@@ -258,6 +258,7 @@ class PrintMaterial{
 
     public static function getPanels()
     {
+        if(!current_user_can('manage_options') && !User::currentUserCan('read','people')) return __('Only admin is authorized to see content!', 'edupressbd');
         $activePage = sanitize_text_field($_REQUEST['activePage'] ?? '');
         $title = '';
         $content = '';

@@ -894,7 +894,7 @@ class Attendance extends CustomPost
 
         if(!empty($ids)){
             foreach($ids as $id){
-                $qry = "SELECT report_time FROM {$wpdb->prefix}attendance WHERE device_id = '{$id}' ORDER BY report_time DESC LIMIT 1";
+                $qry = "SELECT report_time FROM {$wpdb->prefix}attendance WHERE device_id = '{$id}' ORDER BY report_time DESC LIMIT 100";
                 $time = $wpdb->get_var($qry);
                 if(empty($time)) $time = "1970-01-01 00:00:00";
                 $body['data'][] = array(

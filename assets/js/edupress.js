@@ -1447,6 +1447,41 @@ jQuery(document).ready(function(){
     })
 
 
+    // id card download option 
+    $j(document).on('click', '.edupress-download-id-card-pdf', function(e){
+        preventDefault(e);
+        let id = $j(this).data('id');
+        let sel = '#template_id_' + id;
+        let templateId = $j(sel).val();
+        if(templateId === ''){
+            alert('Please select a template!');
+            $j(sel).focus();
+            return false;
+        }
+        let data = `action=print_material_ajax&ajax_action=downloadIdCardPdf&id=${id}&template_id=${templateId}&_wpnonce=${edupress.wpnonce}`;
+        $j.ajax({
+            url: edupress.ajax_url,
+            data: data,
+            dataType: 'json',
+            beforeSend: function(){
+                clog(data);
+                showEduPressLoading();
+            },
+            success: function(res){
+                clog(res);
+                hideEduPressLoading();
+                if(res.data.status == 1){
+                    // download pdf file 
+                    window.open(res.data.pdf, '_blank');
+                    showEduPressPopup(res.data.data);
+                } else {
+                    showEduPressStatus('error');
+                }
+            }
+        })
+    })
+
+
 })
 ///// jQuery Ends //////
 

@@ -46,58 +46,124 @@ class Debug
      */
     public function debug()
     {
-        // Set path to wkhtmltopdf
-        require_once EDUPRESS_LIB_DIR .'/wkhtmltopdf/autoload.php';
-        $pdf = new \mikehaertl\wkhtmlto\Pdf([
-            'binary' => '/usr/local/bin/wkhtmltopdf', // macOS (Intel)
-            'encoding' => 'UTF-8',
-            'page-width'  => '54mm',
-            'page-height' => '86mm',
-            'margin-top'    => 0,
-            'margin-right'  => 0,
-            'margin-bottom' => 0,
-            'margin-left'   => 0,
-            'disable-smart-shrinking',
-            'print-media-type',
-        ]);
-
-        // Your HTML
-        $html = '
-        <!DOCTYPE html>
+        
+        ob_start(); 
+        ?> 
         <html>
-        <head>
-        <style>
-        body { margin:0; padding:0; }
-        .card {
-        width: 54mm;
-        height: 86mm;
-        background: #f4ffd6;
-        position: relative;
-        font-family: Georgia;
-        }
-        .class { position:absolute; top:54mm; left:6mm; }
-        .batch { position:absolute; top:62mm; left:6mm; }
-        </style>
-        </head>
-        <body>
-        <div class="card">
-        <div class="class">Class: 10</div>
-        <div class="batch">Batch: A</div>
-        </div>
-        </body>
+            <head></head>
+            <body>
+                <style>
+                    html, body, *{
+                        margin: 0;
+                        padding: 0;
+                    }
+                    .id-card-holder{
+                        height: 85.598mm;
+                        width: 53.975mm;
+                        height: 100%;
+                        width: 100%;
+                        background-color: #fff;
+                        border: none;
+                        background-image: url('<?php echo EDUPRESS_IMG_URL; ?>front-bg.png');
+                        background-size: cover;
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        position: relative;
+                    }
+                    .id-card-inner{
+                        width: 100%;
+                        height: 100%;
+                        background-color: transparent;
+                        border: none;
+                        top: 85mm;
+                        left: 12mm;
+                        position: absolute;
+                        line-height: 1.65;
+                    }
+                    .card-row{
+                        display: inline-block;
+                        width: 100%;
+                    }
+
+                    .card-label,
+                    .card-value{
+                        display: inline-block;
+                        float:left;
+                        font-size: 18px;
+                        font-weight: bold;
+                        font-family: Calibri, sans-serif;
+                    }
+                    .card-label{
+                        width: 18mm;
+                    }
+                    .card-value{
+                        width: 45mm;
+                    }
+
+                    .class_color{
+                        color: darkgreen;
+                    }
+                    .batch_color{
+                        color: darkblue;
+                    }
+                    .id_color{
+                        color: darkred;
+                    }
+                    .pagebreak{
+                        page-break-after: always;
+                    }
+                </style>
+                <?php 
+                    $users = User::getAll(['role'=>'student']);
+                    foreach($users as $user):
+                        $section_id = get_user_meta($user->ID,'section_id', true);
+                        if(in_array($section_id, [43,46,47])) continue;
+                        $class = get_the_title(get_user_meta($user->ID,'class_id', true));
+                        $section = get_the_title($section_id);
+                        $roll = get_user_meta($user->ID,'roll', true);
+                    ?>
+                    <div class="id-card-holder">
+                        <div class="id-card-inner">
+                            <div class="card-row">
+                                <div class="card-label">Class</div>
+                                <div class="card-value class_color">: <?php echo ucwords($class); ?></div>
+                            </div>
+                            <div class="card-row">
+                                <div class="card-label">Batch</div>
+                                <div class="card-value batch_color">: <?php echo strtoupper($section); ?></div>
+                            </div>
+                            <div class="card-row">
+                                <div class="card-label">ID No</div>
+                                <div class="card-value id_color">: <?php echo strtoupper($roll); ?></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pagebreak"></div>
+                <?php endforeach; ?>
+            </body>
         </html>
-        ';
+        <?php 
+        $html = ob_get_clean();
 
-        // Add HTML as page
-        $pdf->addPage($html);
-
-        // Save to file
-        if (!$pdf->saveAs(__DIR__.'/output.pdf')) {
-            echo $pdf->getError();
-        } else {
-            echo "PDF saved successfully!";
+        $settings = [
+            'page_width' => '54mm',
+            'page_height' => '85.598mm',
+            'margin_left' => 0,
+            'margin_right' => 0,
+            'margin_top' => 0,
+            'margin_bottom' => 0,
+        ];
+        $response = wp_remote_post('http://pdf.edupressbd.com/', [
+            'method' => 'POST',
+            'body' => ['html' => $html, 'settings' => $settings],
+        ]);
+        if(is_wp_error($response)){
+            return ['status' => 0, 'data' => $response->get_error_message()];
         }
-
+        $data = json_decode($response['body'], true);
+        echo $data['pdf'];
+        echo "<br><br>";
+        var_dump($data);
 
 
     }

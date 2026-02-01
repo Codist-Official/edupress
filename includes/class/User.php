@@ -328,6 +328,7 @@ class User
         $teacher->add_cap('read_user' );
         $teacher->add_cap('read_sms' );
         $teacher->add_cap( 'read_attendance');
+        $teacher->add_cap( 'publish_attendance');
 
         // Accountant
         add_role(
@@ -360,6 +361,7 @@ class User
         $accountant->add_cap( 'send_sms');
 
         $accountant->add_cap( 'read_attendance');
+        $accountant->add_cap( 'publish_attendance');
 
 
         // Manager
@@ -417,6 +419,7 @@ class User
             'send_sms',
             'delete_sms',
             'read_attendance',
+            'publish_attendance',
             'delete_attendance',
         );
 

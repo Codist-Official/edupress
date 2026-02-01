@@ -1471,9 +1471,8 @@ jQuery(document).ready(function(){
                 clog(res);
                 hideEduPressLoading();
                 if(res.data.status == 1){
-                    // download pdf file 
-                    window.open(res.data.pdf, '_blank');
-                    showEduPressPopup(res.data.data);
+                    window.open(res.data.pdf, '_blank'); 
+                    showEduPressPopup(res.data.html);
                 } else {
                     showEduPressStatus('error');
                 }

@@ -1,7 +1,6 @@
 <?php 
 namespace EduPress;
 
-use mikehaertl\wkhtmlto\Pdf;
 
 defined( 'ABSPATH' ) || die();
 
@@ -681,17 +680,21 @@ class PrintMaterial{
         if( !is_dir($target_dir) ) mkdir($target_dir, 0777, true);
         if(empty($filename)) $filename = 'edupress-pdf-' . time() . '.pdf';
 
-        // include_once EDUPRESS_LIB_DIR . 'mpdf/vendor/autoload.php';
-        // $pdf = new \Mpdf\Mpdf($options);
-        // $pdf->WriteHTML($html);
-        // $pdf->Output($target_dir . $filename);
-        // $file = $target_dir . $filename;
+        include_once EDUPRESS_LIB_DIR . 'mpdf/vendor/autoload.php';
+        $pdf = new \Mpdf\Mpdf($options);
+        $pdf->WriteHTML($html);
+        $pdf->Output($target_dir . $filename);
+        $file = $target_dir . $filename;
         
-        // return str_replace( WP_CONTENT_DIR, site_url() . '/wp-content/', $file );
-                // Set path to wkhtmltopdf
-                
+        return str_replace( WP_CONTENT_DIR, site_url() . '/wp-content/', $file );
+
+    }
+
+
+    public static function saveAsPdfWkhtml()
+    {
         require_once EDUPRESS_LIB_DIR .'/wkhtmltopdf/autoload.php';
-        $pdf = new Pdf([
+        $pdf = new \mikehaertl\wkhtmlto\Pdf([
             'binary' => '/usr/local/bin/wkhtmltopdf', // macOS (Intel)
             'encoding' => 'UTF-8',
             'page-width'  => '54mm',
@@ -854,16 +857,54 @@ class PrintMaterial{
         $template = maybe_unserialize(get_option('id_card_template_' . $template_id));
         $data = $template['data'] ?? [];
         ob_start();
+        ?>
+        <html>
+            <head>
+            </head>
+            <body>
+        <?php 
         if(!empty($users)){
             $editor_width = $template['settings']['editor_width'] ?? 2.125;
             $editor_height = $template['settings']['editor_height'] ?? 3.370;
+            $editor_width_mm = $editor_width * 25.4;
+            $editor_height_mm = $editor_height * 25.4;
+    
             $editor_bg_color = $template['settings']['editor_bg_color'] ?? '#ffffff';
             $editor_bg = $template['settings']['editor_bg'] ?? null;
             $global_font = $template['settings']['font_family'] ?? 'Arial';
             $template_name = $template['template_name'] ?? '';
             foreach($users as $user){
                 ?>
-                <div style="position:relative; background-image: url('<?php echo EDUPRESS_IMG_URL; ?>front-bg.png'); background-size:cover; width: <?php echo $editor_width; ?>in; height: <?php echo $editor_height; ?>in; background-color: <?php echo $editor_bg_color; ?>;">
+                <style>
+                    html, body, *{
+                        margin: 0;
+                        padding: 0;
+                    }
+                    .card{
+                        display:inline-block;
+                        margin: 0;
+                        padding: 0; 
+                        position:absolute; 
+                        background-color: <?php echo $editor_bg_color; ?>; 
+                        background-image: url('<?php echo EDUPRESS_IMG_URL; ?>front-bg.png'); 
+                        background-size:cover; 
+                        width: 100%; 
+                        height: 100%; 
+                        /* max-width: <?php echo $editor_width_mm; ?>mm; 
+                        max-height: <?php echo $editor_height_mm; ?>mm; */
+                        overflow: hidden;
+                    }
+                    .card-inner{
+                        position:absolute;
+                        width: 85.598mm;
+                        height: 53.975mm;
+                        top: 0;
+                        left: 0;
+                        background-color: yellow;
+                        z-index: 99999999 !important;
+                    }
+                </style>
+                <div class='card'>
                     <?php 
                         if(!empty($data)){
                             foreach($data as $k=>$v){
@@ -885,30 +926,29 @@ class PrintMaterial{
                 <?php 
             }
         }
+        ?>
+            </body>
+        </html>
+        <?php 
         $html = ob_get_clean();
-        // $editor_width_mm = $editor_width * 25.4;
-        // $editor_height_mm = $editor_height * 25.4;
-        // $options = [
-        //     'mode' => 'utf-8',
-        //     'format' => [$editor_width_mm, $editor_height_mm],
-        //     'orientation' => 'P', // portrait
-        //     'margin_left' => 0,
-        //     'margin_right' => 0,
-        //     'margin_top' => 0,
-        //     'margin_bottom' => 0,
-        // ];
-        // $pdf = self::saveAsPdf($html, 'id-card-'.$id.'.pdf', '', $options);
-        // return ['status' => 1, 'data' => $html, 'pdf'=>$pdf];
-        $pdf = new Pdf([
-            // 'binary' => '/usr/bin/wkhtmltopdf',
-            // 'enable-local-file-access',
-            // 'disable-smart-shrinking',
-            // 'print-media-type',
-            // 'dpi' => 300
+        $settings = [
+            'page_width' => $editor_width_mm.'mm',
+            'page_height' => $editor_height_mm.'mm',
+            'margin_left' => 0,
+            'margin_right' => 0,
+            'margin_top' => 0,
+            'margin_bottom' => 0,
+        ];
+        // make wordpress post request with form data
+        $response = wp_remote_post('http://pdf.edupressbd.com/', [
+            'method' => 'POST',
+            'body' => ['html' => $html, 'settings' => $settings],
         ]);
-        $pdf->addPage($html);
-        $pdf->saveAs(WP_CONTENT_DIR.'/uploads/card.pdf');
-        return ['status' => 1, 'data' => $html, 'pdf'=>WP_CONTENT_DIR.'/uploads/card.pdf', 'dir' => WP_CONTENT_DIR];
+        if(is_wp_error($response)){
+            return ['status' => 0, 'data' => $response->get_error_message()];
+        }
+        $data = json_decode($response['body'], true);
+        return ['status' => 1, 'pdf' => $data['pdf'], 'html'=>$data['html'], 'settings'=>$data['settings']];
     }
 
     public static function idCardEditor()
@@ -1378,7 +1418,7 @@ class PrintMaterial{
 
     function generate_pdf_from_html($html) {
 
-        $pdf = new Pdf([
+        $pdf = new \mikehaertl\wkhtmlto\Pdf([
             'binary' => '/usr/bin/wkhtmltopdf', // adjust path
             'encoding' => 'UTF-8',
             'no-outline',

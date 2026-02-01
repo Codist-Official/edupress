@@ -760,9 +760,13 @@ class Attendance extends CustomPost
         $sms_notif = Admin::getSetting('attendance_sms');
         $admin_notif = Admin::getSetting('attendance_sms_to_admin');
         $institute = Admin::getSetting('institute_name');
+        $old_sms_enabled = Admin::getSetting('attendance_send_previous_days_sms') == 'active';
+
+
+        $all_data = $data;
 
         global $wpdb;
-        foreach($data['body_response']['data'] as $data){
+        foreach($all_data['body_response']['data'] as $data){
 
             $aid = $data['user_id'] ?? null;
             $user_id = User::getIdByAttendanceId($aid);
@@ -786,7 +790,7 @@ class Attendance extends CustomPost
 
                 if( $sms_notif !== 'active' && $admin_notif !== 'active') continue;
                 // if report time is not today then skip 
-                if(date('Y-m-d', strtotime($data['report_time'])) !== current_time('Y-m-d')) continue;
+                if( date('Y-m-d', strtotime($data['report_time'])) !== current_time('Y-m-d')) continue;
 
 
                 $aid = $wpdb->insert_id;
@@ -808,19 +812,12 @@ class Attendance extends CustomPost
                     // skip if previous sms sending inactive
                     $today = current_time('Y-m-d');
                     $report_time = date('Y-m-d', strtotime($data['report_time']));
-                    if($report_time < $today){
-                        // checking if sending enabled 
-                        $old_sms_enabled = Admin::getSetting('attendance_send_previous_days_sms') == 'active';
-                        if(!$old_sms_enabled) continue;
-                    }
-
+                    if($report_time < $today && !$old_sms_enabled) continue;
 
                     if($notif == 'guardian_notification'){
-
                         if( strtolower($sms_notif) !== 'active' || strtolower($role) !== 'student' ) continue;
                         $mobile = get_user_meta($user_id, 'mobile', true);
                         if(!$mobile) continue;
-
                     }
 
                     if($notif == 'admin_notification'){
@@ -894,7 +891,7 @@ class Attendance extends CustomPost
 
         if(!empty($ids)){
             foreach($ids as $id){
-                $qry = "SELECT report_time FROM {$wpdb->prefix}attendance WHERE device_id = '{$id}' ORDER BY report_time DESC LIMIT 100";
+                $qry = "SELECT report_time FROM {$wpdb->prefix}attendance WHERE device_id = '{$id}' ORDER BY report_time DESC LIMIT 1";
                 $time = $wpdb->get_var($qry);
                 if(empty($time)) $time = "1970-01-01 00:00:00";
                 $body['data'][] = array(

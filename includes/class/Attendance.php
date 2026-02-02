@@ -833,7 +833,7 @@ class Attendance extends CustomPost
 
                     $sms_format_key = $notif === 'guardian_notification' ? 'attendance_sms_format' : 'attendance_sms_format_to_admin';
                     if($sms_format_key == 'attendance_sms_format'){
-                        $sms_format_key = $action === 'entry' ? 'attendance_sms_format_entry' : 'attendance_sms_format_exit';
+                        $sms_format_key = $action === 'left' ? 'attendance_sms_format_exit' : 'attendance_sms_format_entry';
                     }
                     $sms_text = Admin::getSetting($sms_format_key);
                     if(empty($sms_text)) $sms_text = Admin::getSetting('attendance_sms_format');

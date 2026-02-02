@@ -48,6 +48,8 @@ class Debug
     {
         
         ob_start(); 
+        Attendance::sendAbsenceAttendanceSMS();
+        return ob_get_clean();
         ?> 
         <html>
             <head></head>

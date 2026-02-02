@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.6.6
+Version: 1.6.7
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -505,12 +505,14 @@ class EduPress
                     } else if($post->post_type === 'class'){
                         $branch_id = get_post_meta($post->ID, 'branch_id', true );
                         $shift_id = get_post_meta($post->ID, 'shift_id', true );
-                        $link .= "?branch_id=$branch_id&shift_id=$shift_id&class_id=$post->ID";
+                        $link .= "?branch_id=$branch_id&class_id=$post->ID";
+                        if(EduPress::isActive('shift')) $link .= "&shift_id=$shift_id";
                     } else if ( $post->post_type === 'section'){
                         $branch_id = get_post_meta($post->ID, 'branch_id', true );
                         $shift_id = get_post_meta($post->ID, 'shift_id', true );
                         $class_id = get_post_meta($post->ID, 'class_id', true );
-                        $link .= "?branch_id=$branch_id&shift_id=$shift_id&class_id=$class_id&section_id=$post->ID";
+                        $link .= "?branch_id=$branch_id&class_id=$class_id&section_id=$post->ID";
+                        if(EduPress::isActive('shift')) $link .= "&shift_id=$shift_id";
                     }
     
                     $link .= '&panel=user&role=student';

@@ -3,7 +3,7 @@ namespace EduPress;
 
 defined( 'ABSPATH' ) || die();
 
-class Section extends Post
+class Section extends Klass
 {
 
     /**
@@ -136,14 +136,14 @@ class Section extends Post
         if ( EduPress::isActive('class') ){
 
             $meta_query = [];
-            if(Admin::getSetting('branch_active') == 'active'){
+            if(EduPress::isActive('branch')){
                 $meta_query[] = array(
                     'key'   => 'branch_id',
                     'value' => $this->getMeta('branch_id'),
                     'compare'=> '='
                 );
             }
-            if(Admin::getSetting('shift_active') == 'active'){
+            if(EduPress::isActive('shift')){
                 $meta_query[] = array(
                     'key'   => 'shift_id',
                     'value' => $this->getMeta('shift_id'),
@@ -187,6 +187,29 @@ class Section extends Post
             )
         );
 
+
+        if(Admin::getSetting('absence_sms') == 'active'){
+            $fields['absence_sms'] = array(
+                'type'          => 'select',
+                'name'          => 'absence_sms',
+                'settings'      => array(
+                    'label'     => 'Absence SMS',
+                    'value' => $this->getMeta('absence_sms'),
+                    'options' => ['active' => 'Yes', 'inactive' => 'No'],
+                    'placeholder' => 'Select',
+                    'id' => 'absence_sms'
+                )
+            );
+            $fields['absence_sms_cutoff_time'] = array(
+                'type'          => 'time',
+                'name'          => 'absence_sms_cutoff_time',
+                'settings'      => array(
+                    'label'     => 'Absence SMS cutoff time',
+                    'value' => $this->getMeta('absence_sms_cutoff_time'),
+                )
+            );
+        }
+
         return $new_fields + $fields;
 
 
@@ -207,31 +230,29 @@ class Section extends Post
         $fields['total'] = 'Students';
         $fields['start_date'] = 'Start Date';
         $fields['end_date'] = 'End Date';
-        if( Admin::getSetting('calendar_active') == 'active' ){
+        if( EduPress::isActive('calendar')){
             $fields['calendar'] = 'Calendar';
         }
         $fields['status'] = 'Status';
 
         $new_fields = [];
 
-        if( Admin::getSetting('branch_active') == 'active' ){
-
+        if( EduPress::isActive('branch') ){
             $new_fields['branch_id'] = 'Branch';
-
         }
 
-        if( Admin::getSetting('shift_active') == 'active' ){
-
+        if( EduPress::isActive('shift') ){
             $new_fields['shift_id'] = 'Shift';
-
         }
 
-        if( Admin::getSetting('class_active') == 'active' ){
-
+        if( EduPress::isActive('class') ){
             $new_fields['class_id'] = 'Class';
-
         }
 
+        if(Admin::getSetting('absence_sms') == 'active'){
+            $fields['absence_sms'] = 'Absence SMS';
+            $fields['absence_sms_cutoff_time'] = 'Cutoff time';
+        }
 
         return $new_fields + $fields;
 
@@ -259,7 +280,7 @@ class Section extends Post
             )
         );
 
-        if( Admin::getSetting('shift_active') == 'active' ){
+        if( EduPress::isActive('shift') ){
             $fields['shift_id'] = array(
                 'type' => 'select',
                 'name' => 'shift_id',
@@ -271,7 +292,7 @@ class Section extends Post
             );
         }
 
-        if( Admin::getSetting('class_active') == 'active' ){
+        if( EduPress::isActive('class') ){
             $fields['class_id'] = array(
                 'type' => 'select',
                 'name' => 'class_id',

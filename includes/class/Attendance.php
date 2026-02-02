@@ -723,6 +723,7 @@ class Attendance extends CustomPost
     {
         if(isset($_REQUEST['syncAttendanceLogs'])){
             self::sync();
+            self::sendAbsenceAttendanceSMS();
         }
     }
 
@@ -831,7 +832,11 @@ class Attendance extends CustomPost
                     }
 
                     $sms_format_key = $notif === 'guardian_notification' ? 'attendance_sms_format' : 'attendance_sms_format_to_admin';
+                    if($sms_format_key == 'attendance_sms_format'){
+                        $sms_format_key = $action === 'entry' ? 'attendance_sms_format_entry' : 'attendance_sms_format_exit';
+                    }
                     $sms_text = Admin::getSetting($sms_format_key);
+                    if(empty($sms_text)) $sms_text = Admin::getSetting('attendance_sms_format');
                     $sms_text = str_replace("{name}", $name, $sms_text);
                     $sms_text = str_replace("{role}", $role, $sms_text);
                     $sms_text = str_replace("{action}", $action, $sms_text);
@@ -1424,6 +1429,76 @@ class Attendance extends CustomPost
                 $deleted = self::deleteLog($k, $date->format('Y-m-d'));
                 if($deleted > 0) echo $date->format('Y-m-d') . ' - ' . $deleted . ' logs deleted<br>';
                 else var_dump($deleted);
+            }
+        }
+    }
+
+    /**
+     * Send Absence Attendance SMS to guardian
+     * 
+     * @return void
+     * 
+     * @since 1.0
+     * @access public
+     */
+    public static function sendAbsenceAttendanceSMS()
+    {
+        $today = current_time('Y-m-d');
+
+        $absence_sms = Admin::getSetting('absence_sms');
+        if($absence_sms != 'active') return;
+
+        // find all section with absence_sms = active
+        $sections = get_posts(array(
+            'post_type' => EduPress::isActive('section') ? 'section' : 'class',
+            'meta_key' => 'absence_sms',
+            'meta_value' => 'active',
+        ));
+        foreach($sections as $post){
+
+            echo "Processing {$post->post_title} - {$post->ID}<br>";
+            
+            $calendar = new Calendar($post->ID);
+            if(!$calendar->isOpen($today)) continue;
+            echo "Calendar is open<br>";
+
+            $o = $post->post_type == 'section' ? new Section($post->ID) : new Klass($post->ID);
+            $absence_sms_cutoff_time = $o->getMeta('absence_sms_cutoff_time');
+            $current_time = current_time('H:i');
+            
+            if($current_time > $absence_sms_cutoff_time){
+                // check if sms already sent 
+                $last_sent = $o->getMeta('absence_sms_last_sent');
+                if(empty($last_sent)) $last_sent = '1970-01-01';
+                echo "last notification sent $last_sent<br>";
+                if(strtotime($last_sent) < strtotime($today)){
+
+                    // get all users in this section
+                    $args = [];
+                    if(EduPress::isActive('section')){
+                        $args['section_id'] = $post->ID;
+                    } else {
+                        $args['class_id'] = $post->ID;
+                    }
+                    $users = User::getAll($args);
+                    foreach($users as $user){
+                        $user = new User($user);
+                        if(self::isUserPresent($user->id, $today) || empty($user->getMeta('mobile'))) continue;
+                        $absence_sms_format = Admin::getSetting('absence_sms_format');
+                        if(empty($absence_sms_format)) $absence_sms_format = "{name} is absent today at {institute} : {date}.";
+                        echo "Processing user {$user->id} - {$user->getMeta('first_name')} {$user->getMeta('last_name')} - mobile {$user->getMeta('mobile')}<br>";
+
+                        $sms_format = str_replace('{name}', $user->getMeta('first_name') . ' ' . $user->getMeta('last_name'), $absence_sms_format);
+                        $sms_format = str_replace('{institute}', Admin::getSetting('institute_name'), $sms_format);
+                        $sms_format = str_replace('{date}', current_time('d-m-Y'), $sms_format);
+                        $sms_format = str_replace('{time}', current_time('H:i'), $sms_format);
+                        SMS::send([
+                            'mobile' => $user->getMeta('mobile'),
+                            'sms' => $sms_format,
+                        ]);
+                    }
+                    update_post_meta($post->ID, 'absence_sms_last_sent', $today);
+                }
             }
         }
 

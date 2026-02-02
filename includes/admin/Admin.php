@@ -510,7 +510,7 @@ class Admin
                     'settings' => array(
                         'options' => array('active'=>'Active'),
                         'value' => Admin::getSetting('branch_active'),
-                        'label' => 'Branch',
+                        'label' => __('Branch', 'edupress'),
                         'id' => 'branch_active'
                     )
                 );
@@ -520,7 +520,7 @@ class Admin
                     'settings' => array(
                         'options' => $active_options,
                         'value' => Admin::getSetting('shift_active'),
-                        'label' => 'Shift',
+                        'label' => __('Shift', 'edupress'),
                         'id' => 'shift_active'
                     )
                 );
@@ -530,7 +530,7 @@ class Admin
                     'settings' => array(
                         'options' => $active_options,
                         'value' => Admin::getSetting('class_active'),
-                        'label' => 'Class'
+                        'label' => __('Class', 'edupress')
                     )
                 );
                 $fields['section_active'] = array(
@@ -539,7 +539,7 @@ class Admin
                     'settings' => array(
                         'options' => $active_options,
                         'value' => Admin::getSetting('section_active'),
-                        'label' => 'Section'
+                        'label' => __('Section', 'edupress')
                     )
                 );
                 $fields['subject_active'] = array(
@@ -548,7 +548,7 @@ class Admin
                     'settings' => array(
                         'options' => $active_options,
                         'value' => Admin::getSetting('subject_active'),
-                        'label' => 'Subject'
+                        'label' => __('Subject', 'edupress')
                     )
                 );
                 $fields['term_active'] = array(
@@ -557,7 +557,7 @@ class Admin
                     'settings' => array(
                         'options' => $active_options,
                         'value' => Admin::getSetting('term_active'),
-                        'label' => 'Term'
+                        'label' => __('Term', 'edupress')
                     )
                 );
                 $fields['exam_active'] = array(
@@ -566,7 +566,7 @@ class Admin
                     'settings' => array(
                         'options' => $active_options,
                         'value' => Admin::getSetting('exam_active'),
-                        'label' => 'Exam'
+                        'label' => __('Exam', 'edupress')
                     )
                 );
                 $fields['transaction_active'] = array(
@@ -575,7 +575,7 @@ class Admin
                     'settings' => array(
                         'options' => $active_options,
                         'value' => Admin::getSetting('transaction_active'),
-                        'label' => 'Accounting'
+                        'label' => __('Accounting', 'edupress')
                     )
                 );
                 $fields['sms_active'] = array(
@@ -584,7 +584,7 @@ class Admin
                     'settings' => array(
                         'options' => $active_options,
                         'value' => Admin::getSetting('sms_active'),
-                        'label' => 'SMS'
+                        'label' => __('SMS', 'edupress')
                     )
                 );
                 $fields['attendance_active'] = array(
@@ -593,7 +593,7 @@ class Admin
                     'settings' => array(
                         'options' => $active_options,
                         'value' => Admin::getSetting('attendance_active'),
-                        'label' => 'Attendance'
+                        'label' => __('Attendance', 'edupress')
                     )
                 );
                 $fields['calendar_active'] = array(
@@ -602,7 +602,7 @@ class Admin
                     'settings' => array(
                         'options' => $active_options,
                         'value' => Admin::getSetting('calendar_active'),
-                        'label' => 'Academic Calendar'
+                        'label' => __('Academic Calendar', 'edupress')
                     )
                 );
                 $fields['notice_active'] = array(
@@ -611,7 +611,7 @@ class Admin
                     'settings' => array(
                         'options' => $active_options,
                         'value' => Admin::getSetting('notice_active'),
-                        'label' => 'Notice'
+                        'label' => __('Notice', 'edupress')
                     )
                 );
                 $fields['print_active'] = array(
@@ -620,7 +620,7 @@ class Admin
                     'settings' => array(
                         'options' => $active_options,
                         'value' => Admin::getSetting('print_active'),
-                        'label' => 'Global Print Button'
+                        'label' => __('Global Print Button', 'edupress')
                     )
                 );
 
@@ -640,7 +640,7 @@ class Admin
                         'value' => self::getSystemUid(),
                         'id' => 'system_uid',
                         'readonly' => 'readonly',
-                        'label' => 'System ID',
+                        'label' => __('System ID', 'edupress'),
                     )
                 );
 
@@ -649,7 +649,7 @@ class Admin
                     'name'  => 'institute_name',
                     'settings' => array(
                         'value' => Admin::getSetting('institute_name'),
-                        'label' => 'Institute Name'
+                        'label' => __('Institute Name', 'edupress')
                     )
                 );
 
@@ -663,7 +663,7 @@ class Admin
                             'data-target-class' => 'institute_logo_container',
                             'accept' => 'image/*',
                         ),
-                        'label' => 'Logo',
+                        'label' => __('Logo', 'edupress'),
                         'after' => "<div class='institute_logo_container'>".wp_get_attachment_image(Admin::getSetting('institute_logo_id'), 'full')."</div>",
                     ),
 
@@ -683,7 +683,7 @@ class Admin
                     'name'  => 'institute_eiin',
                     'settings' => array(
                         'value' => Admin::getSetting('institute_eiin'),
-                        'label' => 'EIIN'
+                        'label' => __('EIIN', 'edupress')
                     )
                 );
 
@@ -692,7 +692,7 @@ class Admin
                     'name'  => 'institute_address',
                     'settings' => array(
                         'value' => Admin::getSetting('institute_address'),
-                        'label' => 'Address'
+                        'label' => __('Address', 'edupress')
                     )
                 );
 
@@ -701,7 +701,7 @@ class Admin
                     'name'  => 'institute_phone',
                     'settings' => array(
                         'value' => Admin::getSetting('institute_phone'),
-                        'label' => 'Phone Number'
+                        'label' => __('Phone Number', 'edupress')
                     )
                 );
 
@@ -710,7 +710,7 @@ class Admin
                     'name'  => 'institute_website',
                     'settings' => array(
                         'value' => Admin::getSetting('institute_website'),
-                        'label' => 'Website'
+                        'label' => __('Website', 'edupress')
                     )
                 );
                 $fields['institute_email'] = array(
@@ -718,7 +718,7 @@ class Admin
                     'name'  => 'institute_email',
                     'settings' => array(
                         'value' => Admin::getSetting('institute_email'),
-                        'label' => 'Email'
+                        'label' => __('Email', 'edupress')  
                     )
                 );
                 break;
@@ -731,7 +731,7 @@ class Admin
                     'name'  => 'result_sms_marks_details',
                     'settings' => array(
                         'value' => Admin::getSetting('result_sms_marks_details', 'inactive'),
-                        'label' => 'SMS Result Marks Details',
+                        'label' => __('SMS Result Marks Details', 'edupress'),  
                         'options' => array('active' => 'Active', 'inactive'=>'Inactive'),
                         'placeholder' => 'Select'
                     )
@@ -743,7 +743,7 @@ class Admin
                     'name'  => 'result_title_format',
                     'settings' => array(
                         'value' => Admin::getSetting('result_title_format', $default),
-                        'label' => 'Title Format',
+                        'label' => __('Title Format', 'edupress'),
                         'after' => "Allowed Keywords: <strong>{branch} {shift} {class} {section} {term} {year}</strong>",
                     )
                 );
@@ -752,7 +752,7 @@ class Admin
                     'name'  => 'result_title_font_size',
                     'settings' => array(
                         'value' => Admin::getSetting('result_title_font_size', 20),
-                        'label' => 'Title Font Size',
+                        'label' => __('Title Font Size', 'edupress'),
                         'options' => range(0,100),
                     )
                 );
@@ -761,7 +761,7 @@ class Admin
                     'name'  => 'result_signature_box',
                     'settings' => array(
                         'value' => Admin::getSetting('result_signature_box', 'inactive'),
-                        'label' => 'Signature Box',
+                        'label' => __('Signature Box', 'edupress'),
                         'options' => array('inactive' => 'Inactive', 'active' => 'Active'),
                     )
                 );
@@ -770,7 +770,7 @@ class Admin
                     'name'  => 'result_signature_box_title',
                     'settings' => array(
                         'value' => Admin::getSetting('result_signature_box_title', ''),
-                        'label' => 'Signature Box Title',
+                        'label' => __('Signature Box Title', 'edupress'),
                         'after' => 'Keep it blank to hide box title',
                     )
                 );
@@ -779,7 +779,7 @@ class Admin
                     'name'  => 'result_signature_box_columns',
                     'settings' => array(
                         'value' => Admin::getSetting('result_signature_box_columns', ''),
-                        'label' => 'Signature Box Columns',
+                        'label' => __('Signature Box Columns', 'edupress'),
                         'after' => 'Each line treated as a column',
                     )
                 );
@@ -788,7 +788,7 @@ class Admin
                     'name'  => 'result_signature_box_height',
                     'settings' => array(
                         'value' => Admin::getSetting('result_signature_box_height', '0.5'),
-                        'label' => 'Signature Box Height (in)',
+                        'label' => __('Signature Box Height (in)', 'edupress'),
                         'data' => array(
                             'min' => 0,
                             'max' => 5,
@@ -806,36 +806,36 @@ class Admin
                     'settings' => array(
                         'options' => Sms::getGateways(),
                         'value' => Admin::getSetting('sms_gateway'),
-                        'label' => 'Gateway',
+                        'label' => __('Gateway', 'edupress'),
                         'placeholder' => 'Select',
                         'id' => 'sms_gateway'
                     )
                 );
 
-                $fields['sms_username'] = array(
-                    'type'  => 'text',
-                    'name'  => 'sms_username',
-                    'settings' => array(
-                        'value' => Admin::getSetting('sms_username'),
-                        'label' => 'Username',
-                        'id' => 'sms_username'
-                    )
-                );
-                $fields['sms_password'] = array(
-                    'type'  => 'password',
-                    'name'  => 'sms_password',
-                    'settings' => array(
-                        'value' => Admin::getSetting('sms_password'),
-                        'label' => 'Password',
-                        'id' => 'sms_password'
-                    )
-                );
+                // $fields['sms_username'] = array(
+                //     'type'  => 'text',
+                //     'name'  => 'sms_username',
+                //     'settings' => array(
+                //         'value' => Admin::getSetting('sms_username'),
+                //         'label' => __('Username', 'edupress'),
+                //         'id' => 'sms_username'
+                //     )
+                // );
+                // $fields['sms_password'] = array(
+                //     'type'  => 'password',
+                //     'name'  => 'sms_password',
+                //     'settings' => array(
+                //         'value' => Admin::getSetting('sms_password'),
+                //         'label' => __('Password', 'edupress'),
+                //         'id' => 'sms_password'
+                //     )
+                // );
                 $fields['sms_api_key'] = array(
                     'type'  => 'text',
                     'name'  => 'sms_api_key',
                     'settings' => array(
                         'value' => Admin::getSetting('sms_api_key' ),
-                        'label' => 'API Key',
+                        'label' => __('API Key', 'edupress'),
                         'id' => 'sms_api_key'
                     )
                 );
@@ -845,7 +845,7 @@ class Admin
                     'name'  => 'sms_rate',
                     'settings' => array(
                         'value' => Admin::getSetting('sms_rate'),
-                        'label' => 'Rate',
+                        'label' => __('Rate', 'edupress'),
                         'id' => 'sms_rate'
                     )
                 );
@@ -854,7 +854,7 @@ class Admin
                     'name'  => 'sms_footer',
                     'settings' => array(
                         'value' => Admin::getSetting('sms_footer'),
-                        'label' => 'Footer',
+                        'label' => __('Footer', 'edupress'),
                         'id' => 'sms_footer'
                     )
                 );
@@ -863,7 +863,7 @@ class Admin
                     'name'  => 'sms_sender',
                     'settings' => array(
                         'value' => Admin::getSetting('sms_sender'),
-                        'label' => 'Sender',
+                        'label' => __('Sender', 'edupress'),
                         'id' => 'sms_sender'
                     )
                 );
@@ -879,7 +879,7 @@ class Admin
                     'name'  => 'sms_balance_notification',
                     'settings' => array(
                         'value' => Admin::getSetting('sms_balance_notification', 'active'),
-                        'label' => 'Low Balance Notification',
+                        'label' => __('Low Balance Notification', 'edupress'),
                         'id' => 'sms_balance_notification',
                         'options' => array('inactive' => 'Inactive', 'active'=>'Active'),
                         'placeholder' => 'Select',
@@ -890,7 +890,7 @@ class Admin
                     'name'  => 'sms_balance_limit',
                     'settings' => array(
                         'value' => Admin::getSetting('sms_balance_limit', ),
-                        'label' => 'Balance Limit',
+                        'label' => __('Balance Limit', 'edupress'),
                         'id' => 'sms_balance_limit',
                     )
                 );
@@ -899,7 +899,7 @@ class Admin
                     'name'  => 'sms_balance_notification_mobile',
                     'settings' => array(
                         'value' => Admin::getSetting('sms_balance_notification_mobile'),
-                        'label' => 'Notification Mobile',
+                        'label' => __('Notification Mobile', 'edupress'),
                         'id' => 'sms_low_balance_notification_mobile',
                         'after' => 'Seperated by , for multiple mobiles'
                     )
@@ -909,7 +909,7 @@ class Admin
                     'name'  => 'sms_balance_notification_email',
                     'settings' => array(
                         'value' => Admin::getSetting('sms_balance_notification_email'),
-                        'label' => 'Notification Email',
+                        'label' => __('Notification Email', 'edupress'),
                         'id' => 'sms_balance_notification_email',
                         'after' => 'Seperated by , for multiple emails'
                     )
@@ -922,7 +922,7 @@ class Admin
                     'type'  => 'number',
                     'name'  => 'sms_store_log',
                     'settings' => array(
-                        'label' => 'Store log for last x days',
+                        'label' => __('Store log for last x days', 'edupress'),
                         'id' => 'sms_store_log',
                         'data' => array(
                             'min' => 30,
@@ -944,7 +944,7 @@ class Admin
                     'name'  => 'transaction_accounts',
                     'settings' => array(
                         'value' => Admin::getSetting('transaction_accounts'),
-                        'label' => 'Account Names',
+                        'label' => __('Account Names', 'edupress'),
                         'id'    => 'transaction_accounts',
                         'after' => 'User comma , to separate multiple values'
                     )
@@ -975,7 +975,7 @@ class Admin
                     'name'  => 'transaction_fee_names',
                     'settings' => array(
                         'value' => Admin::getSetting('transaction_fee_names'),
-                        'label' => 'Fee Names',
+                        'label' => __('Fee Names', 'edupress'),
                         'id' => 'transaction_fee_names',
                         'after' => 'User comma , to separate multiple values'
                     )
@@ -985,7 +985,7 @@ class Admin
                     'name'  => 'transaction_online_payment',
                     'settings' => array(
                         'value' => Admin::getSetting('transaction_online_payment'),
-                        'label' => 'Online Payment',
+                        'label' => __('Online Payment', 'edupress'),
                         'options' => array( 'active' => 'Active', 'inactive' => 'Inactive' ),
                         'placeholder' => 'Select',
                         'id' => 'transaction_online_payment'
@@ -996,7 +996,7 @@ class Admin
                     'name'  => 'transaction_currency_sign',
                     'settings' => array(
                         'value' => Admin::getSetting('transaction_currency_sign'),
-                        'label' => 'Currency Sign',
+                        'label' => __('Currency Sign', 'edupress'),
                         'id' => 'transaction_currency_sign'
                     )
                 );
@@ -1005,7 +1005,7 @@ class Admin
                     'name'  => 'transaction_sms',
                     'settings' => array(
                         'value' => Admin::getSetting('transaction_sms'),
-                        'label' => 'Send SMS',
+                        'label' => __('Send SMS', 'edupress'),
                         'id' => 'transaction_sms',
                         'options' => array('active'=>'Active', 'inactive'=>'Inactive'),
                         'placeholder' => 'Select',
@@ -1016,7 +1016,7 @@ class Admin
                     'name'  => 'transaction_print',
                     'settings' => array(
                         'value' => Admin::getSetting('transaction_print'),
-                        'label' => 'Print',
+                        'label' => __('Print', 'edupress'),
                         'id' => 'transaction_print',
                         'options' => array('active'=>'Active', 'inactive'=>'Inactive'),
                         'placeholder' => 'Select',
@@ -1039,7 +1039,7 @@ class Admin
                     'name'  => 'attendance_device_name',
                     'settings' => array(
                         'value' => Admin::getSetting('attendance_device_name', ''),
-                        'label' => "Attendance Device",
+                        'label' => __('Attendance Device', 'edupress'),
                         'id' => 'attendance_device_name',
                         'options' => $devices,
                         'placeholder' => ' Off ',
@@ -1051,7 +1051,7 @@ class Admin
                     'name'  => 'attendance_api_endpoint',
                     'settings' => array(
                         'value' => Admin::getSetting('attendance_api_endpoint', 'http://api.edupressbd.com'),
-                        'label' => "Attendance API Endpoint",
+                        'label' => __('Attendance API Endpoint', 'edupress'),
                         'id' => 'attendance_api_endpoint',
                         'options' => array(
                             'http://api.edupressbd.com' => 'api.edupressbd.com',
@@ -1066,7 +1066,7 @@ class Admin
                     'name'  => 'attendance_device_count',
                     'settings' => array(
                         'value' => Admin::getSetting('attendance_device_count', ''),
-                        'label' => "Number of Attendance Devices",
+                        'label' => __('Number of Attendance Devices', 'edupress'),
                         'id' => 'attendance_device_count',
                         'options' => range(0,10),
                     )
@@ -1075,7 +1075,7 @@ class Admin
                     'type'  => 'button',
                     'name'  => 'register_attendance_device',
                     'settings' => array(
-                        'value' => 'Register Attendance Device',
+                        'value' => __('Register Attendance Device', 'edupress'),
                         'label' => "",
                         'id' => 'register_attendance_device',
                         'class' => 'register_attendance_device',
@@ -1089,7 +1089,7 @@ class Admin
                     'name'  => 'attendance_api_key',
                     'settings' => array(
                         'value' => Admin::getSetting('attendance_api_key', ''),
-                        'label' => "Attendance API Key (<a href='#' class='getApiKey'>Generate API Key</a>)",
+                        'label' => __('Attendance API Key', 'edupress') . " (<a href='#' class='getApiKey'>" . __('Generate API Key', 'edupress') . "</a>)",
                         'id' => 'attendance_api_key',
                         'readonly' => 'readonly'
                     )
@@ -1116,7 +1116,7 @@ class Admin
                                 'name'  => $field_name,
                                 'settings' => array(
                                     'value' => Admin::getSetting($field_name),
-                                    'label' => "Device-Branch Linking (ID# {$device_id})",
+                                    'label' => __('Device-Branch Linking', 'edupress') . " (ID# {$device_id})",
                                     'id' => $field_name,
                                     'placeholder' => 'Select',
                                     'options' => $branches,
@@ -1130,35 +1130,85 @@ class Admin
                     'type'  => 'button',
                     'name'  => 'generate_attendance_ids',
                     'settings' => array(
-                        'value' => 'Generate Attendance IDs',
+                        'value' => __('Generate Attendance IDs', 'edupress'),
                         'label' => "",
                         'id' => 'generate_attendance_ids',
                         'class' => 'generate_attendance_ids',
                     )
                 );
 
+                $fields['absence_sms'] = array(
+                    'type'  => 'select',
+                    'name'  => 'absence_sms',
+                    'settings' => array(
+                        'options' => array('active' => 'Yes', 'inactive' => 'No'),
+                        'value' => Admin::getSetting('absence_sms'),
+                        'label' => __('Absence SMS notification to guardian', 'edupress'),  
+                        'placeholder' => 'Select',
+                        'id' => 'absence_sms'
+                    )
+                );
+                $fields['absence_sms_cutoff_time'] = array(
+                    'type'  => 'time',
+                    'name'  => 'absence_sms_cutoff_time',
+                    'settings' => array(
+                        'options' => array('active' => 'Yes', 'inactive' => 'No'),
+                        'value' => Admin::getSetting('absence_sms_cutoff_time'),
+                        'label' => __('Absence SMS notification cutoff time', 'edupress'),
+                        'placeholder' => 'Select',
+                        'id' => 'absence_sms_cutoff_time'
+                    )
+                );
+                $fields['absence_sms_format'] = array(
+                    'type'  => 'textarea',
+                    'name'  => 'absence_sms_format',
+                    'settings' => array(
+                        'value' => Admin::getSetting('absence_sms_format', '{name} is absent today at {institute} - {date}'),
+                        'label' => __('Absence SMS format', 'edupress'),
+                        'placeholder' => __('Select', 'edupress'),
+                        'id' => 'absence_sms_format'
+                    )
+                );
                 $fields['attendance_sms'] = array(
                     'type'  => 'select',
                     'name'  => 'attendance_sms',
                     'settings' => array(
                         'options' => array('active' => 'Yes', 'inactive' => 'No'),
                         'value' => Admin::getSetting('attendance_sms'),
-                        'label' => 'SMS notification to guardian',
+                        'label' => __('SMS notification to guardian', 'edupress'),
                         'placeholder' => 'Select',
                         'id' => 'attendance_sms'
                     )
                 );
                 $default_text = "{name} {action} {institute} ({branch}) on {time}.";
-                $value = Admin::getSetting('attendance_sms_format');
-                if(empty($value)) $value = $default_text;
                 $fields['attendance_sms_format'] = array(
                     'type'  => 'textarea',
                     'name'  => 'attendance_sms_format',
                     'settings' => array(
-                        'value' => $value,
-                        'label' => 'Guardian SMS format',
+                        'value' => Admin::getSetting('attendance_sms_format', $default_text),
+                        'label' => __('Guardian SMS format', 'edupress') . ' <br>{name} {action} {institute} {branch} {time}',
                         'placeholder' => $default_text,
                         'id' => 'attendance_sms_format',
+                    )
+                );
+                $fields['attendance_sms_format_entry'] = array(
+                    'type'  => 'textarea',
+                    'name'  => 'attendance_sms_format_entry',
+                    'settings' => array(
+                        'value' => Admin::getSetting('attendance_sms_format_entry', "{name} এসেছে - {time}"),
+                        'label' => __('Guardian SMS format (Entry)', 'edupress'),
+                        'placeholder' => $default_text,
+                        'id' => 'attendance_sms_format_entry',
+                    )
+                );
+                $fields['attendance_sms_format_exit'] = array(
+                    'type'  => 'textarea',
+                    'name'  => 'attendance_sms_format_exit',
+                    'settings' => array(
+                        'value' => Admin::getSetting('attendance_sms_format_exit', "{name} বের হয়েছে - {time}"),
+                        'label' => __('Guardian SMS format (Exit)', 'edupress'),
+                        'placeholder' => $default_text,
+                        'id' => 'attendance_sms_format_exit',
                     )
                 );
 
@@ -1168,7 +1218,7 @@ class Admin
                     'settings' => array(
                         'options' => array('active' => 'Yes', 'inactive' => 'No'),
                         'value' => Admin::getSetting('attendance_sms_to_admin'),
-                        'label' => 'Attendance SMS to admin',
+                        'label' => __('Attendance SMS to admin', 'edupress'),
                         'placeholder' => 'Select',
                         'id' => 'attendance_sms_to_admin',
                     )
@@ -1179,7 +1229,7 @@ class Admin
                     'name'  => 'attendance_sms_to_admin_numbers',
                     'settings' => array(
                         'value' => Admin::getSetting('attendance_sms_to_admin_numbers'),
-                        'label' => 'Attendance SMS to admin mobile numbers',
+                        'label' => __('Attendance SMS to admin mobile numbers', 'edupress'),
                         'id' => 'attendance_sms_to_admin_numbers',
                     )
                 );
@@ -1189,7 +1239,7 @@ class Admin
                     'settings' => array(
                         'options' => array_combine(User::getRoles(), User::getRoles()),
                         'value' => Admin::getSetting('attendance_sms_to_admin_for_roles'),
-                        'label' => 'Attendance SMS to admin for what roles?',
+                        'label' => __('Attendance SMS to admin for what roles?', 'edupress'),
                         'id' => 'attendance_sms_to_admin_for_roles',
                     )
                 );
@@ -1203,7 +1253,7 @@ class Admin
                     'name'  => 'attendance_sms_format_to_admin',
                     'settings' => array(
                         'value' => $value,
-                        'label' => 'Admin SMS format',
+                        'label' => __('Admin SMS format', 'edupress'),
                         'placeholder' => $default_text,
                         'id' => 'attendance_sms_format_to_admin',
                     )
@@ -1215,7 +1265,7 @@ class Admin
                     'settings' => array(
                         'options' => array('active' => 'Yes', 'inactive' => 'No'),
                         'value' => Admin::getSetting('attendance_send_previous_days_sms', 'inactive'),
-                        'label' => 'Send previous days attendance SMS',
+                        'label' => __('Send previous days attendance SMS', 'edupress'),
                     )
                 );
 
@@ -1225,7 +1275,7 @@ class Admin
                     'settings' => array(
                         'options' => array('active' => 'Yes', 'inactive' => 'No'),
                         'value' => Admin::getSetting('attendance_email'),
-                        'label' => 'Email notification',
+                        'label' => __('Email notification', 'edupress'),
                         'placeholder' => 'Select',
                         'id' => 'attendance_email'
                     )
@@ -1237,7 +1287,7 @@ class Admin
                     'type'  => 'number',
                     'name'  => 'attendance_store_log',
                     'settings' => array(
-                        'label' => 'Store log for last x days',
+                        'label' => __('Store log for last x days', 'edupress'),
                         'id' => 'attendance_store_log',
                         'data' => array(
                             'min' => 30,
@@ -1256,7 +1306,7 @@ class Admin
                     'settings' => array(
                         'options' => array_combine($daynames, $daynames),
                         'value' => Admin::getSetting('attendance_weekend_holidays'),
-                        'label' => 'Attendance Weekly Holiday',
+                        'label' => __('Attendance Weekly Holiday', 'edupress'), 
                         'id' => 'attendance_weekend_holidays',
                     )
                 );
@@ -1286,7 +1336,7 @@ class Admin
                     'name' => 'user_welcome_sms',
                     'settings' => array(
                         'options' => array('active' => 'Yes', 'inactive' => 'No'),
-                        'label' => 'Welcome SMS',
+                        'label' => __('Welcome SMS', 'edupress'),
                         'value' => Admin::getSetting('user_welcome_sms', 'inactive'),
                         'id' => 'user_welcome_sms',
                     )
@@ -1296,7 +1346,7 @@ class Admin
                     'name' => 'user_welcome_email',
                     'settings' => array(
                         'options' => array('active' => 'Yes', 'inactive' => 'No'),
-                        'label' => 'Welcome Email',
+                        'label' => __('Welcome Email', 'edupress'),
                         'value' => Admin::getSetting('user_welcome_email'),
                         'id' => 'user_welcome_email'
                     )
@@ -1305,7 +1355,7 @@ class Admin
                     'type' => 'textarea',
                     'name' => 'user_profile_custom_fields',
                     'settings' => array(
-                        'label' => 'Profile Custom Fields',
+                        'label' => __('Profile Custom Fields', 'edupress'),
                         'value' => stripslashes(Admin::getSetting('user_profile_custom_fields')),
                         'id' => 'user_profile_custom_fields',
                         'after' => 'Use comma , to separate multiple fields'
@@ -1320,7 +1370,7 @@ class Admin
                     'name'  => 'exam_mark_heads',
                     'settings' => array(
                         'value' => Admin::getSetting('exam_mark_heads'),
-                        'label' => 'Exam Marks',
+                        'label' => __('Exam Marks', 'edupress'),
                         'required' => true,
                         'after' => 'Use comma , to separate multiple values'
                     )
@@ -1338,7 +1388,7 @@ class Admin
                             'name'  => $name,
                             'settings' => array(
                                 'value' => Admin::getSetting($name, 33),
-                                'label' => $head . ' Pass Percentage',
+                                'label' => $head . ' ' . __('Pass Percentage', 'edupress'),
                                 'data' => array(
                                     'min' => 0,
                                     'max' => 100,
@@ -1356,7 +1406,7 @@ class Admin
                     'name'      => 'print_header_elements',
                     'settings'  => array(
                         'value' => Admin::getSetting('print_header_elements'),
-                        'label' => 'Header Elements',
+                        'label' => __('Header Elements', 'edupress'),
                         'options'=> array(
                             'logo'              => 'Logo',
                             'institute_name'    => 'Institute Name',
@@ -1376,7 +1426,7 @@ class Admin
                     'settings' => array(
                         'value' => Admin::getSetting('print_logo_height', 0.5),
                         'class' => 'print_logo_height',
-                        'label' => 'Logo Height (in)',
+                        'label' => __('Logo Height (in)', 'edupress'),
                         'data'  => array(
                             'min' => 0,
                             'max' => 5,
@@ -1390,7 +1440,7 @@ class Admin
                     'name'      => 'print_header_height',
                     'settings'  => array(
                         'value' => Admin::getSetting('print_header_height', 1),
-                        'label' => 'Header Height (in)',
+                        'label' => __('Header Height (in)', 'edupress'),
                         'data'  => array(
                             'min' => 0,
                             'max' => 10,
@@ -1403,7 +1453,7 @@ class Admin
                     'name'      => 'print_footer_height',
                     'settings'  => array(
                         'value' => Admin::getSetting('print_footer_height', 0.5),
-                        'label' => 'Footer Height (in)',
+                        'label' => __('Footer Height (in)', 'edupress'),
                         'data'  => array(
                             'min' => 0,
                             'max' => 5,
@@ -1416,7 +1466,7 @@ class Admin
                     'name'  => 'print_qr_code',
                     'settings' => array(
                         'value' => Admin::getSetting('print_qr_code'),
-                        'label' => 'QR Code',
+                        'label' => __('QR Code', 'edupress'),
                         'options' => array(
                             'active'    => 'Active',
                             'inactive'  => 'Inactive',
@@ -1429,7 +1479,7 @@ class Admin
                     'name'  => 'print_qr_code_size',
                     'settings' => array(
                         'value' => Admin::getSetting('print_qr_code_size', 1),
-                        'label' => 'QR Code Size',
+                        'label' => __('QR Code Size', 'edupress'),  
                         'placeholder' => 'Select',
                         'data'  => array(
                             'min'   => 0,
@@ -1444,7 +1494,7 @@ class Admin
                     'name'  => 'print_qr_code_position',
                     'settings' => array(
                         'value' => Admin::getSetting('print_qr_code_position', 'topright'),
-                        'label' => 'QR Code Position',
+                        'label' => __('QR Code Position', 'edupress'),
                         'placeholder' => 'Select',
                         'options' => array(
                             'topright' => 'Top Right',
@@ -1460,7 +1510,7 @@ class Admin
                     'name'  => 'print_qr_code_top_margin',
                     'settings' => array(
                         'value' => Admin::getSetting('print_qr_code_top_margin', 0),
-                        'label' => 'QR Code Top Margin (in)',
+                        'label' => __('QR Code Top Margin (in)', 'edupress'),
                         'data'  => array(
                             'max'   => 10,
                             'step'  => 'any',
@@ -1473,7 +1523,7 @@ class Admin
                     'name'  => 'print_qr_code_bottom_margin',
                     'settings' => array(
                         'value' => Admin::getSetting('print_qr_code_bottom_margin', 0),
-                        'label' => 'QR Code Bottom Margin (in)',
+                        'label' => __('QR Code Bottom Margin (in)', 'edupress'),
                         'data'  => array(
                             'max'   => 10,
                             'step'  => 'any',
@@ -1486,7 +1536,7 @@ class Admin
                     'name'  => 'print_qr_code_left_margin',
                     'settings' => array(
                         'value' => Admin::getSetting('print_qr_code_left_margin', 0),
-                        'label' => 'QR Code Left Margin (in)',
+                        'label' => __('QR Code Left Margin (in)', 'edupress'),
                         'data'  => array(
                             'max'   => 10,
                             'step'  => 'any',
@@ -1499,7 +1549,7 @@ class Admin
                     'name'  => 'print_qr_code_right_margin',
                     'settings' => array(
                         'value' => Admin::getSetting('print_qr_code_right_margin', 0),
-                        'label' => 'QR Code Right Margin (in)',
+                        'label' => __('QR Code Right Margin (in)', 'edupress'),
                         'data'  => array(
                             'max'   => 10,
                             'step'  => 'any',
@@ -1520,7 +1570,7 @@ class Admin
                     'name'  => 'print_qr_code_expiry',
                     'settings' => array(
                         'value' => Admin::getSetting('print_qr_code_expiry', 'no'),
-                        'label' => 'Delete QR Codes after',
+                        'label' => __('Delete QR Codes after', 'edupress'),
                         'options' => $qr_code_expiry_options,
                         'required' => true,
                     ),
@@ -1530,7 +1580,7 @@ class Admin
                     'name'  => 'print_qr_code_text',
                     'settings' => array(
                         'value' => Admin::getSetting('print_qr_code_text', 'Scan to verify online'),
-                        'label' => 'Text below QR Code',
+                        'label' => __('Text below QR Code', 'edupress'),
                     ),
                 );
 
@@ -1540,7 +1590,7 @@ class Admin
                     'name'  => 'print_font_family',
                     'settings' => array(
                         'value' => Admin::getSetting('print_font_family', 'Roboto'),
-                        'label' => 'Font Family',
+                        'label' => __('Font Family', 'edupress'),
                         'options' => array_combine($fonts, $fonts),
                         'placeholder' => 'Select',
                         'required' => true,
@@ -1552,7 +1602,7 @@ class Admin
                     'name'  => 'print_font_size',
                     'settings' => array(
                         'value' => Admin::getSetting('print_font_size', 12),
-                        'label' => 'Font Size',
+                        'label' => __('Font Size', 'edupress'),
                         'options' => range(0,100)
                     )
                 );
@@ -1562,7 +1612,7 @@ class Admin
                     'name'  => 'print_line_height',
                     'settings' => array(
                         'value' => Admin::getSetting('print_line_height', 16),
-                        'label' => 'Line Height',
+                        'label' => __('Line Height', 'edupress'),   
                         'options' => range(0,100)
                     )
                 );
@@ -1582,7 +1632,7 @@ class Admin
                     'name'  => 'print_paper_size',
                     'settings' => array(
                         'value' => Admin::getSetting('print_paper_size', 'A4'),
-                        'label' => 'Paper Size',
+                        'label' => __('Paper Size', 'edupress'),
                         'options' => array_combine($paper_options2, $paper_options),
                         'placeholder' => 'Select',
                     ),
@@ -1595,7 +1645,7 @@ class Admin
                     'name'  => 'print_top_margin',
                     'settings' => array(
                         'value' => Admin::getSetting('print_top_margin', 0.25),
-                        'label' => 'Paper Top Margin (in)',
+                        'label' => __('Paper Top Margin (in)', 'edupress'),
                         'data'  => array(
                             'min'   => 0,
                             'max'   => 5,
@@ -1611,7 +1661,7 @@ class Admin
                     'name'  => 'print_bottom_margin',
                     'settings' => array(
                         'value' => Admin::getSetting('print_bottom_margin', 0.25),
-                        'label' => 'Paper Bottom Margin (in)',
+                        'label' => __('Paper Bottom Margin (in)', 'edupress'),
                         'data'  => array(
                             'min'   => 0,
                             'max'   => 5,
@@ -1626,7 +1676,7 @@ class Admin
                     'name'  => 'print_left_margin',
                     'settings' => array(
                         'value' => Admin::getSetting('print_left_margin', 0.25),
-                        'label' => 'Paper Left Margin (in)',
+                        'label' => __('Paper Left Margin (in)', 'edupress'),
                         'data'  => array(
                             'min'   => 0,
                             'max'   => 5,
@@ -1641,7 +1691,7 @@ class Admin
                     'name'  => 'print_right_margin',
                     'settings' => array(
                         'value' => Admin::getSetting('print_right_margin', 0.25),
-                        'label' => 'Paper Right Margin (in)',
+                        'label' => __('Paper Right Margin (in)', 'edupress'),
                         'data'  => array(
                             'min'   => 0,
                             'max'   => 5,
@@ -1656,7 +1706,7 @@ class Admin
                     'name'  => 'print_pos_printer',
                     'settings' => array(
                         'value' => Admin::getSetting('print_pos_printer', ''),
-                        'label' => 'POS Printer Size',
+                        'label' => __('POS Printer Size', 'edupress'),
                         'options' => array(
                             '58' => '58 mm (POS-58)',
                             '80' => '80 mm (POS-80)',
@@ -1670,7 +1720,7 @@ class Admin
                     'name'  => 'print_show_edupress_credits',
                     'settings' => array(
                         'value' => Admin::getSetting('print_show_edupress_credits', 'active'),
-                        'label' => 'Show EduPress Credits',
+                        'label' => __('Show EduPress Credits', 'edupress'),
                         'options' => array(
                             'active' => 'Active',
                             'inactive' => 'Inactive',
@@ -1686,7 +1736,7 @@ class Admin
                     'name'  => 'display_posts_per_page',
                     'settings' => array(
                         'value' => Admin::getSetting('display_posts_per_page', 20 ),
-                        'label' => 'Posts per page',
+                        'label' => __('Posts per page', 'edupress'),
                         'data' => array(
                             'min' => 0,
                             'max'   => 500,
@@ -1698,7 +1748,7 @@ class Admin
                     'name'  => 'display_primary_color',
                     'settings' => array(
                         'value' => Admin::getSetting('display_primary_color', 0.5),
-                        'label' => 'Primary Color',
+                        'label' => __('Primary Color', 'edupress'),
                         'data'  => array(
                             'min'   => 0,
                             'max'   => 5,
@@ -1712,7 +1762,7 @@ class Admin
                     'name'  => 'display_secondary_color',
                     'settings' => array(
                         'value' => Admin::getSetting('display_secondary_color', 1),
-                        'label' => 'Secondary Color',
+                        'label' => __('Secondary Color', 'edupress'),   
                         'data'  => array(
                             'min'   => 0,
                             'max'   => 5,
@@ -1727,7 +1777,7 @@ class Admin
                     'name'  => 'display_font_family',
                     'settings' => array(
                         'value' => Admin::getSetting('display_font_family', 'Roboto'),
-                        'label' => 'Font Family',
+                        'label' => __('Font Family', 'edupress'),
                         'options' => array_combine($fonts, $fonts),
                     )
                 );
@@ -1736,7 +1786,7 @@ class Admin
                     'name'  => 'display_menu_font_size',
                     'settings' => array(
                         'value' => Admin::getSetting('display_menu_font_size', 17),
-                        'label' => 'Menu Font Size',
+                        'label' => __('Menu Font Size', 'edupress'),
                         'options' => range(0,100),
                     )
                 );
@@ -1745,7 +1795,7 @@ class Admin
                     'name'  => 'display_content_font_size',
                     'settings' => array(
                         'value' => Admin::getSetting('display_content_font_size', 17),
-                        'label' => 'Content Font Size',
+                        'label' => __('Content Font Size', 'edupress'),
                         'options' => range(0,100),
                     )
                 );
@@ -1761,7 +1811,7 @@ class Admin
                     'name'  => 'delete_data_types',
                     'settings' => array(
                         'value' => Admin::getSetting('display_content_font_size', 17),
-                        'label' => 'Data Types',
+                        'label' => __('Data Types', 'edupress'),
                         'options' => $features,
                     )
                 );
@@ -1770,7 +1820,7 @@ class Admin
                     'name'  => 'delete_start_date',
                     'settings' => array(
                         'value' => Admin::getSetting('delete_start_date'),
-                        'label' => 'Start Date',
+                        'label' => __('Start Date', 'edupress'),
                     )
                 );
                 $fields['delete_end_date'] = array(
@@ -1778,14 +1828,14 @@ class Admin
                     'name'  => 'delete_end_date',
                     'settings' => array(
                         'value' => Admin::getSetting('delete_end_date'),
-                        'label' => 'End Date',
+                        'label' => __('End Date', 'edupress'),
                     )
                 );
                 $fields['delete_data_stats'] = array(
                     'type'  => 'html',
                     'name'  => 'delete_data_stats',
                     'settings' => array(
-                        'label' => 'Data Stats',
+                        'label' => __('Data Stats', 'edupress'),
                         'html'  => "<div class='delete_data_stats'></div>",
                     )
                 );

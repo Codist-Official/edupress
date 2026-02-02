@@ -150,6 +150,27 @@ class Klass extends Post
                 'value' => $this->getMeta('end_date'),
             )
         );
+        if(Admin::getSetting('absence_sms') == 'active' && !EduPress::isActive('section')){
+            $fields['absence_sms'] = array(
+                'type'          => 'select',
+                'name'          => 'absence_sms',
+                'settings'      => array(
+                    'label'     => 'Absence SMS',
+                    'value' => $this->getMeta('absence_sms'),
+                    'options' => ['active' => 'Yes', 'inactive' => 'No'],
+                    'placeholder' => 'Select',
+                    'id' => 'absence_sms'
+                )
+            );
+            $fields['absence_sms_cutoff_time'] = array(
+                'type'          => 'time',
+                'name'          => 'absence_sms_cutoff_time',
+                'settings'      => array(
+                    'label'     => 'Absence SMS cutoff time',
+                    'value' => $this->getMeta('absence_sms_cutoff_time'),
+                )
+            );
+        }
         return $new_fields + $fields;
     }
 
@@ -183,6 +204,11 @@ class Klass extends Post
 
         if( EduPress::isActive('shift') ){
             $new_fields['shift_id'] = 'Shift';
+        }
+
+        if(Admin::getSetting('absence_sms') == 'active' && !EduPress::isActive('section')){
+            $fields['absence_sms'] = 'Absence SMS';
+            $fields['absence_sms_cutoff_time'] = 'Cutoff time';
         }
 
         return $new_fields + $fields;

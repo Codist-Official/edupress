@@ -2991,10 +2991,11 @@ class User
      */
     public function delete()
     {
-        if($this->hasTransaction()){
-            $this->updateMeta('status', 'inactive');
-            return false;
-        }
+        // deleting user even if has transaction 
+        // if($this->hasTransaction()){
+        //     $this->updateMeta('status', 'inactive');
+        //     return false;
+        // }
         return wp_delete_user( $this->id );
     }
 

@@ -69,7 +69,7 @@ class Calendar extends Post
     public function filterPublishFields( $fields = [] )
     {
         $fields = [];
-        if(Admin::getSetting('branch_active') == 'active'){
+        if(EduPress::isActive('branch')){
             $branch = new Branch();
             $fields['branch_id'] = array(
                 'type'  => 'select',
@@ -84,7 +84,7 @@ class Calendar extends Post
             );
         }
 
-        if(Admin::getSetting('shift_active') == 'active'){
+        if(EduPress::isActive('shift')){
             $fields['shift_id'] = array(
                 'type'  => 'select',
                 'name'  => 'shift_id',
@@ -98,7 +98,7 @@ class Calendar extends Post
             );
         }
 
-        if( Admin::getSetting('class_active') == 'active' ){
+        if( EduPress::isActive('class') ){
             $fields['class_id'] = array(
                 'type'  => 'select',
                 'name'  => 'class_id',
@@ -112,7 +112,7 @@ class Calendar extends Post
             );
         }
 
-        if( Admin::getSetting('section_active') == 'active' ){
+        if( EduPress::isActive('section') ){
             $fields['section_id'] = array(
                 'type'  => 'select',
                 'name'  => 'section_id',
@@ -154,6 +154,24 @@ class Calendar extends Post
         $data['data'] = [];
         return update_post_meta( $this->id, $key, $data );
 
+    }
+
+    public function isOpen( $date = '' )
+    {
+        if(empty($date)) return null; 
+        $weekend_holidays = Admin::getSetting('attendance_weekend_holidays', []);
+        $dt = new \DateTime($date);
+        $date_name = $dt->format('l');
+        $cal_details = maybe_unserialize(get_post_meta( $this->id, 'academic_calendar', true));
+        $cal_data = $cal_details['data'] ?? [];
+        if(empty($cal_data)){
+            if(in_array($date_name, $weekend_holidays)) return false;
+            return true;
+        } else {
+            $day_details = $cal_data[$date] ?? null;
+            if(is_null($day_details)) return null;
+            return isset($day_details['status']) && $day_details['status'] == 'o';
+        }
     }
 
     /**
@@ -623,7 +641,7 @@ class Calendar extends Post
              )
         );
 
-        if( Admin::getSetting('shift_active') == 'active' ){
+        if( EduPress::isActive('shift') ){
             $new_fields['shift_id'] =  array(
                 'type'      => 'select',
                 'name'      => 'shift_id',
@@ -636,7 +654,7 @@ class Calendar extends Post
             );
         }
 
-        if( Admin::getSetting('class_active') == 'active' ){
+        if( EduPress::isActive('class') ){
             $new_fields['class_id'] =  array(
                 'type'      => 'select',
                 'name'      => 'class_id',
@@ -649,7 +667,7 @@ class Calendar extends Post
             );
         }
 
-        if( Admin::getSetting('section_active') == 'active' ){
+        if( EduPress::isActive('section') ){
             $new_fields['section_id'] =  array(
                 'type'      => 'select',
                 'name'      => 'section_id',
@@ -719,7 +737,7 @@ class Calendar extends Post
             <form action="" class="<?php echo EduPress::getClassNames( array('publishCalendar'), 'form'); ?>">
                 <table class="edupress-table">
                 <?php
-                if(Admin::getSetting('branch_active') == 'active'){
+                if(EduPress::isActive('branch')){
                     ?>
                     <tr>
                         <th width="150"><?php _e('Branch', 'edupress'); ?></th>
@@ -727,7 +745,7 @@ class Calendar extends Post
                     </tr>
                     <?php
                 }
-                if(Admin::getSetting('shift_active') == 'active'){
+                if(EduPress::isActive('shift')){
                     ?>
                     <tr>
                         <th><?php _e('Shift', 'edupress'); ?></th>
@@ -735,7 +753,7 @@ class Calendar extends Post
                     </tr>
                     <?php
                 }
-                if(Admin::getSetting('class_active') == 'active' && $class_id){
+                if(EduPress::isActive('class') && $class_id){
                     ?>
                     <tr>
                         <th><?php _e('Class', 'edupress'); ?></th>
@@ -743,7 +761,7 @@ class Calendar extends Post
                     </tr>
                     <?php
                 }
-                if(Admin::getSetting('section_active') == 'active' && $section_id > 0){
+                if(EduPress::isActive('section') && $section_id > 0){
                     ?>
                     <tr>
                         <th><?php _e('Section', 'edupress'); ?></th>

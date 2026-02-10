@@ -41,3 +41,13 @@
     }
   }
 }
+
+
+table.edupress-table-attendance{
+  tr[data-role='student'] td{ background-color: #E8F1FA !important;}
+  tr[data-role='teacher'] td{ background-color: #EAF7F1 !important;}
+  tr[data-role='manager'] td{ background-color: #F2ECFA !important;}
+  tr[data-role='student'] td{ background-color: #FFF1E6 !important;}
+  tr[data-role='guardian'] td{ background-color: #FFF9E1 !important;}
+  // tr[data-role='student'] td{ background-color: #E6F4F3 !important;}
+}

@@ -3,9 +3,17 @@ table{
     &[data-post_type=user]{
       tr{
         td{
+          a{
+            text-decoration: none;
+          }
           vertical-align: middle;
           img{
             vertical-align: middle;
+            margin-right: 5px;
+            border-radius: 100%;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            background-color: #fff;
+            padding: 2px;
           }
         }
       }

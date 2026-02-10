@@ -62,6 +62,7 @@ class Admin
             'exam' => 'Exam',
             'user'  => 'User',
             'sms' => 'SMS',
+            'voice' => 'Voice Call',
             'attendance' => 'Attendance',
         );
 
@@ -120,7 +121,7 @@ class Admin
             
         );
 
-        if( Admin::getSetting('exam_active') == 'active' ){
+        if( EduPress::isActive('exam') ){
             $menus['result'] = array(
                 'id'        => 'result',
                 'title'     => 'Result',
@@ -137,7 +138,7 @@ class Admin
             );
         }
 
-        if( Admin::getSetting('transaction_active') == 'active' ){
+        if( EduPress::isActive('transaction') ){
             $menus['transaction'] = array(
                 'id'        => 'transaction',
                 'title'     => 'Accounting',
@@ -147,7 +148,7 @@ class Admin
             );
         }
 
-        if( Admin::getSetting('sms_active') == 'active' ){
+        if( EduPress::isActive('sms') ){
             $menus['sms'] = array(
                 'id'        => 'sms',
                 'title'     => 'SMS',
@@ -157,7 +158,17 @@ class Admin
             );
         }
 
-        if( Admin::getSetting('attendance_active' ) == 'active' ){
+        if( EduPress::isActive('voice') ){
+            $menus['voice'] = array(
+                'id'        => 'voice',
+                'title'     => 'Voice Call',
+                'info'      => '',
+                'url'       => EduPress::changeUrlParam( EduPress::getCurrentUrl(), 'activePage', 'voice' ),
+                'active'    => 0,
+            );
+        }
+
+        if( EduPress::isActive('attendance') ){
             $menus['attendance'] = array(
                 'id'        => 'attendance',
                 'title'     => 'Attendance',
@@ -289,15 +300,10 @@ class Admin
     {
 
         $menus = $this->getSettingsMenu();
-
         if ( empty( $menus ) ) return false;
-
         foreach( $menus as $k => $v ){
-
             if ( $v['id'] == $menu ) return true;
-
         }
-
         return false;
 
     }
@@ -587,6 +593,15 @@ class Admin
                         'label' => __('SMS', 'edupress')
                     )
                 );
+                $fields['voice_active'] = array(
+                    'type'  => 'select',
+                    'name'  => 'voice_active',
+                    'settings' => array(
+                        'options' => $active_options,
+                        'value' => Admin::getSetting('voice_active'),
+                        'label' => __('Voice Call', 'edupress')
+                    )
+                );
                 $fields['attendance_active'] = array(
                     'type'  => 'select',
                     'name'  => 'attendance_active',
@@ -811,25 +826,6 @@ class Admin
                         'id' => 'sms_gateway'
                     )
                 );
-
-                // $fields['sms_username'] = array(
-                //     'type'  => 'text',
-                //     'name'  => 'sms_username',
-                //     'settings' => array(
-                //         'value' => Admin::getSetting('sms_username'),
-                //         'label' => __('Username', 'edupress'),
-                //         'id' => 'sms_username'
-                //     )
-                // );
-                // $fields['sms_password'] = array(
-                //     'type'  => 'password',
-                //     'name'  => 'sms_password',
-                //     'settings' => array(
-                //         'value' => Admin::getSetting('sms_password'),
-                //         'label' => __('Password', 'edupress'),
-                //         'id' => 'sms_password'
-                //     )
-                // );
                 $fields['sms_api_key'] = array(
                     'type'  => 'text',
                     'name'  => 'sms_api_key',
@@ -934,6 +930,56 @@ class Admin
                     )
                 );
 
+                break;
+
+            case 'voice':
+                $fields['voice_api_token'] = array(
+                    'type' => 'text',
+                    'name' => 'voice_api_token',
+                    'settings' => array(
+                        'value' => Admin::getSetting('voice_api_token'),
+                        'label' => __('API Token', 'edupress'),
+                        'id' => 'voice_api_token',
+                    ),
+                );
+                if(current_user_can('manage_options')){
+                    $fields['voice_rate'] = array(
+                        'type' => 'text',
+                        'name' => 'voice_rate',
+                        'settings' => array(
+                            'value' => Admin::getSetting('voice_rate', 0.5),
+                            'label' => __('Rate', 'edupress'),
+                            'id' => 'voice_rate',
+                        ),
+                    );
+                }
+                $fields['voice_caller_id'] = array(
+                    'type' => 'text',
+                    'name' => 'voice_caller_id',
+                    'settings' => array(
+                        'value' => Admin::getSetting('voice_caller_id'),
+                        'label' => __('Caller ID', 'edupress'),
+                        'id' => 'voice_caller_id',
+                    ),
+                );
+                $fields['voice_entry_audio_id'] = array(
+                    'type' => 'text',
+                    'name' => 'voice_entry_audio_id',
+                    'settings' => array(
+                        'value' => Admin::getSetting('voice_entry_audio_id'),
+                        'label' => __('Entry Audio ID', 'edupress'),
+                        'id' => 'voice_entry_audio_id',
+                    ),
+                );
+                $fields['voice_exit_audio_id'] = array(
+                    'type' => 'text',
+                    'name' => 'voice_exit_audio_id',
+                    'settings' => array(
+                        'value' => Admin::getSetting('voice_exit_audio_id'),
+                        'label' => __('Exit Audio ID', 'edupress'),
+                        'id' => 'voice_exit_audio_id',
+                    ),
+                );
                 break;
 
             case 'accounting':
@@ -1892,7 +1938,7 @@ class Admin
      */
     public function updateEduPressSettingsForm( $data = [] )
     {
-        $options = maybe_unserialize( get_option( self::$admin_settings_option_name, array() ) );
+        // $options = maybe_unserialize( get_option( self::$admin_settings_option_name, array() ) );
         $skip_fields = array('action', 'ajax_action', 'is_ajax', 'before_send_callback', 'success_callback', 'error_callback', '_wpnonce', '_wp_http_referer');
         if( is_array($data) && !empty($data) ){
 

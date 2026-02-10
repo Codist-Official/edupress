@@ -460,8 +460,6 @@ class AdminAjax
             $posts = array_map( 'intval', $posts );
             if( $_REQUEST['post_type'] === 'user' ) {
                 foreach($posts as $id){
-                    $count = (int) $wpdb->query("SELECT COUNT(*) FROM {$wpdb->prefix}transaction WHERE user_id = {$id}");
-                    if( $count ) continue;
                     wp_delete_user( $id );
                 }
             } else {
@@ -797,10 +795,11 @@ class AdminAjax
         );
         $response = [];
         for( $i = 0; $i < count($files['name']); $i++ ){
-            $file = $files['tmp_name'][$i];
-            $response = User::bulkUpload($file);
+            // $file = $files['tmp_name'][$i];
+            $response = User::bulkUpload($files['tmp_name'][$i], $files['name'][$i]);
             if(is_array($response)){
                 $response['status'] = 1;
+                $response['file_name'] = $files['name'][$i];
             }
         }
         return $response;

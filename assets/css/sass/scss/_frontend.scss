@@ -232,7 +232,8 @@ ul.top-breadcrumb-bar{
 @media screen and (max-width: 768px) {
   .edupress-frontend-panel-wrap{
     width: 100%;
-    height: auto;
+    height: 100%;
+    overflow: auto;
     .topbar-wrap{
       position: relative;
       .institute-title{ 

@@ -2,7 +2,7 @@
 namespace EduPress;
 
 
-@ini_set('display_errors', 1 );
+@ini_set('display_errors', 0 );
 
 defined( 'ABSPATH' ) || die();
 
@@ -46,7 +46,12 @@ class Debug
      */
     public function debug()
     {
-        
+        var_dump(Voice::getBalance());
+        $id = Voice::getAttendanceEntryId();
+        $mobile = '01913919597';
+        var_dump( Voice::send($mobile, $id) );
+
+        return;
         ob_start(); 
         Attendance::sendAbsenceAttendanceSMS();
         return ob_get_clean();

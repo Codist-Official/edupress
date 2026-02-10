@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.6.8
+Version: 1.6.9
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -65,10 +65,8 @@ class EduPress
      */
     public static function instance( )
     {
-
         if ( is_null( self::$_instance ) ) self::$_instance = new self();
         return self::$_instance;
-
     }
 
     /**
@@ -186,6 +184,22 @@ class EduPress
 
         $charset_collate = $wpdb->get_charset_collate();
 
+        // Voice Calls 
+        $sql = "CREATE TABLE {$wpdb->prefix}voice_logs (
+            id bigint NOT NULL AUTO_INCREMENT,
+            branch_id int NULL,
+            mobile bigint NOT NULL,
+            user_id bigint NULL,
+            rate float NULL, 
+            duration int NULL,
+            cost float null,
+            msg_id bigint NULL,
+            delivered boolean null,
+            record_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY(id)
+        ) {$charset_collate}";
+        dbDelta($sql);
+
         // SMS logs
         $sql = "CREATE TABLE {$wpdb->prefix}sms_logs (
                 id bigint NOT NULL AUTO_INCREMENT,
@@ -287,6 +301,17 @@ class EduPress
             INDEX transaction_items (transaction_id,item_name,item_amount, item_month,item_year,item_due)
         ) $charset_collate";
         dbDelta( $sql );
+
+        // User bulk upload 
+        $sql = "CREATE TABLE {$wpdb->prefix}bulk_upload_users (
+            id bigint NOT NULL AUTO_INCREMENT,
+            data text, 
+            csv VARCHAR(255) NULL,
+            record_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            user_id bigint DEFAULT NULL,
+            PRIMARY KEY (id)
+        ) $charset_collate";
+        dbDelta($sql);
 
         // Update database 
         update_option( 'edupress_version', EDUPRESS_VERSION, 'no');
@@ -1241,6 +1266,10 @@ class EduPress
             'sms' => array(
                 'title' => 'SMS',
                 'icon' => 'fa-solid fa-sms',
+            ),
+            'voice' => array(
+                'title' => 'Voice',
+                'icon' => 'fa-solid fa-voice'
             ),
             'attendance' => array(
                 'title' => 'Attendance',

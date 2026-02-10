@@ -540,7 +540,7 @@ class User
             )
         );
 
-        if(Admin::getSetting('shift_active') == 'active'){
+        if(EduPress::isActive('shift')){
             $fields['shift_id'] = array(
                 'type' => 'select',
                 'name' => 'shift_id',
@@ -551,7 +551,7 @@ class User
                 )
             );
         }
-        if(Admin::getSetting('class_active') == 'active'){
+        if(EduPress::isActive('class')){
             $klass = new Klass();
             $options = $klass->getPosts( [], true );
             $fields['class_id'] = array(
@@ -566,7 +566,7 @@ class User
                 )
             );
         }
-        if(Admin::getSetting('section_active') == 'active'){
+        if(EduPress::isActive('section')){
             $fields['section_id'] = array(
                 'type' => 'select',
                 'name' => 'section_id',
@@ -650,7 +650,7 @@ class User
         $roles = array(
             'student' => 'Student',
             'teacher' => 'Teacher',
-            'manager' => 'Manager',
+            'manager' => 'Admin',
             'accountant' => 'Accountant',
             'alumni'  => 'Alumni',
             'parent' => 'Parent',
@@ -691,7 +691,7 @@ class User
 
         if ( $settings['role'] === 'student' ){
 
-            if ( Admin::getSetting('shift_active' ) == 'active' ){
+            if ( EduPress::isActive('shift') ){
 
                 $branch_id = $settings['branch_id'] ?? '';
                 if( $branch_id ) {
@@ -726,7 +726,7 @@ class User
 
             }
 
-            if( Admin::getSetting('class_active') == 'active' ){
+            if( EduPress::isActive('class') ){
 
                 $class_id = $settings['class_id'] ?? '';
                 if( isset($args['meta_query']) && count( $args['meta_query'] ) > 1 ) $args['meta_query']['relation'] = 'AND';
@@ -751,7 +751,7 @@ class User
                 );
             }
 
-            if( Admin::getSetting('section_active') == 'active' ){
+            if( EduPress::isActive('section') ){
 
                 $section_id = $settings['section_id'] ?? '';
                 if( isset($args['meta_query']) && count( $args['meta_query'] ) > 1 ) $args['meta_query']['relation'] = 'AND';
@@ -843,40 +843,45 @@ class User
         );
 
         if ( $settings['role'] === 'student' ){
-            $subject = new Subject();
-            $fields['optional_subject_id'] = array(
-                'name'  => 'optional_subject_id[]',
-                'type'  => 'select',
-                'settings' => array(
-                    'label' => 'Optional Subject',
-                    'options' => $subject->getPosts( [], true ),
-                    'value' => $settings['optional_subject_id'] ?? '',
-                    'placeholder' => 'Select a subject'
-                )
-            );
 
-            $fields['payment_type'] = array(
-                'name'  => 'payment_type[]',
-                'type'  => 'select',
-                'settings' => array(
-                    'label' => 'Payment Type',
-                    'options' => array('Monthly' => 'Monthly', 'Package' => 'Package'),
-                    'required' => true,
-                    'placeholder' => 'Select a payment type',
-                    'value' => $settings['payment_type'] ?? '',
-                )
-            );
+            if( EduPress::isActive('subject')){
+                $subject = new Subject();
+                $fields['optional_subject_id'] = array(
+                    'name'  => 'optional_subject_id[]',
+                    'type'  => 'select',
+                    'settings' => array(
+                        'label' => 'Optional Subject',
+                        'options' => $subject->getPosts( [], true ),
+                        'value' => $settings['optional_subject_id'] ?? '',
+                        'placeholder' => 'Select a subject'
+                    )
+                );
+            }
 
-            $fields['payment_amount'] = array(
-                'name'  => 'payment_amount[]',
-                'type'  => 'number',
-                'settings' => array(
-                    'label' => 'Payment Amount',
-                    'required' => true,
-                    'placeholder' => 'Enter an amount',
-                    'value' => $settings['payment_amount']
-                )
-            );
+            if( EduPress::isActive('transaction')){
+                $fields['payment_type'] = array(
+                    'name'  => 'payment_type[]',
+                    'type'  => 'select',
+                    'settings' => array(
+                        'label' => 'Payment Type',
+                        'options' => array('Monthly' => 'Monthly', 'Package' => 'Package'),
+                        'required' => true,
+                        'placeholder' => 'Select a payment type',
+                        'value' => $settings['payment_type'] ?? '',
+                    )
+                );
+    
+                $fields['payment_amount'] = array(
+                    'name'  => 'payment_amount[]',
+                    'type'  => 'number',
+                    'settings' => array(
+                        'label' => 'Payment Amount',
+                        'required' => true,
+                        'placeholder' => 'Enter an amount',
+                        'value' => $settings['payment_amount']
+                    )
+                );
+            }
         }
 
         return $fields;
@@ -1340,7 +1345,7 @@ class User
             </div>
             <div class="ep-flex-4 ep-mb-flex-12">
                 <?php if(EduPress::isActive('attendance')) : ?>
-                    <button class="ep-mt-sm generate_attendance_ids" type="button"><?php _e('Sync User Attendance IDs', 'edupress'); ?></button>
+                    <button class="ep-mt-sm edupress-btn generate_attendance_ids" type="button"><?php _e('Sync User Attendance IDs', 'edupress'); ?></button>
                 <?php endif; ?>
             </div>
         </div>
@@ -1354,7 +1359,7 @@ class User
                                 <input data-post_type="<?php echo $this->post_type; ?>" type="checkbox" name="edupress-select-bulk-delete" class="edupress-bulk-select-all" id="edupress-select-bulk-delete">
                                 <!--                            <label for="edupress-select-bulk-delete">--><?php //_e('All', 'edupress'); ?><!--</label>-->
                                 <span style="float:right">
-                                    <a title="Bulk Delete" href="javascript:void(0)" class="edupress-bulk-delete"><?php echo EduPress::getIcon('delete'); ?></a>
+                                    <a title="Bulk Delete" href="javascript:void(0)" data-post-type="user" class="edupress-bulk-delete"><?php echo EduPress::getIcon('delete'); ?></a>
                                     <a title="Bulk Update" href="javascript:void(0)" class="edupress-bulk-update-users"><?php echo EduPress::getIcon('edit'); ?></a>
                                 </span>
                             </span>
@@ -1392,51 +1397,51 @@ class User
                         <?php
                             // current user cannot delete himself
                             $disable_own = $this->id === get_current_user_id() ? " disabled='disabled' " :  '';
-                            // ID field, we'll show attendance id if its active
-                            // otherwise show user id
-                            // in checkbox we'll always show user id
 
                             $user_visible_id = $this->id;
-                            if(Admin::getSetting('attendance_active') == 'active'){
+                            if(EduPress::isActive('attendance')){
                                 $user_visible_id = $this->getMeta('attendance_id');
+                                if(str_contains($user_visible_id,'token')) $user_visible_id = 0;
                             }
                         ?>
-                        <input <?php echo $disable_own; ?> data-id="<?php echo $this->id; ?>" data-post_type="<?php echo $this->post_type; ?>" type="checkbox" name="edupress-bulk-delete-post[]" class="edupress-bulk-select-item no-print" value="<?php echo $this->id; ?>" id="id_<?php echo $this->id; ?>">
+                        <input <?php echo $disable_own; ?> data-id="<?php echo $this->id; ?>" data-post-type="<?php echo $this->post_type; ?>" type="checkbox" name="edupress-bulk-delete-post[]" class="edupress-bulk-select-item no-print" value="<?php echo $this->id; ?>" id="id_<?php echo $this->id; ?>">
                         <label for="id_<?php echo $this->id; ?>"><?php echo $user_visible_id; ?></label>
 
                     </td>
 
-                    <td><?php echo get_the_title( $this->getMeta('branch_id')); ?></td>
-                    <td><?php echo ucwords($this->getRole()); ?></td>
+                    <td data-field="branch_id"><?php echo get_the_title( $this->getMeta('branch_id')); ?></td>
                     <td>
-                        <?php $text = get_avatar($this->id, 18) . $this->getMeta('first_name');  ?>
+                        <?php 
+                        $roles = $this->getRoles();
+                        $current_role = $this->getRole();
+                        $role_name = $roles[$current_role] ?? '';
+                        echo ucwords($role_name); 
+                    ?>
+                    </td>
+                    <td data-field="name">
+                        <?php $text = get_avatar($this->id, 20) . $this->getMeta('first_name');  ?>
                         <?php echo self::showProfileOnClick( $this->id, $text ); ?>
                     </td>
 
                     <?php if($class_active):?>
                         <?php if(!isset($titles[$this->getMeta('class_id')])) $titles[$this->getMeta('class_id')] = get_the_title($this->getMeta('class_id')); ?>
-                        <td><?php echo !empty($this->getMeta('class_id')) && $this->getRole() == 'student' ? $titles[$this->getMeta('class_id')] : ''; ?></td>
+                        <td data-field="class"><?php echo !empty($this->getMeta('class_id')) && $this->getRole() == 'student' ? $titles[$this->getMeta('class_id')] : ''; ?></td>
                     <?php endif; ?>
 
                     <?php if($section_active):?>
                         <?php if(!isset($titles[$this->getMeta('section_id')])) $titles[$this->getMeta('section_id')] = get_the_title($this->getMeta('section_id')); ?>
-                        <td><?php echo !empty($this->getMeta('section_id')) && $this->getRole() == 'student' ? $titles[$this->getMeta('section_id')] : ''; ?></td>
+                        <td data-field="section"><?php echo !empty($this->getMeta('section_id')) && $this->getRole() == 'student' ? $titles[$this->getMeta('section_id')] : ''; ?></td>
                     <?php endif; ?>
 
-                    <td><?php echo $this->getRole() == 'student' ? $this->getMeta('roll') : ''; ?></td>
+                    <td data-field="role"><?php echo $this->getRole() == 'student' ? $this->getMeta('roll') : ''; ?></td>
 
-                    <td><?php echo $this->getRegisterDate(); ?> </td>
+                    <td data-field="register_date"><?php echo $this->getRegisterDate(); ?> </td>
                     <?php if( User::currentUserCan( 'edit', $this->post_type ) ): ?>
-                        <td align="center" style="text-align: center;" class="no-print">
-
+                        <td data-field="action" align="center" style="text-align: center;" class="no-print">
                             <a href="javascript:void(0)" data-action="edit" class="edupress-modify-user no-print" data-user-id="<?php echo $this->id; ?>"> <?php echo EduPress::getIcon('edit'); ?></a>
-
                             <?php if ( self::currentUserCan('delete', $this->post_type ) ) : ?>
-
                                 <a href="javascript:void(0)" data-action="delete" class="edupress-modify-user" data-user-id="<?php echo $this->id; ?>"><?php echo EduPress::getIcon('delete'); ?></a>
-
                             <?php endif; ?>
-
                         </td>
                     <?php endif; ?>
                 </tr>
@@ -1513,7 +1518,7 @@ class User
             </div>
 
             <!-- shift -->
-            <?php if( Admin::getSetting('shift_active') == 'active' ) : ?>
+            <?php if( EduPress::isActive('shift') ) : ?>
                 <div class="form-col shift_id">
                     <div class="label-wrap"><label for="shift_id"><?php _e( 'Shift', 'edupress' ); ?></label></div>
                     <div class="value-wrap"><?php echo EduPress::generateFormElement( 'select', 'shift_id', array( 'options' => [], 'required' => false, 'id' => 'shift_id', 'placeholder' => 'Select' ) ); ?></div>
@@ -1521,7 +1526,7 @@ class User
             <?php endif; ?>
 
             <!-- class -->
-            <?php if( Admin::getSetting('class_active') == 'active' ) : ?>
+            <?php if( EduPress::isActive('class') ) : ?>
                 <div class="form-col class_id">
                     <div class="label-wrap"><label for="class_id"><?php _e( 'Class', 'edupress' ); ?></label></div>
                     <div class="value-wrap"><?php echo EduPress::generateFormElement( 'select', 'class_id', array( 'options' => [], 'required' => false, 'id' => 'class_id', 'placeholder' => 'Select' ) ); ?></div>
@@ -1529,7 +1534,7 @@ class User
             <?php endif; ?>
 
             <!-- section -->
-            <?php if( Admin::getSetting('section_active') == 'active' ) : ?>
+            <?php if( EduPress::isActive('section') ) : ?>
                 <div class="form-col section_id">
                     <div class="label-wrap"><label for="section_id"><?php _e( 'Section', 'edupress' ); ?></label></div>
                     <div class="value-wrap"><?php echo EduPress::generateFormElement( 'select', 'section_id', array( 'options' => [], 'required' => false, 'id' => 'section_id', 'placeholder' => 'Select' ) ); ?></div>
@@ -1851,26 +1856,18 @@ class User
 
     }
 
-
-    /**
-     * Upload with CSV
-     *
-     * @return mixed
-     *
-     * @since 1.0
-     * @access public
-     * @acccess
-     */
-    public static function bulkUpload( $file = '' )
+    public static function processBulkUploadedUsers($limit=20)
     {
-
-        $data = EduPress::readCSV($file);
-        if(empty($data)) return false;
-        $response = [];
-        foreach($data as $user){
+        global $wpdb; 
+        $table = $wpdb->prefix .'bulk_upload_users';
+        $qry = "SELECT * FROM $table WHERE user_id IS NULL ORDER BY id ASC LIMIT $limit";
+        $rows = $wpdb->get_results($qry, ARRAY_A);
+        if(empty($rows)) return;
+        foreach($rows as $row){
+            $user = json_decode($row['data'], true);
 
             if(empty($user['role'])) {
-                $response['error'] = isset($response['error']) ? $response['error'] + 1 : 1;
+                $wpdb->update($table, ['user_id'=>0], ['id'=>$row['id']]);
                 continue;
             }
 
@@ -1898,9 +1895,6 @@ class User
             );
             $user_id = wp_insert_user( $args );
             if(!is_wp_error($user_id)){
-
-                $response['success'] = isset($response['success']) ? $response['success'] + 1 : 1;
-
                 $new_user = new \WP_User( $user_id );
                 $new_user->set_role(strtolower(trim($user['role'])));
 
@@ -1928,6 +1922,8 @@ class User
                     if(isset($user['optional']) && !empty($user['optional'])) update_user_meta( $user_id, 'optional_subject_id', intval($user['optional']) );
                 }
 
+                $wpdb->update($table, ['user_id'=>$user_id], ['id'=>$row['id']]);
+
                 // Send welcome sms or email if enabled
                 self::notifyAfterRegister(
                     array(
@@ -1940,10 +1936,47 @@ class User
                 );
 
             } else {
-                $response['error'] = isset($response['error']) ? $response['error'] + 1 : 1;
+                $wpdb->update($table, ['user_id'=>$user_id], ['id'=>$row['id']]);
             }
         }
         if( EduPress::isActive('attendance') ) self::generateRemoteIdForAll();
+
+    }
+
+
+    /**
+     * Upload with CSV
+     *
+     * @return mixed
+     *
+     * @since 1.0
+     * @access public
+     * @acccess
+     */
+    public static function bulkUpload( $file = '', $org_file_name = '' )
+    {
+
+        $data = EduPress::readCSV($file);
+        if(empty($data)) return false;
+        $response = [];
+        global $wpdb;
+
+        // get file name 
+        foreach($data as $user){
+
+            // inserting into bulk upload table 
+            $user_data = array(
+                'data' => json_encode($user),
+                'record_time' => current_time('mysql'),
+                'user_id' => null,
+                'csv' => $org_file_name
+            );
+
+            // insert 
+            $insert = $wpdb->insert($wpdb->prefix.'bulk_upload_users', $user_data);
+            if($insert) $response['success'] = $response['success'] + 1;
+            
+        }
         return $response;
 
     }
@@ -2770,8 +2803,8 @@ class User
 
         $response = [];
         foreach($users as $user){
-            $attendance_id = (int) get_user_meta( $user->ID, 'attendance_id', true );
-            if($attendance_id) continue;
+            $attendance_id = get_user_meta( $user->ID, 'attendance_id', true );
+            if(!is_array($attendance_id) && $attendance_id > 0) continue;
             $remote_id = Attendance::getRemoteId($user->ID);
             $response[$user->ID] = $remote_id;
             if( is_numeric($remote_id) ) update_user_meta( $user->ID, 'attendance_id', $remote_id );

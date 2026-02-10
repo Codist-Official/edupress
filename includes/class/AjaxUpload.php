@@ -125,12 +125,14 @@ class AjaxUpload
                         processData: false,
                         dataType:'JSON',
                         beforeSend: function(){
+                            showEduPressLoading();
                             console.log(form_data);
                             if(ajax_upload.loading){
                                 ajax_upload.loading.show();
                             }
                         },
                         success: function(response){
+                            hideEduPressLoading();
                             if(ajax_upload.loading){
                                 ajax_upload.loading.hide();
                             }

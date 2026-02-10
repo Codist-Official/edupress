@@ -197,7 +197,7 @@ class Attendance extends CustomPost
         ob_start();
         ?>
         <div class="edupress-table-wrap">
-            <table class="edupress-table tablesorter edupress-master-table">
+            <table class="edupress-table edupress-table-attendance tablesorter edupress-master-table">
 
                 <thead>
                     <tr>
@@ -227,7 +227,7 @@ class Attendance extends CustomPost
                         global $wpdb;
                         $sms_text = $sms_id ? $wpdb->get_var("SELECT sms FROM {$wpdb->prefix}sms_logs WHERE id = {$sms_id} ") : '';
                     ?>
-                    <tr data-user_id="<?php echo $r->user_id; ?>">
+                    <tr data-role="<?php echo $user->getRole(); ?>" data-user_id="<?php echo $r->user_id; ?>">
                         <?php if( $branch_active ): ?><td><?php  echo !empty($branch_id) ? get_the_title( $branch_id ) : ''; ?></td><?php endif; ?>
                         <td><?php if($user->getRole() == 'student') echo $user->getMeta('roll'); ?></td>
                         <td><?php echo User::showProfileOnClick( $r->user_id, $user->getMeta('first_name')); ?></td>
@@ -724,6 +724,7 @@ class Attendance extends CustomPost
         if(isset($_REQUEST['syncAttendanceLogs'])){
             self::sync();
             self::sendAbsenceAttendanceSMS();
+            User::processBulkUploadedUsers();
         }
     }
 
@@ -962,8 +963,10 @@ class Attendance extends CustomPost
         $response = wp_remote_post($url, $args);
         $body = wp_remote_retrieve_body($response);
         $body = json_decode($body, true);
-        if($body['status'] == 200 && $body['body_response']['message'] == 'ok') return $body['body_response']['data']['user_id'] ?? $body['body_response']['data'];
-        return $body['body_response']['data'];
+        if($body['status'] == 200 && $body['body_response']['message'] == 'ok'){
+            return $body['body_response']['data']['user_id'] ?? 0;
+        }
+        return 0;
     }
 
     /**

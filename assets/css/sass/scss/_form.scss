@@ -65,8 +65,8 @@
   &.grid-4-col,
   &.grid-5-col{
     display: grid;
-    grid-column-gap: 20px;
-    grid-row-gap: 20px;
+    grid-column-gap: var(--ep-gap);
+    grid-row-gap: var(--ep-gap);
     .form-row{
       flex-direction: column;
       border: none;
@@ -107,7 +107,7 @@
   label{
     font-size: 16px;
     font-weight: 500;
-    line-height: 24px;
+    line-height: 1;
   }
   .label-wrap{
     margin-bottom: 5px;

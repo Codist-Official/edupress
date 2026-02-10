@@ -378,6 +378,10 @@ class Frontend
             case 'sms':
                 $post = new SMS();
                 break;
+    
+            case 'voice':
+                $post = new Voice();
+                break;
 
             case 'attendance':
                 $post = new Attendance();

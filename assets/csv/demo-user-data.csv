@@ -1,5 +1,4 @@
 ﻿role,name,email,roll,class,section,mobile,payment,amount,optional
-"NOTE: YOU MUST KEEP THE CSV FILE FIRST ROW THAT WORKS AS HEADER. TO GET SECTION NOR CLASS ID, GO TO EDUPRESS PANEL. IT SHOWS CLASS ID OR SECTION ID ON THE LEFT. PLEASE DELETE THIS ROW BEFORE UPLOADING DATA.",,,,,,,,,
 student,user 1,,3,,102,12,monthly,1000,
 student,user 2,,4,,248,19,package,5000,
 student,user 3,,5,,102,18,monthly,2000,

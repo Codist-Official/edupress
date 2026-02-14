@@ -107,10 +107,11 @@
   label{
     font-size: 16px;
     font-weight: 500;
-    line-height: 1;
+    line-height: 1; 
   }
   .label-wrap{
     margin-bottom: 5px;
+    line-height: 1;
   }
   button,
   button:active,
@@ -142,12 +143,15 @@ button.edupress-btn:focus-visible{
   background-color: $primary-color;
   color: $color-white;
   border: 1px solid $primary-color;
+  margin: 0 5px 5px 0;
   &:hover{
     background-color: #fff;
     color: $primary-color;
     border-color: $primary-color;
   }
 }
+
+
 
 /* MOBILE */
 @media screen and (max-width: 768px) {

@@ -620,6 +620,7 @@ class Post
 
                 <?php
 
+                    $count_fields = 0;
                     $hidden_fields = [];
                     foreach ($fields as $field) {
 
@@ -631,6 +632,8 @@ class Post
                             continue;
                         }
 
+                        $count_fields++;
+
                     ?>
                     <div class="form-column" data-name="<?php echo $field['name'] ?? ''; ?>">
                         <div class="label-wrap"><label for="<?php echo $field['settings']['id'] ?? ''; ?>"><?php _e($field['settings']['label'] ?? '', 'edupress'); ?></label></div>
@@ -639,7 +642,9 @@ class Post
                 <?php } ?>
 
                 <div class="form-column" data-name="submit">
-                    <div class="label-wrap"> &nbsp; </div>
+                    <?php if($count_fields % 4 != 0) : ?>
+                        <div class="label-wrap"> &nbsp; </div>
+                    <?php endif; ?>
                     <div class="value-wrap">
                         <?php
                             echo implode( ' ', $hidden_fields ) ;

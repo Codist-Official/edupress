@@ -604,11 +604,18 @@ class User
                 'id'=>'mobile'
             )
         );
+
+        $all_roles = self::getRoles();
+        $all_roles = array_map( function($v,$k){
+            $count = self::countUsersByRole($k);
+            return $v . " ($count)";
+        }, $all_roles, array_keys($all_roles));
+        
         $fields['role'] = array(
             'type'  => 'select',
             'name'  => 'role',
             'settings' => array(
-                'options' => self::getRoles(),
+                'options' => $all_roles,
                 'value' => sanitize_text_field($_REQUEST['role'] ?? ''),
                 'label' => 'Role',
                 'id'=>'user_role',
@@ -648,16 +655,42 @@ class User
     {
 
         $roles = array(
-            'student' => 'Student',
-            'teacher' => 'Teacher',
-            'manager' => 'Admin',
-            'accountant' => 'Accountant',
-            'alumni'  => 'Alumni',
-            'parent' => 'Parent',
+            'student' => __('Student', 'edupress'),
+            'teacher' => __('Teacher', 'edupress'),
+            'manager' => __('Admin', 'edupress'),
+            'accountant' => __('Accountant', 'edupress'),
+            'alumni'  => __('Alumni', 'edupress'),
+            'parent' => __('Parent', 'edupress'),
         );
+
+        // Looking for custom roles 
+        $custom_roles = explode(',', Admin::getSetting('user_custom_roles', ""));
+        $custom_roles = array_unique(array_filter($custom_roles));
+
+        if(!empty($custom_roles)){
+            foreach($custom_roles as $role){
+                // clean $role 
+                $key = preg_replace('/[^a-zA-Z0-9]/', '_', strtolower(trim($role)));
+                $key = str_replace(' ', '_', $key);
+                $role = ucwords($role);
+                $roles[$key] = __($role, 'edupress');
+            }
+        }
 
         return apply_filters( 'edupress_user_roles', $roles );
 
+    }
+
+    /**
+     * Count user by role 
+     */
+    public static function countUsersByRole($role='')
+    {
+        if ( empty( $role ) ) return 0;
+        $users = count_users();
+        return isset( $users['avail_roles'][ $role ] )
+            ? (int) $users['avail_roles'][ $role ]
+            : 0;
     }
 
     /**

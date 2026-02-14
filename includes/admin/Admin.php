@@ -1407,6 +1407,16 @@ class Admin
                         'after' => 'Use comma , to separate multiple fields'
                     )
                 );
+                $fields['user_custom_roles'] = array(
+                    'type' => 'textarea',
+                    'name' => 'user_custom_roles',
+                    'settings' => array(
+                        'label' => __('Custom Roles', 'edupress'),
+                        'value' => stripslashes(Admin::getSetting('user_custom_roles')),
+                        'id' => 'user_custom_roles',
+                        'after' => 'Use comma , to separate multiple fields'
+                    )  
+                );
                 break;
 
             case 'exam':

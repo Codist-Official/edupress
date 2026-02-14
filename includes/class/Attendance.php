@@ -84,13 +84,25 @@ class Attendance extends CustomPost
     {
         if( !User::currentUserCan('publish',  $this->post_type ) ) return '';
         ob_start();
+        $start_date = sanitize_text_field($_REQUEST['start_date'] ?? current_time('Y-m-d'));
+        $end_date = sanitize_text_field($_REQUEST['end_date'] ?? current_time('Y-m-d'));
         ?>
         <div class="edupress-publish-btn-wrap">
             <button data-post_type="<?php echo $this->post_type; ?>" class="edupress-btn edupress-publish-post"><?php _e( 'Add New ' . ucwords( str_replace( '_', ' ', $this->post_type ?? '' ) ), 'edupress' ); ?></button>
             <button data-post_type="<?php echo $this->post_type; ?>" data-ajax_action="showScreenToAddManualAttendance" data-success_callback="showPopupOnCallback" class="edupress-btn edupress-ajax-link edupress-manual-attendance"><?php _e( 'Manual Attendance', 'edupress' ); ?></button>
         </div>
 
-        <div id='edupress_online_device_status'><?php echo $this->getDevicesOnlineStatusHTML(); ?></div>
+        <?php if($start_date == $end_date) : ?>
+        <div class='ep-flex-wrap'>
+            <div class='ep-flex-4 ep-mb-flex-12'>
+                <div id='edupress_online_device_status'><?php echo $this->getDevicesOnlineStatusHTML(); ?></div>
+            </div>
+            <div class='ep-flex-8 ep-mb-flex-12'>
+                <div style="text-align: center; font-weight: bold;"><?php _e( 'Attendance Sumamry of ' . date('d/m/Y', strtotime($start_date)), 'edupress'); ?></div>
+                <?php echo self::getDayStatsHTML($start_date); ?>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <script>
             jQuery(document).ready(function(){
@@ -134,24 +146,24 @@ class Attendance extends CustomPost
                         </tr>
                     </thead>
                     <tbody>
-                <?php 
-                foreach($ids as $id){
-                    $online = Admin::getSetting('device_' . $id . '_online', 0);
-                    // light green or light red
-                    $online_color = $online == 1 ? '#90EE90' : '#FFB6C1';
-                    $online_status = intval($online) == 1 ? 'Online' : 'Offline';
-                    $branch_id = Admin::getSetting('attendance_device_'.$id.'_branch_id', 0);
-                    $branch_title = get_the_title($branch_id);
-                    echo "<tr>";
-                    echo "<td style='background-color: {$online_color} !important;'>{$branch_title}</td>";
-                    echo "<td style='background-color: {$online_color} !important;'>{$id}</td>";
-                    echo "<td style='background-color: {$online_color} !important;'>{$online_status}</td>";
-                    echo "</tr>";
-                }
-                ?>
+                    <?php 
+                    foreach($ids as $id){
+                        $online = Admin::getSetting('device_' . $id . '_online', 0);
+                        // light green or light red
+                        $online_color = $online == 1 ? '#90EE90' : '#FFB6C1';
+                        $online_status = intval($online) == 1 ? 'Online' : 'Offline';
+                        $branch_id = Admin::getSetting('attendance_device_'.$id.'_branch_id', 0);
+                        $branch_title = get_the_title($branch_id);
+                        echo "<tr>";
+                        echo "<td style='background-color: {$online_color} !important;'>{$branch_title}</td>";
+                        echo "<td style='background-color: {$online_color} !important;'>{$id}</td>";
+                        echo "<td style='background-color: {$online_color} !important;'>{$online_status}</td>";
+                        echo "</tr>";
+                    }
+                    ?>
                     </tbody>
                 </table>
-            </div>
+            </div>            
             <?php 
             return ob_get_clean();
         }
@@ -321,7 +333,7 @@ class Attendance extends CustomPost
             $user_id = (int) $result['user_id'];
             $time = date('Y-m-d', strtotime($result['report_time']));
             if( !isset($logs[$user_id])) $logs[$user_id] = [];
-            if( is_array($logs[$user_id]) && !in_array($time, $logs[$user_id]) ) $logs[$user_id][] = $time;
+            $logs[$user_id][$time][] = date('h:i A', strtotime($result['report_time']));
         }
         $start = new \DateTime($start_date);
         $end = new \DateTime($end_date);
@@ -338,7 +350,7 @@ class Attendance extends CustomPost
         ob_start();
         ?>
         <div class="edupress-table-wrap">
-            <table class="edupress-table edupress-master-table tablesorter">
+            <table class="edupress-table edupress-master-table edupress-table-attendance-report tablesorter" data-report_type="<?php echo $args['details'] ?? ''; ?>">
                 <thead>
                     <tr>
                         <th style="text-align: left;"><?php _e('Branch', 'edupress'); ?></th>
@@ -364,13 +376,17 @@ class Attendance extends CustomPost
                                     if(empty($month)) $month = $month_c;
                                     if($month !== $month_c) $month = $month_c;
                                     $print_month = !in_array($month, $printed_months) ? $month : ' ';
-                                    $status = $calendar_stats[$day_formatted]['status'];
+                                    $status = $calendar_stats[$day_formatted]['status'] ?? null;
  
-                                    echo "<th style='text-align: center'>{$print_month}<br>{$day->format('d')}<br><span class='attendance-day-status {$status}'> &nbsp; </span></th>";
+                                    echo "<th style='text-align: center'>{$print_month}<br>{$day->format('d')}<br><br><span class='attendance-day-status {$status}'> &nbsp; </span></th>";
                                     $printed_months[]= $month;
                                 }
                             }
                         ?>
+                        <?php if($total_days == 1) : ?>
+                            <th style="text-align: center; font-size: 12px;"><?php _e('Entry', 'edupress'); ?></th>
+                            <th style="text-align: center; font-size: 12px;"><?php _e('Exit', 'edupress'); ?></th>
+                        <?php endif; ?>
                         <th style="text-align: center; font-size: 12px;"><?php _e('Total', 'edupress'); ?></th>
                         <th style="text-align: center; font-size: 12px;"><?php _e('Open', 'edupress'); ?></th>
                         <th style="text-align: center; font-size: 12px;"><?php _e('Close', 'edupress'); ?></th>
@@ -383,7 +399,7 @@ class Attendance extends CustomPost
                 <?php
                     $branch_title = get_the_title($branch_id);
                     foreach($all_users as $k=>$v){
-                        $total_present = isset($logs[$k]) && is_countable($logs[$k]) ? count($logs[$k]) : 0;
+                        $total_present = isset($logs[$k]) && is_countable($logs[$k]) ? count(array_keys($logs[$k])) : 0;
                         $total_absent = $open_days  - $total_present;
                         if($total_absent < 0) $total_absent = 0;
                         $presence_percentage = $open_days > 0 ? number_format( $total_present * 100 / $open_days, 2) : 0;
@@ -401,12 +417,26 @@ class Attendance extends CustomPost
                             if($details){
                                 foreach($period as $day){
                                     $day_formatted = $day->format('Y-m-d');
-                                    $status = $calendar_stats[$day_formatted]['status'];
-                                    $is_present = isset($logs[$k]) && is_array($logs[$k]) && in_array($day_formatted, $logs[$k]);
+                                    $status = $calendar_stats[$day_formatted]['status'] ?? null;
+                                    $is_present = isset($logs[$k]) && is_array($logs[$k]) && array_key_exists($day_formatted, $logs[$k]);
+                                    $day_logs = isset($logs[$k][$day_formatted]) ? $logs[$k][$day_formatted] : [];
+                                    $entry_time = $exit_time = '';
+                                    if(count($day_logs)){
+                                        $entry_time = $day_logs[0];
+                                        $exit_time = count($day_logs) > 1 ? $day_logs[count($day_logs) - 1] : '';
+                                    }
+                                    $log_times = $is_present ? "{$entry_time}-{$exit_time}" : "";
                                     $icon = $is_present ? "present" : "absent";
-                                    echo "<td style='text-align: center'><span class='attendance-{$icon}'></span></td>";
+                                    echo "<td style='text-align: center' title='{$log_times}'><span class='attendance-{$icon}'></span></td>";
+                                    if($total_days == 1): 
+                                        ?> 
+                                        <td style="text-align: center"><?php echo $entry_time; ?></td>
+                                        <td style="text-align: center"><?php echo $exit_time; ?></td>
+                                        <?php 
+                                    endif; 
                                 }
                             }
+   
                             ?>
                             <td style="text-align: center"><?php echo $total_days; ?></td>
                             <td style="text-align: center"><?php echo $count_open; ?></td>
@@ -425,9 +455,70 @@ class Attendance extends CustomPost
             edupress.summary_json = <?php echo json_encode($summary_json); ?>
         </script>
         <?php
-        $content = ob_get_clean();
-        if($html) return $content;
+        return ob_get_clean();
     }
+
+    /**
+     * Get total user presence stats on a particular day 
+     * 
+     * @return string 
+     * 
+     * @since 1.6.8
+     */
+    public static function getDayStats($date='')
+    {
+        if(empty($date)) return [];
+        // get total users on the site 
+        $count = count_users();
+        $total = $count['total_users'];
+
+        $administrators = $count['avail_roles']['administrator'] ?? 0;
+        $net_users = $total - $administrators;
+
+
+        global $wpdb; 
+        $table = $wpdb->prefix . 'attendance';
+        $present = $wpdb->get_var("SELECT COUNT(DISTINCT(user_id)) FROM {$table} WHERE DATE(report_time) = '{$date}' AND user_id > 0");
+        $absent = $net_users - $present; 
+        return [
+            'total' => $total,
+            'present' => $present,
+            'absent' => $absent
+        ];
+    }
+
+
+
+    /**
+     * Get total user presence stats on a particular day 
+     * 
+     * @return string 
+     * 
+     * @since 1.6.8
+     */
+    public static function getDayStatsHTML($date='')
+    {
+        $stats = self::getDayStats($date);
+        ob_start();
+        ?>
+        <div id="single-day-count" data-day="<?php echo $date; ?>">
+            <div class="day-count-item">
+                <div id='single_day_total_users' class='value'><?php echo $stats['total']; ?></div>
+                <div class="label"><?php _e('Total', 'edupress'); ?></div>
+            </div> 
+            <div class="day-count-item">
+                <div id='single_day_total_present' class='value'><?php echo $stats['present']; ?></div>
+                <div class="label"><?php _e('Present', 'edupress'); ?></div>
+            </div> 
+            <div class="day-count-item">
+                <div id='single_day_total_absent' class='value'><?php echo $stats['absent']; ?></div>
+                <div class="label"><?php _e('Absent', 'edupress'); ?></div>
+            </div> 
+        </div>
+        <?php 
+        return ob_get_clean();
+    }
+
 
     /**
      * Get list query
@@ -533,7 +624,6 @@ class Attendance extends CustomPost
      */
     public static function insert( $data = [] )
     {
-
         $insert_data = [];
         $insert_data['user_id'] = intval($data['user_id'] ?? 0);
         $insert_data['device_id'] = intval($data['device_id'] ?? 0);

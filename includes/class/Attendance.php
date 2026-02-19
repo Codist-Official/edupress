@@ -862,6 +862,7 @@ class Attendance extends CustomPost
 
             $aid = $data['user_id'] ?? null;
             $user_id = User::getIdByAttendanceId($aid);
+            if(!$user_id) continue;
             $array = array(
                 'user_id'    => $user_id,
                 'report_time' => $data['report_time'] ?? null,

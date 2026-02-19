@@ -312,13 +312,13 @@ table, tr, td, th{
         }
       }
       th{
-        padding: 20px 15px;
+        padding: 7px;
         color: $secondary-color;
         background-color: $color-white;
         vertical-align: top;
       }
       td{
-        padding: 10px 15px;
+        padding: 7px;
         border: 1px solid #a9cccc;
         vertical-align: top;
         &[data-failed='1']{

@@ -193,8 +193,9 @@ class Frontend
         $post_types_always_active = [ 'user', 'setting', 'support' ];
 
         foreach( $post_types as $k => $v ){
+            if( EduPress::isActive('transaction') && $k == 'transaction_report' ) $menus[$k] = $v;
             if( in_array($k, array('result', 'grade_table')) && EduPress::isActive('exam')) $menus[$k] = $v;
-            if( ($k == 'print' || EduPress::isActive('exam')) && current_user_can('edit_setting') ) $menus[$k] = $v;
+            if( ($k == 'print' && EduPress::isActive('exam')) && current_user_can('edit_setting') ) $menus[$k] = $v;
             if( !in_array( $k, $post_types_always_active ) && !EduPress::isActive($k) ) continue;
             if( User::currentUserCan( 'read', $k ) ) $menus[$k] = $v;
         }
@@ -325,8 +326,10 @@ class Frontend
             $always_active_panels[] = 'result';
             $always_active_panels[] = 'grade_table';
             $always_active_panels[] = 'print';
-            $always_active_panels[] = 'transaction_report';
         }
+
+        if(EduPress::isActive('transaction')) $always_active_panels[] = 'transaction_report';
+
 
         if( !in_array($panel, $always_active_panels) && !empty($panel) && !$is_active ) return __( "This feature is not active.", 'edupress' );
 

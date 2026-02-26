@@ -245,6 +245,7 @@ class User
     {
         if($post_type === 'user') $post_type = 'people';
         if($post_type === 'term') $post_type = 'exam_term';
+        if($post_type === 'transaction_report') $post_type = 'transaction';
         if( in_array( $post_type, array( 'exam', 'result', 'calendar', 'notice' ) ) && $action == 'read' ) return true;
         return current_user_can('manage_options') || current_user_can(trim(strtolower($action . '_' . $post_type)));
 
@@ -431,6 +432,14 @@ class User
         foreach($caps as $cap){
             $manager->add_cap($cap);
         }
+
+        // Adding Custom Roles 
+        $custom_roles = self::getCustomRoles();
+        if(!empty($custom_roles)){
+            foreach($custom_roles as $k=>$v){
+                add_role($k, $v);
+            }
+        }
     }
 
     /**
@@ -606,10 +615,9 @@ class User
         );
 
         $all_roles = self::getRoles();
-        $all_roles = array_map( function($v,$k){
-            $count = self::countUsersByRole($k);
-            return $v . " ($count)";
-        }, $all_roles, array_keys($all_roles));
+        foreach($all_roles as $k=>$v){
+            $all_roles[$k] = $v . " (".self::countUsersByRole($k).")";
+        }
         
         $fields['role'] = array(
             'type'  => 'select',
@@ -663,6 +671,19 @@ class User
             'parent' => __('Parent', 'edupress'),
         );
 
+        $custom_roles = self::getCustomRoles();
+        if(!empty($custom_roles)){
+            foreach($custom_roles as $k=>$v){
+                $roles[$k] = $v;
+            }
+        }
+        return apply_filters( 'edupress_user_roles', $roles );
+
+    }
+
+    public static function getCustomRoles()
+    {
+        $all_roles = [];
         // Looking for custom roles 
         $custom_roles = explode(',', Admin::getSetting('user_custom_roles', ""));
         $custom_roles = array_unique(array_filter($custom_roles));
@@ -673,12 +694,11 @@ class User
                 $key = preg_replace('/[^a-zA-Z0-9]/', '_', strtolower(trim($role)));
                 $key = str_replace(' ', '_', $key);
                 $role = ucwords($role);
-                $roles[$key] = __($role, 'edupress');
+                $all_roles[$key] = __($role, 'edupress');
             }
         }
 
-        return apply_filters( 'edupress_user_roles', $roles );
-
+        return $all_roles;
     }
 
     /**
@@ -1303,14 +1323,14 @@ class User
             $args['meta_query'][] = array(
                 'key'   => 'first_name',
                 'value' => sanitize_text_field($_REQUEST['first_name']),
-                'compare' => '='
+                'compare' => 'LIKE'
             );
         }
 
         if( isset($_REQUEST['roll']) && !empty($_REQUEST['roll'])){
             $args['meta_query'][] = array(
                 'key'   => 'roll',
-                'value' => intval($_REQUEST['roll']),
+                'value' => sanitize_text_field($_REQUEST['roll']),
                 'compare' => '='
             );
         }
@@ -1499,7 +1519,7 @@ class User
     public static function showProfileOnClick($user_id,$text)
     {
         $classes = EduPress::getClassNames(array('showUserProfile'), 'link');
-        return "<a data-user-id='{$user_id}' data-success_callback='showUserProfileSuccessCallback' data-error_callback='' data-action='edupress_admin_ajax' data-ajax_action='showUserProfile'  href='javascript:void(0)'  class='{$classes}'>{$text}</a>";
+        return "<a data-user-id='{$user_id}' data-success_callback='showUserProfileSuccessCallback' data-error_callback='' data-action='edupress_admin_ajax' data-ajax_action='showUserProfile'  href='javascript:void(0)'  class='{$classes}'>".__($text, 'edupress')."</a>";
     }
 
 
@@ -1687,7 +1707,7 @@ class User
             <section class="header-wrap">
                 <div class="avatar-wrap"><?php echo get_avatar( $this->id, 150 ); ?></div>
                 <div class="title-wrap">
-                    <h3 class="name"><?php echo $this->getMeta('first_name'); ?></h3>
+                    <h3 class="name"><?php echo $this->getMeta('first_name'); ?> <a href="javascript:void(0)" data-action="edit" class="edupress-modify-user no-print" data-user-id="<?php echo $this->id; ?>"> <?php echo EduPress::getIcon('edit'); ?></a></h3>
                     <ul class="user-meta">
                         <li><?php echo EduPress::getIcon('attendance'); ?><a href="javascript:void(0)" class="<?php echo !$present ? 'absent' : 'present'; ?>"><?php echo $present ? "Present Today" : "Absent Today"; ?></a></li>
                         <li><?php echo EduPress::getIcon('user'); ?><a href="javascript:void(0)">Since <?php echo $this->getRegisterDate( 'd M, y'); ?></a></li>
@@ -3089,7 +3109,8 @@ class User
         } else {
             $dt2 = new \DateTime($dt1->format('Y-m-d'));
             $dt2->add(new \DateInterval('P12M'));
-        }        
+        } 
+
 
         $period = new \DatePeriod($dt1, new \DateInterval('P1M'), $dt2);
         foreach($period as $dt){
@@ -3098,6 +3119,7 @@ class User
         }
         $months = array_map('intval', $months);
         $years = array_map('intval', $years);
+
 
         global $wpdb;
         $table = $wpdb->prefix . 'transaction';
@@ -3121,6 +3143,7 @@ class User
             );
         }
 
+
         $response = [];
         for( $i = 0; $i < count($months); $i++ ){
             $m = $months[$i];
@@ -3128,6 +3151,8 @@ class User
             if($payment_type != 'monthly') $response['details'][$y][$m] = $formatted_data[$y][$m] ?? array('paid'=>0,'due'=>0);
             else $response['details'][$y][$m] = $formatted_data[$y][$m] ?? array('paid'=>0,'due'=>$payment_amount);
         }
+
+
         
         $total_paid = $total_due = 0;
         foreach($response['details'] as $y => $m){
@@ -3136,6 +3161,7 @@ class User
                 $total_due += $data['due'];
             }
         }
+
 
         if($payment_type != 'monthly'){
             $total_due = $payment_amount - $total_paid;
@@ -3152,6 +3178,7 @@ class User
         $response['query'] = $qry;
         $response['months'] = count($months);
         $response['payable'] = $payment_type == 'monthly' ? $response['months'] * $payment_amount : $payment_amount;
+
         return $response;
     }
 
@@ -3213,26 +3240,30 @@ class User
 
         <div class="edupress-table-wrap" style="margin-top: 20px;">
             <table class="edupress-table compact">
-                <tr>
-                    <th>Type</th>
-                    <th>Amount</th>
-                    <?php if($details['type'] == 'monthly'): ?>
-                        <th>Months</th>
-                        <th>Payable</th>
-                    <?php endif; ?>
-                    <th>Paid</th>
-                    <th>Due</th>
-                </tr>
-                <tr>
-                    <td><?php echo ucwords($details['type']); ?></td>
-                    <td><?php echo $details['amount']; ?></td>
-                    <?php if($details['type'] == 'monthly'): ?>
-                        <td><?php echo $details['months'] ?? 0; ?></td>
-                        <td><?php echo $details['payable'] ?? 0; ?></td>
-                    <?php endif; ?>
-                    <td><?php echo $details['total_paid'] ?? 0; ?></td>
-                    <td><?php echo $details['total_due'] ?? 0; ?></td>
-                </tr>
+                <thead>
+                    <tr>
+                        <th style="text-align:left;"><?php _e('Type', 'edupress'); ?></th>
+                        <th style="text-align:left;"><?php _e('Amount', 'edupress'); ?></th>
+                        <?php if($details['type'] == 'monthly'): ?>
+                            <th style="text-align:left;"><?php _e('Months', 'edupress'); ?></th>
+                            <th style="text-align:left;"><?php _e('Payable', 'edupress'); ?></th>
+                        <?php endif; ?>
+                        <th style="text-align:left;"><?php _e('Paid', 'edupress'); ?></th>
+                        <th style="text-align:left;"><?php _e('Due', 'edupress'); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><?php echo ucwords($details['type']); ?></td>
+                        <td><?php echo $details['amount']; ?></td>
+                        <?php if($details['type'] == 'monthly'): ?>
+                            <td><?php echo $details['months'] ?? 0; ?></td>
+                            <td><?php echo $details['payable'] ?? 0; ?></td>
+                        <?php endif; ?>
+                        <td><?php echo $details['total_paid'] ?? 0; ?></td>
+                        <td><?php echo $details['total_due'] ?? 0; ?></td>
+                    </tr>
+                </tbody>
             </table>
         </div>
 

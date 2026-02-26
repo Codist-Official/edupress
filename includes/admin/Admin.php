@@ -815,6 +815,8 @@ class Admin
 
             case 'sms':
 
+                $disabled = !current_user_can('manage_options');
+
                 $fields['sms_gateway'] = array(
                     'type'  => 'select',
                     'name'  => 'sms_gateway',
@@ -822,19 +824,22 @@ class Admin
                         'options' => Sms::getGateways(),
                         'value' => Admin::getSetting('sms_gateway'),
                         'label' => __('Gateway', 'edupress'),
-                        'placeholder' => 'Select',
-                        'id' => 'sms_gateway'
+                        'id' => 'sms_gateway',
+                        'disabled' => $disabled
                     )
                 );
+
                 $fields['sms_api_key'] = array(
-                    'type'  => 'text',
+                    'type'  => current_user_can('manage_options')? 'text' : 'password',
                     'name'  => 'sms_api_key',
                     'settings' => array(
                         'value' => Admin::getSetting('sms_api_key' ),
                         'label' => __('API Key', 'edupress'),
-                        'id' => 'sms_api_key'
+                        'id' => 'sms_api_key',
+                        'disabled' => $disabled,
                     )
                 );
+
 
                 $fields['sms_rate'] = array(
                     'type'  => 'text',
@@ -842,7 +847,8 @@ class Admin
                     'settings' => array(
                         'value' => Admin::getSetting('sms_rate'),
                         'label' => __('Rate', 'edupress'),
-                        'id' => 'sms_rate'
+                        'id' => 'sms_rate',
+                        'disabled' => $disabled,
                     )
                 );
                 $fields['sms_footer'] = array(
@@ -860,7 +866,8 @@ class Admin
                     'settings' => array(
                         'value' => Admin::getSetting('sms_sender'),
                         'label' => __('Sender', 'edupress'),
-                        'id' => 'sms_sender'
+                        'id' => 'sms_sender',
+                        'disabled' => $disabled,
                     )
                 );
                 $fields['sms_balance_section'] = array(
@@ -1241,7 +1248,7 @@ class Admin
                     'type'  => 'textarea',
                     'name'  => 'attendance_sms_format_entry',
                     'settings' => array(
-                        'value' => Admin::getSetting('attendance_sms_format_entry', "{name} এসেছে - {time}"),
+                        'value' => Admin::getSetting('attendance_sms_format_entry', "{name} {action} {institute} on {time}."),
                         'label' => __('Guardian SMS format (Entry)', 'edupress'),
                         'placeholder' => $default_text,
                         'id' => 'attendance_sms_format_entry',
@@ -1251,7 +1258,7 @@ class Admin
                     'type'  => 'textarea',
                     'name'  => 'attendance_sms_format_exit',
                     'settings' => array(
-                        'value' => Admin::getSetting('attendance_sms_format_exit', "{name} বের হয়েছে - {time}"),
+                        'value' => Admin::getSetting('attendance_sms_format_exit', "{name} {action} {institute} on {time}."),
                         'label' => __('Guardian SMS format (Exit)', 'edupress'),
                         'placeholder' => $default_text,
                         'id' => 'attendance_sms_format_exit',
@@ -1283,7 +1290,7 @@ class Admin
                     'type'  => 'checkbox',
                     'name'  => 'attendance_sms_to_admin_for_roles',
                     'settings' => array(
-                        'options' => array_combine(User::getRoles(), User::getRoles()),
+                        'options' => User::getRoles(),
                         'value' => Admin::getSetting('attendance_sms_to_admin_for_roles'),
                         'label' => __('Attendance SMS to admin for what roles?', 'edupress'),
                         'id' => 'attendance_sms_to_admin_for_roles',

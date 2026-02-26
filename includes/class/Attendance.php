@@ -205,7 +205,7 @@ class Attendance extends CustomPost
         $class_active = EduPress::isActive( 'class' );
         $section_active = EduPress::isActive( 'section' );
         $sms_active = EduPress::isActive( 'sms' );
-
+        $roles = User::getRoles();
         ob_start();
         ?>
         <div class="edupress-table-wrap">
@@ -238,6 +238,8 @@ class Attendance extends CustomPost
                         $sms_id = $r->sms_id;
                         global $wpdb;
                         $sms_text = $sms_id ? $wpdb->get_var("SELECT sms FROM {$wpdb->prefix}sms_logs WHERE id = {$sms_id} ") : '';
+                        $role = $user->getRole();
+                        $role_name = isset($roles[$role]) ? $roles[$role] : $role;
                     ?>
                     <tr data-role="<?php echo $user->getRole(); ?>" data-user_id="<?php echo $r->user_id; ?>">
                         <?php if( $branch_active ): ?><td><?php  echo !empty($branch_id) ? get_the_title( $branch_id ) : ''; ?></td><?php endif; ?>
@@ -245,7 +247,7 @@ class Attendance extends CustomPost
                         <td><?php echo User::showProfileOnClick( $r->user_id, $user->getMeta('first_name')); ?></td>
                         <td><?php echo date('d/m/y', strtotime($r->report_time) ); ?></td>
                         <td><?php echo date('h:i:s a', strtotime($r->report_time) ); ?></td>
-                        <td><?php echo !is_null($user->getRole()) ? ucwords($user->getRole()) : ''; ?></td>
+                        <td><?php _e($role_name, 'edupress'); ?></td>
                         <?php if( $shift_active ): ?><td><?php echo !empty($shift_id) ? get_the_title( $shift_id ) : ''; ?></td><?php endif; ?>
                         <?php if( $class_active ): ?><td><?php echo !empty($class_id) && $user->getRole() == 'student' ? get_the_title( $class_id ) : ''; ?></td><?php endif; ?>
                         <?php if( $section_active ): ?><td><?php echo !empty($section_id) && $user->getRole() == 'student' ? get_the_title( $section_id ) : ''; ?></td><?php endif; ?>

@@ -171,7 +171,7 @@ class PrintMaterial{
 
     public static function getPanels()
     {
-        if(!current_user_can('manage_options') && !User::currentUserCan('read','people')) return __('Only admin is authorized to see content!', 'edupressbd');
+        if(!current_user_can('manage_options') || !User::currentUserCan('read','people')) return __('Only admin is authorized to see content!', 'edupressbd');
         $activePage = sanitize_text_field($_REQUEST['activePage'] ?? '');
         $title = '';
         $content = '';
@@ -693,29 +693,29 @@ class PrintMaterial{
 
     public static function saveAsPdfWkhtml()
     {
-        require_once EDUPRESS_LIB_DIR .'/wkhtmltopdf/autoload.php';
-        $pdf = new \mikehaertl\wkhtmlto\Pdf([
-            'binary' => '/usr/local/bin/wkhtmltopdf', // macOS (Intel)
-            'encoding' => 'UTF-8',
-            'page-width'  => '54mm',
-            'page-height' => '86mm',
-            'margin-top'    => 0,
-            'margin-right'  => 0,
-            'margin-bottom' => 0,
-            'margin-left'   => 0,
-            'disable-smart-shrinking',
-            'print-media-type',
-        ]);
+        // require_once EDUPRESS_LIB_DIR .'/wkhtmltopdf/autoload.php';
+        // $pdf = new \mikehaertl\wkhtmlto\Pdf([
+        //     'binary' => '/usr/local/bin/wkhtmltopdf', // macOS (Intel)
+        //     'encoding' => 'UTF-8',
+        //     'page-width'  => '54mm',
+        //     'page-height' => '86mm',
+        //     'margin-top'    => 0,
+        //     'margin-right'  => 0,
+        //     'margin-bottom' => 0,
+        //     'margin-left'   => 0,
+        //     'disable-smart-shrinking',
+        //     'print-media-type',
+        // ]);
 
-        // Add HTML as page
-        $pdf->addPage($html);
+        // // Add HTML as page
+        // $pdf->addPage($html);
 
-        // Save to file
-        if (!$pdf->saveAs(__DIR__.'/output.pdf')) {
-            echo $pdf->getError();
-        } else {
-            echo "PDF saved successfully!";
-        }
+        // // Save to file
+        // if (!$pdf->saveAs(__DIR__.'/output.pdf')) {
+        //     echo $pdf->getError();
+        // } else {
+        //     echo "PDF saved successfully!";
+        // }
     }
 
     /**
@@ -1416,27 +1416,27 @@ class PrintMaterial{
     }  
 
 
-    function generate_pdf_from_html($html) {
+    public function generate_pdf_from_html($html) 
+    {
+        // $pdf = new \mikehaertl\wkhtmlto\Pdf([
+        //     'binary' => '/usr/bin/wkhtmltopdf', // adjust path
+        //     'encoding' => 'UTF-8',
+        //     'no-outline',
+        //     'margin-top'    => 0,
+        //     'margin-right'  => 0,
+        //     'margin-bottom' => 0,
+        //     'margin-left'   => 0,
+        //     'page-width'    => '54mm',
+        //     'page-height'   => '86mm',
+        // ]);
 
-        $pdf = new \mikehaertl\wkhtmlto\Pdf([
-            'binary' => '/usr/bin/wkhtmltopdf', // adjust path
-            'encoding' => 'UTF-8',
-            'no-outline',
-            'margin-top'    => 0,
-            'margin-right'  => 0,
-            'margin-bottom' => 0,
-            'margin-left'   => 0,
-            'page-width'    => '54mm',
-            'page-height'   => '86mm',
-        ]);
+        // $pdf->addPage($html);
 
-        $pdf->addPage($html);
+        // if (!$pdf->saveAs(WP_CONTENT_DIR.'/uploads/card.pdf')) {
+        //     return $pdf->getError();
+        // }
 
-        if (!$pdf->saveAs(WP_CONTENT_DIR.'/uploads/card.pdf')) {
-            return $pdf->getError();
-        }
-
-        return true;
+        // return true;
     }
 }
 

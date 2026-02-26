@@ -581,7 +581,7 @@ class Sms extends CustomPost
     public static function getGateways()
     {
 
-        $gateways = array('easysms'=> 'EasySMS', 'bulksmsbd' => 'BulkSmsBd');
+        $gateways = array('easysms'=> 'EasySMS');
         return apply_filters( 'edupress_sms_gateways', $gateways );
 
     }

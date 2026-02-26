@@ -500,7 +500,7 @@ class Transaction extends CustomPost
                         $name = get_user_meta( $r->user_id, 'first_name', true );
                         $details_qry = "SELECT * FROM {$wpdb->prefix}transaction_items WHERE transaction_id = {$r->id}";
                         $details = $wpdb->get_results( $details_qry );
-                        $logs = json_decode( $r->update_log, true );
+                        $logs = !empty($r->update_log) ? json_decode( $r->update_log, true ) : [];
                         $logs_data = is_array($logs) ? array_combine( array_column($logs, 'time'), array_column($logs, 'user_id') ) : [];
                         ?>
                         <tr>

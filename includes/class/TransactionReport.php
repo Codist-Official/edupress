@@ -115,7 +115,7 @@ class TransactionReport extends Post
                 'class' => 't_user_id',
             )
         );
-        if( Admin::getSetting('shift_active') == 'active'){
+        if( EduPress::isActive('shift')){
             $fields['shift_id'] = array(
                 'type' => 'select',
                 'name' => 'shift_id',
@@ -128,7 +128,7 @@ class TransactionReport extends Post
                 )
             );
         }
-        if( Admin::getSetting('class_active') == 'active'){
+        if( EduPress::isActive('class') ){
             $fields['class_id'] = array(
                 'type' => 'select',
                 'name' => 'class_id',
@@ -141,7 +141,7 @@ class TransactionReport extends Post
                 )
             );
         }
-        if( Admin::getSetting('section_active') == 'active'){
+        if( EduPress::isActive('section') ){
             $fields['section_id'] = array(
                 'type' => 'select',
                 'name' => 'section_id',
@@ -172,11 +172,12 @@ class TransactionReport extends Post
                 'class'=>'report_duration'
             )
         );
+
         $fields['start_date'] = array(
             'type' => 'date',
             'name'  => 'start_date',
             'settings' => array(
-                'label' => 'Start Date',
+                'label' => __('Start Date', 'edupress'),
                 'value' => sanitize_text_field($_REQUEST['start_date'] ?? ''),
                 'required'=> false,
             )
@@ -185,7 +186,7 @@ class TransactionReport extends Post
             'type' => 'date',
             'name'  => 'end_date',
             'settings' => array(
-                'label' => 'End Date',
+                'label' => __('End Date', 'edupress'),
                 'value' => sanitize_text_field($_REQUEST['end_date'] ?? ''),
                 'required'=> false,
             )
@@ -204,7 +205,7 @@ class TransactionReport extends Post
      * @access public
      * @static 
      */
-    public static function getClassReport( $class_id = 0 )
+    public static function getClassReport( $class_id = 0, $start_date = null, $end_date = null )
     {
         $class_id = intval($class_id);
         $post = get_post( $class_id );
@@ -238,23 +239,28 @@ class TransactionReport extends Post
             $data[$user->id] = $tran_details;
         }
 
-        // echo "<pre>";
-        // var_dump( $data );
-        // echo "</pre>";
-
 
         $class_start_date = get_post_meta( $class_id, 'start_date', true );
         $class_end_date = get_post_meta( $class_id, 'end_date', true );
-        $start_date = $end_date = '';
-        if(empty($class_start_date) || empty($class_end_date)){
+
+        // if start or end date is empty 
+        // we will use class start date and end date 
+        // if class start date and end date emtpy, we'll use first and last days of the current year 
+
+        if(!empty($start_date) && !empty($end_date)){
+            $start_date = new \Datetime(date('Y-m-d', strtotime($start_date)));
+            $end_date = new \Datetime(date('Y-m-d', strtotime($end_date)));
+        } else if (!empty($class_start_date) && !empty($class_end_date)){
+            $start_date = new \Datetime($class_start_date);
+            $end_date = new \Datetime($class_end_date);
+        } else {
             $start_date = new \Datetime(current_time('mysql'));
             $end_date = new \Datetime(current_time('mysql'));
             $start_date->modify('first day of January');
             $end_date->modify('last day of December');
-        } else {
-            $start_date = new \Datetime($class_start_date);
-            $end_date = new \Datetime($class_end_date);
         }
+
+
         $period = new \DatePeriod($start_date, new \DateInterval('P1M'), $end_date);
 
         // Format data
@@ -284,6 +290,10 @@ class TransactionReport extends Post
             $month = $date->format('m');
             $year = $date->format('Y');
             foreach($formatted_data['user_data'] as $user_id=>$user){
+                $month = intval($month);
+                $year = intval($year);
+                // echo $year. ' - ' . $month . '<br>';
+                // var_dump($data[$user_id]['details'][$year][$month]) . "<br>";
                 $formatted_data['transaction_data'][$user_id][$year][$month] = $data[$user_id]['details'][$year][$month] ?? [];
             }
         }
@@ -302,17 +312,17 @@ class TransactionReport extends Post
      * @since 1.0
      * @access public
      */
-    public function showClassReport( $class_id = 0 )
+    public function showClassReport( $class_id = 0, $start_date = null, $end_date = null )
     {
-        $data = self::getClassReport( $class_id );
+        $data = self::getClassReport( $class_id, $start_date, $end_date );
         if(empty($data['user_data'])) return __('No data found!', 'edupress');
-
 
         $user_total_data = [];
         $monthly_total_data = [];
 
         ob_start();
         ?>
+                        
         <div class="class-report-wrap">
             <div class="edupress-table-wrap">
                 <h2 style="text-align: center; width: 100%;" class="text-center">Payment Report of <?php echo get_the_title( $class_id ); ?></h2>
@@ -320,24 +330,24 @@ class TransactionReport extends Post
                 <table class="edupress-table compact edupress-master-table">
                     <thead>
                         <tr>
-                            <th><?php _e('Name', 'edupress'); ?></th>
-                            <th><?php _e('Roll', 'edupress'); ?></th>
+                            <th style="text-align:left;"><?php _e('Name', 'edupress'); ?></th>
+                            <th style="text-align:left;"><?php _e('Roll', 'edupress'); ?></th>
                             <?php foreach($data['months'] as $month){ ?>
                                 <?php $date = \DateTime::createFromFormat('!m', $month['month']); ?>
-                                <th><?php echo $date->format('M') . ' '. $month['year']; ?></th>
+                                <th style="text-align:left;"><?php echo $date->format('M') . ' '. $month['year']; ?></th>
                             <?php } ?>
-                            <th>Total</th>
+                            <th style="text-align:left;">Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach($data['user_data'] as $user_id=>$user){ ?>
                             <tr>
-                                <td><?php echo $user['name']; ?></td>
+                                <td><?php echo User::showProfileOnClick( $user_id, $user['name']); ?></td>
                                 <td><?php echo $user['roll']; ?></td>
                                 <?php foreach($data['months'] as $month_data){ ?>
                                     <?php 
-                                        $month = $month_data['month']; 
-                                        $year = $month_data['year']; 
+                                        $month = (int) $month_data['month']; 
+                                        $year = (int) $month_data['year']; 
                                         $paid = $data['transaction_data'][$user_id][$year][$month]['paid'] ?? '-';
                                         $due = $data['transaction_data'][$user_id][$year][$month]['due'] ?? '-';
                                         $due_class = $due > 0 ? 'text-red' : '';
@@ -402,14 +412,17 @@ class TransactionReport extends Post
             if(typeof $j === 'undefined') var $j = jQuery();
             $j(document).ready(function(){
 
-                const updateReportFields = () => {
+                const updateReportFields = (updateDateFields=false) => {
                     var sels = [ 't_user', 'shift_id', 'class_id', 'section_id', 'duration', 'start_date', 'end_date', 'submit' ];
                     var activeSels = [];
                     sels.forEach( (k,v) => {
                         $j(`.edupress-filter-list div[data-name=${k}]`).hide();
                     })
-                    $j(`.edupress-filter-list :input[name=start_date]`).val('');
-                    $j(`.edupress-filter-list :input[name=end_date]`).val('');
+
+                    if(updateDateFields){
+                        $j(`.edupress-filter-list :input[name=start_date]`).val('');
+                        $j(`.edupress-filter-list :input[name=end_date]`).val('');
+                    }
 
                     var reportType = $j(":input[name=report_type]").val();
                     if(reportType !== ''){
@@ -433,24 +446,21 @@ class TransactionReport extends Post
 
                 // trigger update fields
                 $j(document).on('change', ':input[name=report_type]', function(){
-                    updateReportFields();
+                    updateReportFields(true);
                 })
 
                 updateReportFields();
-
 
                 // Report duration change
                 $j(document).on( 'change', '.report_duration', function(){
                     var v = $j(this).val();
                     var dates = dateRanges[v];
-                    console.log(dates);
                     $j(`:input[name='start_date']`).val(dates['start']);
                     $j(`:input[name='end_date']`).val(dates['end']);
                 })
             })
         </script>
-        <?php
-        return ob_get_clean();
+        <?php return ob_get_clean();
     }
 
     /**
@@ -505,19 +515,23 @@ class TransactionReport extends Post
 
                 <div class="duration-report-wrap">
                     <div class="edupress-table-wrap">
-                        <table class="edupress-table">
-                            <tr>
-                                <th style="text-align: left;">Date</th>
-                                <th style="text-align: center">Inflow</th>
-                                <th style="text-align: center">Discount</th>
-                            </tr>
-                            <?php foreach($data as $k=>$v){ ?>
+                        <table class="edupress-table tablesorter">
+                            <thead>
                                 <tr>
-                                    <td><?php echo date('d M, y', strtotime($k)); ?></td>
-                                    <td style="text-align: center;"><?php echo isset( $v['amount']) ? number_format( $v['amount'], 0) : 0; ?></td>
-                                    <td style="text-align: center;"><?php echo $v['discount'] ?? 0; ?></td>
+                                    <th style="text-align: left;">Date</th>
+                                    <th style="text-align: center">Inflow</th>
+                                    <th style="text-align: center">Discount</th>
                                 </tr>
-                            <?php } ?>
+                            </thead>
+                            <tbody>
+                                <?php foreach($data as $k=>$v){ ?>
+                                    <tr>
+                                        <td><?php echo date('d M, y', strtotime($k)); ?></td>
+                                        <td style="text-align: center;"><?php echo isset( $v['amount']) ? number_format( $v['amount'], 0) : 0; ?></td>
+                                        <td style="text-align: center;"><?php echo $v['discount'] ?? 0; ?></td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
                             <tfoot>
                                 <tr>
                                     <td> </td>
@@ -539,7 +553,9 @@ class TransactionReport extends Post
                         else if(isset($_REQUEST['class_id'])) $cls_id = intval($_REQUEST['class_id']);
                         else if(isset($_REQUEST['shift_id'])) $cls_id = intval($_REQUEST['shift_id']);
                         else if(isset($_REQUEST['branch_id'])) $cls_id = intval($_REQUEST['branch_id']);
-                        echo self::showClassReport( $cls_id );
+                        $start_date = sanitize_text_field($_REQUEST['start_date'] ?? '');
+                        $end_date = sanitize_text_field($_REQUEST['end_date'] ?? '');
+                        echo self::showClassReport( $cls_id, $start_date, $end_date );
                     ?>
                 </div>
             <?php endif; ?>
@@ -549,52 +565,58 @@ class TransactionReport extends Post
                 <div class="user-report-wrap">    
                     <div class="user-intro-wrap">
                         <?php $user = new User($user_id); ?>
-                        <h5 style="text-align: center;margin-top: 10px;">User Details</h5>
-                        <div class="edupress-table-wrap">
-                            <table class="edupress-table compact">
-                                <tr>
-                                    <th style="text-align: left;">Name</th>
-                                    <th style="text-align: left;">Branch</th>
-                                    <?php if( EduPress::isActive('shift')) : ?>
-                                        <th style="text-align: left;">Shift</th>                                
-                                    <?php endif; ?>
-                                    <?php if( EduPress::isActive('class')) : ?>
-                                        <th style="text-align: left;">Class</th>
-                                    <?php endif; ?>
-                                    <?php if( EduPress::isActive('section')) : ?>
-                                        <th style="text-align: left;">Section</th>
-                                    <?php endif; ?>
-                                    <th style="text-align: left;">Roll</th>
-                                    <th style="text-align: left;">Mobile</th>
-                                </tr>
-                                <tr>
-                                    <td><?php echo $user->getMeta('first_name'); ?> <?php echo $user->getMeta('last_name'); ?></td>
-                                    <td><?php echo get_the_title($user->getMeta('branch_id')); ?></td>
-                                    <?php if( EduPress::isActive('shift')) : ?>
-                                        <td><?php echo get_the_title($user->getMeta('shift_id')); ?></td>                                
-                                    <?php endif; ?>
-                                    <?php if( EduPress::isActive('class')) : ?>
-                                        <td><?php echo get_the_title($user->getMeta('class_id')); ?></td>
-                                    <?php endif; ?>
-                                    <?php if( EduPress::isActive('section')) : ?>
-                                        <td><?php echo get_the_title($user->getMeta('section_id')); ?></td>
-                                    <?php endif; ?>
-                                    <td><?php echo $user->getMeta('roll'); ?></td>
-                                    <td><?php echo $user->getMeta('mobile'); ?></td>
-                                </tr>
-                            </table>
-                        </div>
+                        <?php if($user->id): ?>
+                            <h5 style="text-align: center;margin-top: 10px;">User Details</h5>
+                            <div class="edupress-table-wrap">
+                                <table class="edupress-table compact">
+                                    <tr>
+                                        <th style="text-align: left;"><?php _e('Name', 'edupress'); ?></th>
+                                        <th style="text-align: left;"><?php _e('Branch', 'edupress'); ?></th>
+                                        <?php if( EduPress::isActive('shift')) : ?>
+                                            <th style="text-align: left;"><?php _e('Shift', 'edupress'); ?></th>                                
+                                        <?php endif; ?>
+                                        <?php if( EduPress::isActive('class')) : ?>
+                                            <th style="text-align: left;"><?php _e('Class', 'edupress'); ?></th>
+                                        <?php endif; ?>
+                                        <?php if( EduPress::isActive('section')) : ?>
+                                            <th style="text-align: left;"><?php _e('Section', 'edupress'); ?></th>
+                                        <?php endif; ?>
+                                        <th style="text-align: left;"><?php _e('Roll', 'edupress'); ?></th>
+                                        <th style="text-align: left;"><?php _e('Mobile', 'edupress'); ?></th>
+                                    </tr>
+                                    <tr>
+                                        <td><?php $name = $user->getMeta('first_name') . ' ' . $user->getMeta('last_name'); echo User::showProfileOnClick($user->id, $name); ?></td>
+                                        <td><?php echo get_the_title($user->getMeta('branch_id')); ?></td>
+                                        <?php if( EduPress::isActive('shift')) : ?>
+                                            <td><?php echo get_the_title($user->getMeta('shift_id')); ?></td>                                
+                                        <?php endif; ?>
+                                        <?php if( EduPress::isActive('class')) : ?>
+                                            <td><?php echo get_the_title($user->getMeta('class_id')); ?></td>
+                                        <?php endif; ?>
+                                        <?php if( EduPress::isActive('section')) : ?>
+                                            <td><?php echo get_the_title($user->getMeta('section_id')); ?></td>
+                                        <?php endif; ?>
+                                        <td><?php echo $user->getMeta('roll'); ?></td>
+                                        <td><?php echo $user->getMeta('mobile'); ?></td>
+                                    </tr>
+                                </table>
+                            </div>
+
+
+                            <div class="user-pay-details" style="margin: 25px 0; width: 100%; background-color: #fff; padding: 20px; box-sizing: border-box;">
+                                <h5 style="text-align: center;">Payment Details</h5>
+                                <?php echo $user->showTransactionDetails(); ?>
+                            </div>
+
+                            <div class="user-transaction-details">
+                                <h5 style="text-align: center;">Transaction Activity</h5>
+                                <?php echo $user->showTransactionActivity(); ?>
+                            </div>
+                        <?php else: ?>
+                            <?php _e('No users found!', 'edupress'); ?>
+                        <?php endif; ?>
                     </div>
 
-                    <div class="user-pay-details" style="margin: 25px 0; width: 100%; background-color: #fff; padding: 20px; box-sizing: border-box;">
-                        <h5 style="text-align: center;">Payment Details</h5>
-                        <?php echo $user->showTransactionDetails(); ?>
-                    </div>
-
-                    <div class="user-transaction-details">
-                        <h5 style="text-align: center;">Transaction Activity</h5>
-                        <?php echo $user->showTransactionActivity(); ?>
-                    </div>
                 </div>
             <?php endif; ?>
 

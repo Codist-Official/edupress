@@ -46,6 +46,9 @@ class Debug
      */
     public function debug()
     {
+        $users = count_users();
+        var_dump($users);
+        return;
         var_dump(Voice::getBalance());
         $id = Voice::getAttendanceEntryId();
         $mobile = '01913919597';

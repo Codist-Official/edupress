@@ -1488,15 +1488,17 @@ class AdminAjax
     {
         $att_data = [];
         $branch_id = intval($_REQUEST['branch_id']);
-        $current_time = strtotime(current_time('mysql'));
         if( isset($_REQUEST['user_id']) && count($_REQUEST['user_id']) > 0 ){  
+            $base_time = strtotime($_REQUEST['date'][0]);
             for($i = 0; $i < count($_REQUEST['user_id']); $i++){
                 if($_REQUEST['status'][$i] != 'present') continue;
+                $current_time = strtotime($_REQUEST['date'][$i]);
+                $report_time = $base_time == $current_time ? $base_time + $i : $current_time;
                 $att_data[] = array(
                     'branch_id' => $branch_id,
                     'user_id' => intval($_REQUEST['user_id'][$i]),
                     'uaid' => intval($_REQUEST['attendance_id'][$i]),
-                    'report_time' => date('Y-m-d H:i:s', $current_time++ ),
+                    'report_time' => date('Y-m-d H:i:s', $report_time),
                     'auth_type' => 'MN',
                 );
             }
@@ -1691,6 +1693,37 @@ class AdminAjax
             'data' => $attendance->getDevicesOnlineStatusHTML(),
         );
     }
+
+
+    public function viewBalanceHistoryHTML()
+    {
+        return array(
+            'status' => 1,
+            'data' => Voice::getBalanceHistoryHTML(),
+        );
+    }
+
+    public function updateBalanceHTML()
+    {
+        return array(
+            'status' => 1,
+            'data' => Voice::getBlanceModifyOptionHTML(),
+        );
+    }
+
+    public function updateVoiceBalance()
+    {
+        $amount = floatval($_REQUEST['amount']);
+        $action = sanitize_text_field($_REQUEST['balance_action']);
+        if($action == 'add') Voice::AddBalance($amount);
+        if($action == 'remove') Voice::removeBalance($amount);
+        return array(
+            'status' => 1,
+            'data' => __('Balance updated!', 'edupress')
+        );
+    }
+
+
 
 }
 

@@ -1382,49 +1382,60 @@ class Attendance extends CustomPost
             }
         </style>
         <form class="edupress-form edupress-ajax-form attendance-users-list">
-            <table class="edupress-table" style="width: 100%;max-width: 750px;margin: 0;">
-                <thead> 
+            <div class="edupress-table-wrap">
+                <table class="edupress-table tablesorter" style="width: 100%;max-width: 750px;margin: 0;">
+                    <thead> 
+                        <tr>
+                            <th><?php _e('Roll', 'edupress'); ?></th>
+                            <th><?php _e('Name', 'edupress'); ?></th>
+                            <th>
+                                <?php _e('Status', 'edupress'); ?>
+                                <?php echo EduPress::generateFormElement('select', 'attendance-bulk-status', array( 'class' => 'attendance-bulk-status', 'options' => array( '' => 'Select', 'present' => 'Present', 'absent' => 'Absent' ), 'value' => '' )); ?>
+                            </th>
+                            <th>
+                                <?php _e('Date', 'edupress'); ?>
+                                <?php echo EduPress::generateFormElement('datetime-local', 'attendance-bulk-date', array( 'class' => 'attendance-bulk-date', 'value' => current_time('YYYY-MM-DDTHH:mm') )); ?>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                <?php foreach($users as $user): $user = new User($user); ?>
+                    <?php 
+                        // $is_present = self::isUserPresent($user->id, current_time('Y-m-d'));
+                        // $style = $is_present ? 'background-color: #8ec5321c !important;' : '';
+                        $style = '';
+                    ?>
                     <tr>
-                        <th>Roll</th>
-                        <th>Name</th>
-                        <th>
-                            Status
-                            <?php echo EduPress::generateFormElement('select', 'attendance-bulk-status', array( 'class' => 'attendance-bulk-status', 'options' => array( '' => 'Select', 'present' => 'Present', 'absent' => 'Absent' ), 'value' => '' )); ?>
-                        </th>
+                        <td style="<?php echo $style; ?>"><?php echo $user->getMeta('roll'); ?></td>
+                        <td style="<?php echo $style; ?>"><?php echo $user->getMeta('first_name') . ' ' . $user->getMeta('last_name'); ?></td>
+                        <td style="<?php echo $style; ?>">
+                            <input type="hidden" name="user_id[]" value="<?php echo $user->id; ?>">
+                            <input type="hidden" name="attendance_id[]" value="<?php echo $user->getMeta('attendance_id'); ?>">
+                            <?php echo EduPress::generateFormElement('select', 'status[]', array( 'options' => array( '' => 'Select', 'present' => 'Present', 'absent' => 'Absent' ), 'value' => '' )); ?>
+                            <?php //if($is_present): echo "<strong>Already Present</strong>"; endif; ?>
+                        </td>
+                        <td style="<?php echo $style; ?>">
+                            <?php echo EduPress::generateFormElement('datetime-local', 'date[]', array( 'class' => 'attendance-user-date', 'value' => current_time('YYYY-MM-DDTHH:mm') )); ?>
+                        </td>
+
                     </tr>
-                </thead>
-                <tbody>
-            <?php foreach($users as $user): $user = new User($user); ?>
-                <?php 
-                    $is_present = self::isUserPresent($user->id, current_time('Y-m-d'));
-                    $style = $is_present ? 'background-color: #8ec5321c !important;' : '';
-                ?>
-                <tr>
-                    <td style="<?php echo $style; ?>"><?php echo $user->getMeta('roll'); ?></td>
-                    <td style="<?php echo $style; ?>"><?php echo $user->getMeta('first_name') . ' ' . $user->getMeta('last_name'); ?></td>
-                    <td style="<?php echo $style; ?>">
-                        <input type="hidden" name="user_id[]" value="<?php echo $user->id; ?>">
-                        <input type="hidden" name="attendance_id[]" value="<?php echo $user->getMeta('attendance_id'); ?>">
-                        <?php echo EduPress::generateFormElement('select', 'status[]', array( 'options' => array( '' => 'Select', 'present' => 'Present', 'absent' => 'Absent' ), 'value' => '' )); ?>
-                        <?php if($is_present): echo "<strong>Already Present</strong>"; endif; ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-                <tr>
-                    <td colspan="4">
-                        <?php 
-                            echo EduPress::generateFormElement('hidden', 'branch_id', array( 'value' => $args['branch_id'] ));
-                            echo EduPress::generateFormElement('hidden', 'class_id', array( 'value' => $args['class_id'] ));
-                            echo EduPress::generateFormElement('hidden', 'section_id', array( 'value' => $args['section_id'] ));
-                            echo EduPress::generateFormElement('hidden', 'shift_id', array( 'value' => $args['shift_id'] ));
-                            echo EduPress::generateFormElement('submit', 'submit', array( 'value' => 'Save' )); 
-                            echo EduPress::generateFormElement('hidden', 'ajax_action', array( 'value' => 'insertManualAttendance' )); 
-                            echo EduPress::generateFormElement('hidden', 'action', array( 'value' => 'edupress_admin_ajax' )); 
-                            wp_nonce_field('edupress', '_wpnonce');
-                        ?>
-                    </td>
-                </tr>
-            </table>
+                <?php endforeach; ?>
+                    <tr>
+                        <td colspan="4">
+                            <?php 
+                                echo EduPress::generateFormElement('hidden', 'branch_id', array( 'value' => $args['branch_id'] ));
+                                echo EduPress::generateFormElement('hidden', 'class_id', array( 'value' => $args['class_id'] ));
+                                echo EduPress::generateFormElement('hidden', 'section_id', array( 'value' => $args['section_id'] ));
+                                echo EduPress::generateFormElement('hidden', 'shift_id', array( 'value' => $args['shift_id'] ));
+                                echo EduPress::generateFormElement('submit', 'submit', array( 'value' => 'Save' )); 
+                                echo EduPress::generateFormElement('hidden', 'ajax_action', array( 'value' => 'insertManualAttendance' )); 
+                                echo EduPress::generateFormElement('hidden', 'action', array( 'value' => 'edupress_admin_ajax' )); 
+                                wp_nonce_field('edupress', '_wpnonce');
+                            ?>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </form>
         <?php 
         return ob_get_clean();

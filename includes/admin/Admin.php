@@ -352,7 +352,7 @@ class Admin
                         <div class="value-wrap">
                             <?php
                                 $disabled = !current_user_can('administrator') && $form == 'features' ? 'disabled' : '';
-                                echo EduPress::generateFormElement( 'submit', 'Save', array('value'=>__('Save', 'edupress'), 'disabled'=>$disabled) );
+                                echo EduPress::generateFormElement( 'submit', 'Save', array('value'=>__('Save', 'edupress')) );
                                 echo EduPress::generateFormElement( 'hidden', 'action', array( 'value'=>'edupress_admin_ajax' ) );
                                 echo EduPress::generateFormElement( 'hidden', 'ajax_action', array( 'value'=>'saveEduPressAdminSettingsForm' ) );
                                 echo EduPress::generateFormElement( 'hidden', 'is_ajax', array( 'value'=>1 ) );
@@ -940,21 +940,25 @@ class Admin
                 break;
 
             case 'voice':
-                $fields['voice_api_token'] = array(
-                    'type' => 'text',
-                    'name' => 'voice_api_token',
-                    'settings' => array(
-                        'value' => Admin::getSetting('voice_api_token'),
-                        'label' => __('API Token', 'edupress'),
-                        'id' => 'voice_api_token',
-                    ),
-                );
+                $disabled = !current_user_can('manage_options');
+
+                if(current_user_can('manage_options')):
+                    $fields['voice_api_token'] = array(
+                        'type' => 'password',
+                        'name' => 'voice_api_token',
+                        'settings' => array(
+                            'value' => Admin::getSetting('voice_api_token'),
+                            'label' => __('API Token', 'edupress'),
+                            'id' => 'voice_api_token',
+                        ),
+                    );
+                endif; 
                 if(current_user_can('manage_options')){
                     $fields['voice_rate'] = array(
                         'type' => 'text',
                         'name' => 'voice_rate',
                         'settings' => array(
-                            'value' => Admin::getSetting('voice_rate', 0.5),
+                            'value' => Admin::getSetting('voice_rate', '0.45'),
                             'label' => __('Rate', 'edupress'),
                             'id' => 'voice_rate',
                         ),
@@ -964,9 +968,10 @@ class Admin
                     'type' => 'text',
                     'name' => 'voice_caller_id',
                     'settings' => array(
-                        'value' => Admin::getSetting('voice_caller_id'),
+                        'value' => Admin::getSetting('voice_caller_id', '01979001001'),
                         'label' => __('Caller ID', 'edupress'),
                         'id' => 'voice_caller_id',
+                        'disabled' => $disabled
                     ),
                 );
                 $fields['voice_entry_audio_id'] = array(
@@ -974,8 +979,9 @@ class Admin
                     'name' => 'voice_entry_audio_id',
                     'settings' => array(
                         'value' => Admin::getSetting('voice_entry_audio_id'),
-                        'label' => __('Entry Audio ID', 'edupress'),
+                        'label' => __('Entry Audio Name / ID', 'edupress'),
                         'id' => 'voice_entry_audio_id',
+                        'disabled' => $disabled
                     ),
                 );
                 $fields['voice_exit_audio_id'] = array(
@@ -983,8 +989,19 @@ class Admin
                     'name' => 'voice_exit_audio_id',
                     'settings' => array(
                         'value' => Admin::getSetting('voice_exit_audio_id'),
-                        'label' => __('Exit Audio ID', 'edupress'),
+                        'label' => __('Exit Audio Name / ID', 'edupress'),
                         'id' => 'voice_exit_audio_id',
+                        'disabled' => $disabled,
+                    ),
+                );
+                $fields['voice_call_rate'] = array(
+                    'type' => 'text',
+                    'name' => 'voice_call_rate',
+                    'settings' => array(
+                        'value' => Admin::getSetting('voice_call_rate', 0.45),
+                        'label' => __('Voice Call Rate', 'edupress'),
+                        'id' => 'voice_call_rate',
+                        'disabled' => !current_user_can('manage_options'),
                     ),
                 );
                 break;

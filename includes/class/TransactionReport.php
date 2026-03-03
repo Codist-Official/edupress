@@ -326,8 +326,7 @@ class TransactionReport extends Post
         <div class="class-report-wrap">
             <div class="edupress-table-wrap">
                 <h2 style="text-align: center; width: 100%;" class="text-center">Payment Report of <?php echo get_the_title( $class_id ); ?></h2>
-                <br>
-                <table class="edupress-table compact edupress-master-table">
+                <table class="edupress-table tablesorter compact edupress-master-table">
                     <thead>
                         <tr>
                             <th style="text-align:left;"><?php _e('Name', 'edupress'); ?></th>

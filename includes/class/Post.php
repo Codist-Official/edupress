@@ -908,7 +908,6 @@ class Post
      */
     public function getList( $settings = [] )
     {
-
         if( !User::currentUserCan('read', $this->post_type) ) return User::getCapabilityErrorMsg('see', $this->post_type . ' entries.' );
 
         ob_start();
@@ -916,18 +915,20 @@ class Post
         echo $this->getFilterForm();
         echo apply_filters( "edupress_list_{$this->post_type}_filter_form_after_html", '' );
         echo $this->getPublishButton();
+        $before_list_html = $this->getBeforeListHtml();
+        $after_list_html = $this->getAfterListHtml();
         ?>
-        <div>
+        <?php if(!empty($before_list_html)): ?>
             <div class="edupress-before-list-wrap">
-                <?php echo $this->getBeforeListHtml(); ?>
+                <?php echo $before_list_html; ?>
             </div>
-        </div>
+        <?php endif; ?>
         <?php echo $this->getListHtml(); ?>
-        <div>
+        <?php if(!empty($after_list_html)): ?>
             <div class="edupress-after-list-wrap">
-                <?php echo $this->getAfterListHtml(); ?>
+                <?php echo $after_list_html; ?>
             </div>
-        </div>
+        <?php endif; ?>
         <div class="clear"></div>
         <?php
         return ob_get_clean();
@@ -964,7 +965,7 @@ class Post
             'exam_date' => 'Exam Date',
             'post_title' => 'Search'
         );
-        if(count($_REQUEST)){
+        if(count($_REQUEST) > 1 && 1 === 2){
             ?>
             <div class="edupress-table-wrap">
                 <table class="edupress-table">

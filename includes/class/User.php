@@ -328,6 +328,8 @@ class User
 
         $teacher->add_cap('read_user' );
         $teacher->add_cap('read_sms' );
+        $teacher->add_cap('read_voice' );
+        
         $teacher->add_cap( 'read_attendance');
         $teacher->add_cap( 'publish_attendance');
 
@@ -360,6 +362,9 @@ class User
 
         $accountant->add_cap( 'read_sms');
         $accountant->add_cap( 'send_sms');
+
+        $accountant->add_cap( 'read_voice');
+        $accountant->add_cap( 'send_voice');
 
         $accountant->add_cap( 'read_attendance');
         $accountant->add_cap( 'publish_attendance');
@@ -419,9 +424,13 @@ class User
             'read_sms',
             'send_sms',
             'delete_sms',
+            'read_voice',
+            'send_voice',
+            'delete_voice',
             'read_attendance',
             'publish_attendance',
             'delete_attendance',
+
         );
 
         add_role(

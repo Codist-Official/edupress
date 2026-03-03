@@ -78,7 +78,18 @@ class Support extends Post{
                 <p><i class="fa-brands fa-whatsapp"></i> To get support over whatsapp, please send a message to <a target="_blank" href="https://wa.me/+8801979001001?text=<?php echo $text; ?>"><strong>+8801979001001</strong></a></p>
             </li>
         </ul>
+        <div class="yt-playlist">
+            <h4><?php _e('Supporting videos on EduPress School Management Software', 'edupress'); ?></h4>
+            <iframe width="500" height="500" src="https://www.youtube.com/embed/videoseries?si=_5-LXzAXGPBaBm-J&amp;list=PLFwC56qOrdPkWVtyes7sn3aIWm1FWNb9h" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
         <style>
+            .yt-playlist{
+                margin-top: 30px;
+                display: inline-block;
+                height:auto;
+                width: 100%;
+                max-width: 1024px;
+            }
             .support-list {
                 list-style: none;
                 padding: 0;

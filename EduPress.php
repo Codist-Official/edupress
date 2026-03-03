@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.7.2
+Version: 1.7.3
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -187,14 +187,12 @@ class EduPress
         // Voice Calls 
         $sql = "CREATE TABLE {$wpdb->prefix}voice_logs (
             id bigint NOT NULL AUTO_INCREMENT,
-            branch_id int NULL,
             mobile bigint NOT NULL,
             user_id bigint NULL,
             rate float NULL, 
-            duration int NULL,
-            cost float null,
+            audio_id bigint NULL,
             msg_id bigint NULL,
-            delivered boolean null,
+            `status` varchar(24) NULL,
             record_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY(id)
         ) {$charset_collate}";
@@ -1269,7 +1267,7 @@ class EduPress
             ),
             'voice' => array(
                 'title' => 'Voice',
-                'icon' => 'fa-solid fa-voice'
+                'icon' => 'fa-solid fa-microphone'
             ),
             'attendance' => array(
                 'title' => 'Attendance',

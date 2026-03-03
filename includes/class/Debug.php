@@ -46,11 +46,15 @@ class Debug
      */
     public function debug()
     {
+    
+        $voice = Voice::send('01913919597', 'edupress_ramadan_campaign_1');
+        var_dump($voice);
+        return; 
         $users = count_users();
         var_dump($users);
         return;
         var_dump(Voice::getBalance());
-        $id = Voice::getAttendanceEntryId();
+        $id = Voice::getEntryVoiceId();
         $mobile = '01913919597';
         var_dump( Voice::send($mobile, $id) );
 

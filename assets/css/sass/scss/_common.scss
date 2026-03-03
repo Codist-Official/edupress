@@ -274,6 +274,9 @@ table, tr, td, th{
   height: auto;
   overflow: auto;
   table{
+    &.edupress-master-table{
+      margin-top: 25px;
+    }
     width: 100%;
     border-collapse: collapse;
     thead{

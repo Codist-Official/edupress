@@ -9,7 +9,13 @@ class Voice extends CustomPost
     private static $_instance; 
     protected $table = 'voice_logs';
     protected $post_type = 'voice';
+    protected static $voice_balance_key = 'edupress_voice_balance';
+    protected static $voice_balance_history_key = 'edupress_voice_balance_history';
 
+    private static function getApiToken()
+    {
+        return Admin::getSetting('voice_api_token');
+    }
     public static function instance()
     {
         if(self::$_instance == null) self::$_instance = new self();
@@ -84,30 +90,30 @@ class Voice extends CustomPost
         if( empty( $results ) ) return __( "No {$this->post_type} found!", 'edupress' );
         ob_start();
         ?>
-        <script>
-            jQuery(document).ready(function(){
-                if( typeof smsGetCurBal != 'undefined' ){
+        <h3><?php _e( 'Current balance: ৳', 'edupress' ); ?> <span class="voice-current-balance"><?php echo number_format(self::getBalance(), 2); ?></span></h3>
 
-                    smsGetCurBal();
-                    setTimeout( smsGetCurBal, edupress.sms_balance_refresh_sec * 1000 );
+        <div>
+            <!-- View Balance History --> 
+            <button data-success_callback="showPopupOnCallback" class="edupress-btn edupress-btn-primary edupress-ajax-link" data-ajax_action="viewBalanceHistoryHTML"><?php _e( 'View Balance History', 'edupress' ); ?></button>
+            
+            <?php if(current_user_can('manage_options')): ?>
+                <!-- Add Balance --> 
+                <button data-success_callback="showPopupOnCallback" class="edupress-btn edupress-btn-primary edupress-ajax-link" data-ajax_action="updateBalanceHTML"><?php _e( 'Add Balance', 'edupress' ); ?></button>
+            <?php endif; ?>
+        </div>
 
-                }
-            })
-        </script>
-        <h3 style="margin-top: 50px;">Current balance: ৳ <span class="sms-current-balance">0</span></h3>
 
-        <div class="edupress-table-wrap" style="margin-top: 50px;">
+        <div class="edupress-table-wrap">
             <table class="edupress-table edupress-master-table tablesorter">
 
                 <thead>
                     <tr>
                         <th><?php _e( 'ID', 'edupress' ); ?></th>
                         <th><?php _e( 'Mobile', 'edupress' ); ?></th>
-                        <th><?php _e( 'Duration', 'edupress' ); ?></th>
-                        <th><?php _e( 'Rate', 'edupress' ); ?></th>
+                        <th><?php _e( 'User', 'edupress' ); ?></th>
                         <th><?php _e( 'Cost', 'edupress' ); ?></th>
-                        <th><?php _e( 'Sent By', 'edupress' ); ?></th>
-                        <th><?php _e( 'Record Time', 'edupress' ); ?></th>
+                        <th><?php _e( 'Status', 'edupress' ); ?></th>
+                        <th><?php _e( 'Sent On', 'edupress' ); ?></th>
                     </tr>
                 </thead>
 
@@ -118,17 +124,16 @@ class Voice extends CustomPost
                         <tr class="row-<?php echo $error_class; ?>">
                             <td><?php echo $result->id; ?></td>
                             <td><?php echo $result->mobile; ?></td>
-                            <td><?php echo $result->duration; ?></td>
+                            <td>
+                                <?php 
+                                    if($result->user_id):
+                                        $name = get_user_meta($result->user_id, 'first_name', true ) .  ' ' . get_user_meta($result->user_id, 'last_name', true);
+                                        echo User::showProfileOnClick($result->user_id, $name);
+                                    endif; 
+                                ?>
+                            </td>
                             <td><?php echo $result->rate; ?></td>
-                            <td><?php echo $result->cost; ?></td>
-                            <td><?php
-                                if($result->user_id){
-                                    $user = get_user_by( 'id', $result->user_id ); 
-                                    if( $user ) echo User::showProfileOnClick( $result->user_id, $user->first_name ); 
-                                } else {
-                                    echo "System";
-                                }
-                                ?></td>
+                            <td><?php echo $result->status; ?></td>
                             <td><?php echo date('h:i A, d/m/Y', strtotime($result->record_time)); ?></td>
                         </tr>
                         <?php
@@ -146,108 +151,218 @@ class Voice extends CustomPost
         return '';
     }
 
-    public static function getAttendanceEntryId()
+    public static function getEntryVoiceId()
     {
         return Admin::getSetting('voice_entry_audio_id');
     }
 
-    public static function getAttenanceExitId()
+    public static function getExitVoiceId()
     {
         return Admin::getSetting('voice_exit_audio_id');
     }
 
+    public static function getCallRate()
+    {
+        return Admin::getSetting('voice_call_rate');
+    }
+
     public static function getBalance()
     {
-        $response = wp_remote_get(
-            'https://voicesms.softcents.com/api/account/balance',
-            array(
-                'method' => 'GET',
-                'headers' => array(
-                    'Content-Type'  => 'application/json',
-                    'Authorization' => 'Bearer '. Admin::getSetting('voice_api_token'),
+        return (float) get_option(self::$voice_balance_key, 0);
+    }
+
+    public static function AddBalance($amount=0)
+    {
+        $balance = self::getBalance();
+        $balance = $balance + floatval($amount);
+        update_option(self::$voice_balance_key, $balance);
+        self::addBalanceHistory($amount, 'add');
+        return $balance;
+    }
+
+
+    public static function removeBalance( $amount = 0 )
+    {
+        $balance = self::getBalance();
+        $balance = $balance - floatval($amount);
+        update_option(self::$voice_balance_key, $balance);
+        self::addBalanceHistory($amount, 'remove');
+        return $balance;
+    }
+
+  
+    public static function addBalanceHistory($amount=0, $type='add')
+    {
+        $history = get_option(self::$voice_balance_history_key, []);
+        $history = maybe_unserialize($history);
+        $history[] = [
+            'amount' => $amount,
+            'type' => $type,
+            'date' => current_time('mysql'),
+        ];
+        update_option(self::$voice_balance_history_key, $history);
+    }
+
+    public static function getBalanceHistoryHTML()
+    {
+        $history = get_option(self::$voice_balance_history_key, []);
+        $history = maybe_unserialize($history);
+        // reverse sort 
+        $history = array_reverse($history);
+        ob_start();
+        ?>
+        <h4><?php _e( 'Balance History', 'edupress' ); ?></h4>
+        <?php if(empty($history)): echo __('No balance history found!', 'edupress'); return ob_get_clean(); endif; ?>
+        <div class="edupress-table-wrap">
+            <table class="edupress-table edupress-master-table tablesorter" style="max-width: 300px;">
+                <thead>
+                    <tr>
+                        <th style="text-align:left;"><?php _e( 'Date', 'edupress' ); ?></th>
+                        <th style="text-align:left;"><?php _e( 'Action', 'edupress' ); ?></th>
+                        <th style="text-align:left;"><?php _e( 'Amount', 'edupress' ); ?></th>
+                    </tr>
+                </thead>
+                <?php foreach($history as $item){?>
+                    <tr>
+                        <td><?php echo date('d/m/Y', strtotime($item['date'])); ?></td>
+                        <td><?php echo $item['type'] == 'add' ? '+' : '-'; ?></td>
+                        <td><?php echo $item['amount']; ?></td>
+                    </tr>
+                <?php } ?>
+            </table>
+        </div>
+        <?php return ob_get_clean();
+    }
+
+
+    public static function getBlanceModifyOptionHTML()
+    {
+        $fields = [];
+        $fields['amount'] = array(
+            'type' => 'text',
+            'name' => 'amount',
+            'settings' => array(
+                'label' => __('Amount', 'edupress'),
+                'value' => '',
+                'required' => true,    
+            )
+        );
+        $fields['balance_action'] = array(
+            'type' => 'select',
+            'name' => 'balance_action',
+            'settings' => array(
+                'label' => __('Action', 'edupress'),
+                'required' => true,
+                'options' => array(
+                    'add' => __('Add', 'edupress'),
+                    'remove' => __('Remove', 'edupress'),
                 )
             )
         );
-
-        if ( is_wp_error( $response ) ) {
-            error_log( $response->get_error_message() );
-            return ['status' => 0, 'error'=>$response->get_error_message(), 'response'=>$response];
-        } else {
-            $body = json_decode($response['body'], true);
-            $pulse_rate = $body['data']['pulse_rate'] ?? 0;
-            $balance = $body['data']['balance'] ?? 0;
-            return ['status' => 1, 'balance' => $balance, 'pulse_rate' => $pulse_rate ];
-        }
-
+        $fields['submit'] = array(
+            'type' => 'submit',
+            'name' => '',
+            'settings' => array(
+                'value' => __('Submit', 'edupress'),
+            )
+        );
+        ob_start();
+        ?>
+        <form action="" class="edupress-form edupress-ajax-form edupress-filter-list">
+            <?php foreach($fields as $field){ ?>
+                <div class="form-column">
+                    <div class="label-wrap"><label for="<?php echo $field['name']; ?>"><?php echo $field['settings']['label']; ?></label></div>
+                    <div class="value-wrap"><?php echo EduPress::generateFormElement( $field['type'], $field['name'], $field['settings'] ); ?></div>
+                </div>
+            <?php } ?>
+            <?php 
+                echo EduPress::generateFormElement('hidden', 'action', ['value'=>'edupress_admin_ajax']);
+                echo EduPress::generateFormElement('hidden', 'ajax_action', ['value'=>'updateVoiceBalance']);
+                echo EduPress::generateFormElement('hidden', '_wpnonce', ['value'=>wp_create_nonce('edupress')]);
+            ?>
+        </form>
+        <?php 
+        return ob_get_clean();
     }
 
     public static function send($mobile='', $audio_id=0, $user_id=null)
     {
-        if(empty($mobile)) return ['status'=>0, 'errors'=>'Mobile blank'];
-        if(empty($audio_id) || $audio_id == 0) return ['status'=>0, 'errors'=>'Audio ID cannot be blank'];
+        // check balance 
+        // if balance available submit to api 
+        // otherwise make it pending by making msg_id  = 0 
+        // default all voice 0.29 
+        global $wpdb; 
+        $table = $wpdb->prefix .'voice_logs';
+        $balance = self::getBalance();
+        $rate = self::getCallRate();
 
-        $response = wp_remote_post(
-            'https://voicesms.softcents.com/api/calls',
-            array(
-                'method'  => 'POST',
-                'headers' => array(
-                    'Content-Type'  => 'application/json',
-                    'Authorization' => 'Bearer '. Admin::getSetting('voice_api_token'),
-                ),
-                'body'    => array(
-                    'caller_id'    => Admin::getSetting('voice_caller_id'),
-                    'audio_id'     => $audio_id,
-                    'phone_number' => $mobile,
-                    'scheduled_at' => current_time('mysql'),
-                ),
-                'timeout' => 30,
-            )
-        );
-        
-        if ( is_wp_error( $response ) ) {
-            error_log( $response->get_error_message() );
-            return ['status' => 0, 'error'=>$response->get_error_message(), 'response'=>$response];
-        } else {
-            $reponse = [];
-            $status_code = wp_remote_retrieve_response_code( $response );
-            if($status_code != 201){
-                return ['status'=> 0, 'error'=> 'Call not sent'];
-            }
+        $insert_data = [
+            'mobile' => $mobile, 
+            'user_id' => $user_id,
+            'rate' => $rate,
+            'audio_id' => $audio_id,
+            'record_time' => current_time('mysql')
+        ];
 
-            $reponse['status'] = 1;
-            $response['message'] = 'Voice call submitted';
+        if( $rate > $balance ){
+            // insufficient balance 
+            $insert_data['msg_id'] = 0;
+            $insert_data['status'] = 'INSUFFICIENT_BALANCE';
 
-            $body        = wp_remote_retrieve_body( $response );
-        
-            // Optional: decode JSON response
-            $data = json_decode( $body, true );
+            $insert = $wpdb->insert($table, $insert_data);
 
-            $reponse['response'] = $data;
-
-            $id = $data['id'] ?? null; 
-            $delivered = isset($data['status']) && $data['status']  == 'answered' ? 1 : 0;
-            $duration = $data['duration'] ?? 0;
-            $cost = $data['cost'] ?? 0;
-
-            // inserting into database 
-            global $wpdb; 
-            $insert = $wpdb->insert(
-                $wpdb->prefix . 'voice_calls',
-                array(
-                    'mobile' => $mobile, 
-                    'user_id' => $user_id,
-                    'rate' => Admin::getSetting('voice_sms_rate'),
-                    'msg_id' => $id, 
-                    'delivered' => $delivered,
-                    'duration' => $duration,
-                    'cost' => $cost
-                )
-            );
-            if(!empty($wpdb->last_error)) $reponse['db_error'] = $wpdb->last_error;
-            else $reponse['db_id'] = $wpdb->last_id;
-            return $response;
+            return ['status' => 0, 'data' => 'Insufficient balance'];
         }
-        
+
+        // make api reqest 
+        $body = [
+            'request_id' => uniqid('edupress',true),
+            'voice' => $audio_id,
+            'sender' => Admin::getSetting('voice_caller_id'),
+            'phone_numbers' => !is_array($mobile) ? explode(',', $mobile) : $mobile,
+        ];
+
+        $args = array(
+            'method'    => 'POST',
+            'headers'   => array(
+                'Authorization' => 'Bearer ' . self::getApiToken(),
+                'Content-Type'  => 'application/json',
+            ),
+            'body' => json_encode($body),
+            'timeout' => 20
+        );
+
+        var_dump($args);
+
+        // make wordpress post request 
+        $response = wp_remote_post('https://api.awajdigital.com/api/broadcasts', $args );
+
+        if(is_wp_error($response)){
+            $insert_data['msg_id'] = 0;
+            $insert_data['status'] = 'PENDING';
+            $wpdb->insert($table, $insert_data);
+            return ['status' => 0, 'data'=>$response->get_error_message()];
+        }
+
+
+        $status = wp_remote_retrieve_response_code($response);
+
+        $res_body = wp_remote_retrieve_body($response);
+        $res_decoded = json_decode($res_body, true);
+
+        if(!$res_decoded['success']){
+            return ['status' => 0, 'data'=>$res_decoded['message']];
+        }
+
+
+        if(isset($res_decoded['success']) && $res_decoded['success'] ){
+            $insert_data['msg_id'] = $res_decoded['broadcast']['id'];
+            $insert_data['status'] = ucwords($res_decoded['broadcast']['status']);
+            $wpdb->insert($table, $insert_data);
+            self::removeBalance($rate);
+            return['status' => 1, 'data'=>'Voice successfully submitted'];
+        }
+
     }
 
 }

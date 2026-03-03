@@ -549,6 +549,11 @@ jQuery(document).ready(function(){
         $j(this).parents('form').find(':input[name="status[]"]').val(v);
     })
 
+    $j(document).on('change', '.attendance-bulk-date', function (){
+        let v = $j(this).val();
+        $j(this).parents('form').find(':input[name="date[]"]').val(v);
+    })
+
     // Generate attendance api key
     $j(document).on('click touch', '.getApiKey', function(e){
         preventDefault(e);

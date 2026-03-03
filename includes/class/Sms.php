@@ -517,12 +517,12 @@ class Sms extends CustomPost
                 }
             })
         </script>
-        <h3 style="margin-top: 50px;">Current balance: ৳ <span class="sms-current-balance">0</span></h3>
+        <h3><?php _e( 'Current balance', 'edupress' ); ?>: ৳<span class="sms-current-balance"><?php number_format(self::getBalance(), 2); ?></span></h3>
         <button class="edupress-btn edupress-btn-primary edupress-ajax-link" data-before_send_callback="confirmBeforeSendCallback" data-ajax_action="resendTodayFailedSms">Resend Today's Failed SMS (<?php echo self::countTodayFailedSms(); ?>)</button>
         <a class="edupress-btn edupress-btn-primary" href="<?php echo $fail_url; ?>"><?php _e('Filter Failed', 'edupressbd'); ?></a> | 
         <a class="edupress-btn edupress-btn-primary" href="<?php echo $success_url; ?>"><?php _e('Filter Success', 'edupressbd'); ?></a>
 
-        <div class="edupress-table-wrap" style="margin-top: 50px;">
+        <div class="edupress-table-wrap">
             <table class="edupress-table edupress-master-table tablesorter">
 
                 <thead>

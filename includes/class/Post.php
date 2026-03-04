@@ -615,7 +615,7 @@ class Post
         ob_start();
         echo apply_filters( "edupress_filter_{$this->post_type}_before_form_html", '' );
         ?>
-        <div class="edupress-filter-list-wrap" data-post_type="<?php echo $this->post_type; ?>">
+        <div class="edupress-filter-list-wrap no-print" data-post_type="<?php echo $this->post_type; ?>">
             <form data-post_type="<?php echo $this->post_type; ?>" action="" method="GET" class="edupress-form edupress-filter-list">
 
                 <?php
@@ -761,7 +761,7 @@ class Post
         if( !User::currentUserCan('publish',  $this->post_type ) ) return '';
         ob_start();
         ?>
-        <div class="edupress-publish-btn-wrap">
+        <div class="edupress-publish-btn-wrap no-print">
             <button data-post_type="<?php echo $this->post_type; ?>" class="edupress-btn edupress-publish-post"><?php _e( 'Add New ' . ucwords( str_replace( '_', ' ', $this->post_type ) ), 'edupress' ); ?></button>
         </div>
 

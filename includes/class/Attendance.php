@@ -87,13 +87,13 @@ class Attendance extends CustomPost
         $start_date = sanitize_text_field($_REQUEST['start_date'] ?? current_time('Y-m-d'));
         $end_date = sanitize_text_field($_REQUEST['end_date'] ?? current_time('Y-m-d'));
         ?>
-        <div class="edupress-publish-btn-wrap">
+        <div class="edupress-publish-btn-wrap no-print">
             <button data-post_type="<?php echo $this->post_type; ?>" class="edupress-btn edupress-publish-post"><?php _e( 'Add New ' . ucwords( str_replace( '_', ' ', $this->post_type ?? '' ) ), 'edupress' ); ?></button>
             <button data-post_type="<?php echo $this->post_type; ?>" data-ajax_action="showScreenToAddManualAttendance" data-success_callback="showPopupOnCallback" class="edupress-btn edupress-ajax-link edupress-manual-attendance"><?php _e( 'Manual Attendance', 'edupress' ); ?></button>
         </div>
 
         <?php if($start_date == $end_date) : ?>
-        <div class='ep-flex-wrap'>
+        <div class='ep-flex-wrap no-print'>
             <div class='ep-flex-4 ep-mb-flex-12'>
                 <div id='edupress_online_device_status'><?php echo $this->getDevicesOnlineStatusHTML(); ?></div>
             </div>
@@ -135,35 +135,37 @@ class Attendance extends CustomPost
         if(!empty($ids)){
             ob_start();
             ?>
-            <?php _e('Last Update: ', 'edupress'); ?> <?php echo current_time('h:i:s a d/m/Y'); ?>
-            <div class="edupress-table-wrap">
-                <table class="ep-table edupress-table" style="width: 100%; max-width: 500px;">
-                    <thead>
-                        <tr>
-                            <th style="text-align: left;"><?php _e('Branch', 'edupress'); ?></th>
-                            <th style="text-align: left;"><?php _e('Device ID', 'edupress'); ?></th>
-                            <th style="text-align: left;"><?php _e('Online Status', 'edupress'); ?></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <?php 
-                    foreach($ids as $id){
-                        $online = Admin::getSetting('device_' . $id . '_online', 0);
-                        // light green or light red
-                        $online_color = $online == 1 ? '#90EE90' : '#FFB6C1';
-                        $online_status = intval($online) == 1 ? 'Online' : 'Offline';
-                        $branch_id = Admin::getSetting('attendance_device_'.$id.'_branch_id', 0);
-                        $branch_title = get_the_title($branch_id);
-                        echo "<tr>";
-                        echo "<td style='background-color: {$online_color} !important;'>{$branch_title}</td>";
-                        echo "<td style='background-color: {$online_color} !important;'>{$id}</td>";
-                        echo "<td style='background-color: {$online_color} !important;'>{$online_status}</td>";
-                        echo "</tr>";
-                    }
-                    ?>
-                    </tbody>
-                </table>
-            </div>            
+            <div class="ep-online-device-wrap no-print">
+                <?php _e('Last Update: ', 'edupress'); ?> <?php echo current_time('h:i:s a d/m/Y'); ?>
+                <div class="edupress-table-wrap">
+                    <table class="ep-table edupress-table" style="width: 100%; max-width: 500px;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left;"><?php _e('Branch', 'edupress'); ?></th>
+                                <th style="text-align: left;"><?php _e('Device ID', 'edupress'); ?></th>
+                                <th style="text-align: left;"><?php _e('Online Status', 'edupress'); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <?php 
+                        foreach($ids as $id){
+                            $online = Admin::getSetting('device_' . $id . '_online', 0);
+                            // light green or light red
+                            $online_color = $online == 1 ? '#90EE90' : '#FFB6C1';
+                            $online_status = intval($online) == 1 ? 'Online' : 'Offline';
+                            $branch_id = Admin::getSetting('attendance_device_'.$id.'_branch_id', 0);
+                            $branch_title = get_the_title($branch_id);
+                            echo "<tr>";
+                            echo "<td style='background-color: {$online_color} !important;'>{$branch_title}</td>";
+                            echo "<td style='background-color: {$online_color} !important;'>{$id}</td>";
+                            echo "<td style='background-color: {$online_color} !important;'>{$online_status}</td>";
+                            echo "</tr>";
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             <?php 
             return ob_get_clean();
         }
@@ -346,13 +348,14 @@ class Attendance extends CustomPost
         $count_open = $calendar_stats['count_o'] ?? 0;
         $count_holiday = $calendar_stats['count_h'] ?? 0;
         $count_closed = $calendar_stats['count_c'] ?? 0;
+        $report_type = sanitize_text_field($_REQUEST['report_type'] ?? '');
 
         $summary_json = [];
 
         ob_start();
         ?>
         <div class="edupress-table-wrap">
-            <table class="edupress-table edupress-master-table edupress-table-attendance-report tablesorter" data-report_type="<?php echo $args['details'] ?? ''; ?>">
+            <table class="edupress-table edupress-master-table edupress-table-attendance-report tablesorter" data-report_type="<?php echo $report_type; ?>">
                 <thead>
                     <tr>
                         <th style="text-align: left;"><?php _e('Branch', 'edupress'); ?></th>
@@ -385,7 +388,7 @@ class Attendance extends CustomPost
                                 }
                             }
                         ?>
-                        <?php if($total_days == 1) : ?>
+                        <?php if($total_days == 1 && $report_type == 'detailed') : ?>
                             <th style="text-align: center; font-size: 12px;"><?php _e('Entry', 'edupress'); ?></th>
                             <th style="text-align: center; font-size: 12px;"><?php _e('Exit', 'edupress'); ?></th>
                         <?php endif; ?>

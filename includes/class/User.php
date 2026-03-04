@@ -416,6 +416,7 @@ class User
             'edit_calendar',
             'read_transaction',
             'publish_transaction',
+            'edit_transaction',
             'delete_transaction',
             'read_people',
             'publish_people',
@@ -1748,14 +1749,17 @@ class User
                 $custom_fields = self::getCustomProfileFieldNames();
                 if(!empty($custom_fields))  $fields = $fields + $custom_fields;
                 $fields = apply_filters( 'edupress_user_profile_fields', $fields, $this->id );
+                $role = $this->getRole();
+                $role_names = $this->getRoles();
+                $role_name = $role_names[$role] ?? '';
                 ?>
                 <div class="col-left">
-                    <h4 class="section-title">User Details</h4>
+                    <h4 class="section-title"><?php _e('User Details', 'edupress'); ?></h4>
                     <div class="edupress-table-wrap">
                         <table class="edupress-table user-profile">
                             <tr>
                                 <th><?php _e( 'Role', 'edupress' ); ?></th>
-                                <td><?php echo ucwords($this->getRole()); ?></td>
+                                <td><?php echo $role_name; ?></td>
                             </tr>
                             <?php
                             foreach($fields as $k=>$v){

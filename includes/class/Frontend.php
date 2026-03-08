@@ -225,7 +225,7 @@ class Frontend
                         <span class="menu-icon-wrap">
                             <?php echo EduPress::getIcon('dashboard'); ?>
                         </span>
-                        <?php _e( 'Dashboard', 'edupress' ); ?>
+                        <?php _t( 'Dashboard' ); ?>
                     </a>
                 </li>
             <?php endif; ?>
@@ -238,7 +238,7 @@ class Frontend
                             <span class="menu-icon-wrap">
                                 <?php echo EduPress::getIcon($v['icon']); ?>
                             </span> 
-                            <?php _e( $v['title'], 'edupress' ) ; ?>
+                            <?php _t( $v['title'] ) ; ?>
                         </a>
                         <?php if($k == 'transaction'): ?>
                             <?php $active_class = $active_panel === 'transaction_report' ? ' active ' : ''; ?>
@@ -248,7 +248,7 @@ class Frontend
                                         <span class="menu-icon-wrap">
                                             <?php echo EduPress::getIcon('report'); ?>
                                         </span>
-                                        <?php _e('Report', 'edupress' ); ?>
+                                        <?php _t('Report'); ?>
                                     </a>
                                 </li>
                             </ul>
@@ -299,7 +299,7 @@ class Frontend
         ?>
         <ul class="top-breadcrumb-bar">
             <li class="dash"><?php echo EduPress::getIcon($panel_icon); ?></li>
-            <li class="current"><?php echo $panel; ?></li>
+            <li class="current"><?php _t($panel); ?></li>
         </ul>
         <?php
         return ob_get_clean();

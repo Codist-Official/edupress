@@ -64,6 +64,7 @@ if ( typeof hideEdupressPopup === 'undefined' ){
     }
 }
 
+
 jQuery(document).ready(function(){
 
     // table sorter
@@ -196,6 +197,27 @@ jQuery(document).ready(function(){
 
 
     })
+
+     // Adding portion to show filter wrap 
+     if($j('.edupress-filter-list-wrap').length > 0){
+        let txt = edupress.lang == 'bn' ? '+ ফিল্টার অপশন দেখুন' : '+ Show Filter Options';
+        let html = `<a href='javascript:void(0)' class='filter-toggle ep-search-toggle-btn no-print' data-active='0'>${txt}</a>`;
+        $j('.edupress-filter-list-wrap').before(html);
+    }
+
+    // Filter Toggle
+    $j(document).on('click', '.filter-toggle',function(e){
+        console.log($j(this).attr('data-active'));
+        if($j(this).attr('data-active') == 0){
+            let txt = edupress.lang == 'bn' ? '+ ফিল্টার অপশন লুকান' : '+ Hide Filter Options';
+            $j(this).text(txt).attr('data-active', 1);
+        } else {
+            let txt = edupress.lang == 'bn' ? '+ ফিল্টার অপশন দেখুন' : '+ Show Filter Options';
+            $j(this).text(txt).attr('data-active', 0);
+        }
+        $j('.edupress-filter-list-wrap').slideToggle();
+    })
+    
 
     // clicking ajax form
     $j(document).on('submit', '.edupress-ajax-form', function (e){

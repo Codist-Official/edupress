@@ -276,19 +276,19 @@ class Sms extends CustomPost
         $role_options = array_combine( $available_roles, $available_roles );
 
         $branch = new Branch();
-        $fields['send_to'] = array('type' => 'select', 'name' => 'send_to', 'settings' => array( 'options' => array( 'users'=>'Users','numbers'=>'Numbers'), 'placeholder' => 'Select', 'label' => 'Send SMS to', 'required' => true ));
-        $fields['branch_id'] = array('type' => 'select', 'name' => 'branch_id', 'settings' => array( 'label'=>'Branch', 'placeholder' => 'Select a branch', 'options'=> $branch->getPosts( [], true)));
-        $fields['role'] = array( 'type' => 'select', 'name' => 'role', 'settings' => array('options'=>$role_options, 'label'=>'Role', 'required' => false, 'placeholder' => 'Select a role' ));
-        $fields['status'] = array( 'type' => 'select', 'name' => 'status', 'settings' => array('options' => array( 'active'=>'Active','inactive'=>'Inactive', 'any'=> 'Any' ), 'label'=>'Status'));
+        $fields['send_to'] = array('type' => 'select', 'name' => 'send_to', 'settings' => array( 'options' => array( 'users'=>'Users','numbers'=>'Numbers'), 'placeholder' => t('Select'), 'label' => t('Send SMS to'), 'required' => true ));
+        $fields['branch_id'] = array('type' => 'select', 'name' => 'branch_id', 'settings' => array( 'label'=>t('Branch'), 'placeholder' => t('Select a branch'), 'options'=> $branch->getPosts( [], true)));
+        $fields['role'] = array( 'type' => 'select', 'name' => 'role', 'settings' => array('options'=>$role_options, 'label'=>t('Role'), 'required' => false, 'placeholder' => t('Select a role') ));
+        $fields['status'] = array( 'type' => 'select', 'name' => 'status', 'settings' => array('options' => array( 'active'=>'Active','inactive'=>'Inactive', 'any'=> 'Any' ), 'label'=>t('Status')));
 
         if( Admin::getSetting('shift_active') == 'active'){
-            $fields['shift_id'] = array('type' => 'select', 'name' => 'shift_id', 'settings' => array( 'label'=>'Shift (Optional)', 'placeholder' => 'Select a shift', 'options'=> [] ) );
+            $fields['shift_id'] = array('type' => 'select', 'name' => 'shift_id', 'settings' => array( 'label'=>t('Shift (Optional)'), 'placeholder' => t('Select a shift'), 'options'=> [] ) );
         }
         if( Admin::getSetting('class_active') == 'active'){
-            $fields['class_id'] = array('type' => 'select', 'name' => 'class_id', 'settings' => array( 'label'=>'Class (Optional)', 'placeholder' => 'Select a class', 'options'=> [] ) );
+            $fields['class_id'] = array('type' => 'select', 'name' => 'class_id', 'settings' => array( 'label'=>t('Class (Optional)'), 'placeholder' => t('Select a class'), 'options'=> [] ) );
         }
         if( Admin::getSetting('section_active') == 'active'){
-            $fields['section_id'] = array('type' => 'select', 'name' => 'section_id', 'settings' => array( 'label'=>'Section (Optional)', 'placeholder' => 'Select a section', 'options'=> [] ) );
+            $fields['section_id'] = array('type' => 'select', 'name' => 'section_id', 'settings' => array( 'label'=>t('Section (Optional)'), 'placeholder' => t('Select a section'), 'options'=> [] ) );
         }
 
         ob_start();
@@ -300,7 +300,7 @@ class Sms extends CustomPost
                     ?>
                     <div class="form-row <?php echo $field['name'];?>">
                         <div class="label-wrap">
-                            <label for="<?php echo $field['name']; ?>"><?php _e( $field['settings']['label'] ?? '', 'edupress'); ?></label>
+                            <label for="<?php echo $field['name']; ?>"><?php echo $field['settings']['label'] ?? ''; ?></label>
                         </div>
                         <div class="value-wrap">
                             <?php echo EduPress::generateFormElement( $field['type'], $field['name'], $field['settings'] ); ?>
@@ -517,7 +517,7 @@ class Sms extends CustomPost
                 }
             })
         </script>
-        <h3><?php _e( 'Current balance', 'edupress' ); ?>: ৳<span class="sms-current-balance"><?php number_format(self::getBalance(), 2); ?></span></h3>
+        <h3><?php _t( 'Current balance', 'edupress' ); ?>: ৳<span class="sms-current-balance"><?php number_format(self::getBalance(), 2); ?></span></h3>
         <button class="edupress-btn edupress-btn-primary edupress-ajax-link" data-before_send_callback="confirmBeforeSendCallback" data-ajax_action="resendTodayFailedSms">Resend Today's Failed SMS (<?php echo self::countTodayFailedSms(); ?>)</button>
         <a class="edupress-btn edupress-btn-primary" href="<?php echo $fail_url; ?>"><?php _e('Filter Failed', 'edupressbd'); ?></a> | 
         <a class="edupress-btn edupress-btn-primary" href="<?php echo $success_url; ?>"><?php _e('Filter Success', 'edupressbd'); ?></a>
@@ -527,14 +527,14 @@ class Sms extends CustomPost
 
                 <thead>
                     <tr>
-                        <th><?php _e( 'ID', 'edupress' ); ?></th>
-                        <th><?php _e( 'Mobile', 'edupress' ); ?></th>
-                        <th><?php _e( 'SMS', 'edupress' ); ?></th>
-                        <th><?php _e( 'Count', 'edupress' ); ?></th>
-                        <th><?php _e( 'Rate', 'edupress' ); ?></th>
-                        <th><?php _e( 'Cost', 'edupress' ); ?></th>
-                        <th><?php _e( 'Sent By', 'edupress' ); ?></th>
-                        <th><?php _e( 'Record Time', 'edupress' ); ?></th>
+                        <th><?php _t( 'ID', 'edupress' ); ?></th>
+                        <th><?php _t( 'Mobile', 'edupress' ); ?></th>
+                        <th><?php _t( 'SMS', 'edupress' ); ?></th>
+                        <th><?php _t( 'Count', 'edupress' ); ?></th>
+                        <th><?php _t( 'Rate', 'edupress' ); ?></th>
+                        <th><?php _t( 'Cost', 'edupress' ); ?></th>
+                        <th><?php _t( 'Sent By', 'edupress' ); ?></th>
+                        <th><?php _t( 'Record Time', 'edupress' ); ?></th>
                     </tr>
                 </thead>
 

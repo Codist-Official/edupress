@@ -16,8 +16,6 @@ class GradeTable extends Post
      */
     protected $post_type = 'grade_table';
 
-    protected $list_title = 'Grade Table List';
-
     /**
      * Constructor
      *

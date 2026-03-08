@@ -16,8 +16,6 @@ class Exam extends Post
      */
     private static $_instance;
 
-    protected $list_title = 'Exam List';
-
     /**
      * Initialize instance
      *

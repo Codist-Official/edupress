@@ -658,6 +658,16 @@ class Admin
                         'label' => __('System ID', 'edupress'),
                     )
                 );
+                $fields['system_lang'] = array(
+                    'type'  => 'select',
+                    'name'  => 'system_lang',
+                    'settings' => array(
+                        'value' => Admin::getSetting('system_lang', 'en'),
+                        'id' => 'system_lang',
+                        'label' => __('System Lanaguge', 'edupress'),
+                        'options' => ['en'=>'English','bn'=>'বাংলা'],
+                    )
+                );
 
                 $fields['institute_name'] = array(
                     'type'  => 'text',

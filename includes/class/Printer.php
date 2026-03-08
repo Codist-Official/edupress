@@ -70,6 +70,8 @@ class Printer
         $left_margin = Admin::getSetting('print_left_margin');
         $right_margin = Admin::getSetting('print_right_margin');
 
+        $show_edupress_credits = Admin::getSetting('print_show_edupress_credits', 'active');
+
         $footer_height = Admin::getSetting('print_footer_height', 1);
         ob_start();
         ?>
@@ -78,6 +80,7 @@ class Printer
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=<?php echo $font_family_escaped; ?>:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
         <style type="text/css" media="screen,print">
+            /* bottom margin is increase by 0.2in for footer  */
             @page{
                 size: <?php echo Admin::getSetting('print_paper_size'); ?>;
                 margin: <?php echo "{$top_margin}in {$right_margin}in {$bottom_margin}in {$left_margin}in" ?>;
@@ -197,14 +200,6 @@ class Printer
         if(!has_shortcode($post->post_content, 'edupress')) return '';
         ob_start();
         ?>
-        <style media="screen,print">
-            .footer{
-                height: <?php echo Admin::getSetting('print_footer_height', 0.5); ?>in;
-                width: 100%;
-                overflow: hidden;
-                border: none !important;
-            }
-        </style>
         <?php $show_edupress_credits = Admin::getSetting('print_show_edupress_credits', 'active'); ?>
         <?php if($show_edupress_credits == 'active'): ?>
             <section class="edupress-print-footer-wrap">
@@ -215,8 +210,7 @@ class Printer
             </section>
         <?php endif; ?>
         <?php
-        $html = ob_get_clean();
-        return "<div class='footer' id='pageFooter'>{$html}</div>";
+        return ob_get_clean();
 
     }
 
@@ -241,16 +235,12 @@ class Printer
                 // Global print button
                 $j(document).on('click', '.printContent', function(e){
                     let o = $j(this).data('orientation');
-                    let popupLen = $j('.edupress-popup').length;
                     let html = '';
-                    if(popupLen > 0){
+                    if($j('.edupress-popup').length > 0){
                         html += $j(".edupress-popup").html();
                     } else {
-                        html += $j('.edupress-before-list-wrap').length > 0 ? $j('.edupress-before-list-wrap').parent().html() : '';
-                        html += $j('.edupress-master-table').length > 0 ? $j('.edupress-master-table').parent().html() : '';
-                        html += $j('.edupress-after-list-wrap').length > 0 ? $j('.edupress-after-list-wrap').parent().html() : '';
+                        html += $j('.edupress-master-table').length > 0 ? $j('.content-wrap').html() : '';
                     }
-
                     printContent(html, o === 'p');
                 })
 
@@ -263,15 +253,13 @@ class Printer
                 let customContent = `
                     <html>
                     <head>
-                        <title>Print Preview</title>
+                        <title>EduPress School Management Software | www.edupressbd.com</title>
                         ${landscapeMode}
                     </head>
                     <body>
-                        <?php echo self::getHeader(); ?>
-                        <div class='main'>
-                            <div class="print-section">${content}</div>
-                        </div>
-                        <?php echo self::getFooter(); ?>
+                        <div class='print-header'><?php echo self::getHeader(); ?></div>
+                        <main class='print-content'>${content}</main>
+                        <div class='print-footer' id='pageFooter'><?php echo self::getFooter(); ?></div>
                     </body>
                     </html>
                 `;
@@ -280,9 +268,9 @@ class Printer
                 printWindow.document.write(customContent);
                 printWindow.document.close();
 
-                printWindow.onload = function() {
-                    printWindow.print();
-                };
+                setTimeout(function(){
+                    printWindow.print()
+                }, 1000);
             }
         </script>
         <?php echo ob_get_clean();

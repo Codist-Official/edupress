@@ -16,8 +16,6 @@ class Term extends Post
      */
     protected $post_type = 'term';
 
-    protected $list_title = 'Exam Term List';
-
     /**
      * Initialize instance
      */

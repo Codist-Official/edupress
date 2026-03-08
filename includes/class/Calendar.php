@@ -16,8 +16,6 @@ class Calendar extends Post
      */
     protected $post_type = 'calendar';
 
-    protected $list_title = 'Academic Calendars';
-
     /**
      * @Initialize instance
      *
@@ -233,20 +231,20 @@ class Calendar extends Post
                     <thead>
                         <tr>
                             <?php if($branch_active == 'active'): ?>
-                                <th><?php _e( 'Branch', 'edupress' ); ?></th>
+                                <th><?php _t( 'Branch', 'edupress' ); ?></th>
                             <?php endif; ?>
                             <?php if($shift_active == 'active'): ?>
-                                <th><?php _e( 'Shift', 'edupress' ); ?></th>
+                                <th><?php _t( 'Shift', 'edupress' ); ?></th>
                             <?php endif; ?>
                             <?php if($class_active == 'active'): ?>
-                                <th><?php _e( 'Class', 'edupress' ); ?></th>
+                                <th><?php _t( 'Class', 'edupress' ); ?></th>
                             <?php endif; ?>
                             <?php if($section_active == 'active'): ?>
-                                <th><?php _e( 'Section', 'edupress' ); ?></th>
+                                <th><?php _t( 'Section', 'edupress' ); ?></th>
                             <?php endif; ?>
-                            <th><?php _e( 'Start Date', 'edupress' ); ?></th>
-                            <th><?php _e( 'End Date', 'edupress' ); ?></th>
-                            <th><?php _e( 'Action', 'edupress' ); ?></th>
+                            <th><?php _t( 'Start Date', 'edupress' ); ?></th>
+                            <th><?php _t( 'End Date', 'edupress' ); ?></th>
+                            <th><?php _t( 'Action', 'edupress' ); ?></th>
                         </tr>
                     </thead>
 

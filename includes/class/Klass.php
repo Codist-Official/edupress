@@ -16,11 +16,6 @@ class Klass extends Post
     protected $post_type = 'class';
 
     /**
-     * @var string $list_title
-     */
-    protected $list_title = 'Class List';
-
-    /**
      * Initialize instance
      */
     public static function instance()

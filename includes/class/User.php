@@ -1427,23 +1427,23 @@ class User
                                 </span>
                             </span>
                         </th>
-                        <th><?php _e( 'Branch', 'eduprsss'); ?></th>
-                        <th><?php _e( 'Role', 'eduprsss'); ?></th>
-                        <th><?php _e( 'Name', 'eduprsss'); ?></th>
+                        <th><?php _t( 'Branch'); ?></th>
+                        <th><?php _t( 'Role'); ?></th>
+                        <th><?php _t( 'Name'); ?></th>
                         <?php if($class_active): ?>
-                            <th><?php _e( 'Class', 'eduprsss'); ?></th>
+                            <th><?php _t( 'Class' ); ?></th>
                         <?php endif; ?>
 
                         <?php if($section_active) : ?>
-                            <th><?php _e( 'Section', 'eduprsss'); ?></th>
+                            <th><?php _t( 'Section' ); ?></th>
                         <?php endif; ?>
 
-                        <th><?php _e( 'Roll', 'eduprsss'); ?></th>
+                        <th><?php _t( 'Roll' ); ?></th>
 
-                        <th><?php _e( 'Reg. Date', 'edupress' ); ?></th>
+                        <th><?php _t( 'Reg. Date' ); ?></th>
                         <?php if( self::currentUserCan( 'edit', $this->post_type ) ): ?>
 
-                            <th class="no-print" style="text-align:center;"><?php _e( 'Action', 'eduprsss'); ?></th>
+                            <th class="no-print" style="text-align:center;"><?php _t( 'Action' ); ?></th>
 
                         <?php endif; ?>
                     </tr>

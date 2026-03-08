@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.7.4
+Version: 1.7.5
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -23,6 +23,7 @@ if( !defined( 'EDUPRESS_PATH') ) define('EDUPRESS_PATH', plugin_dir_path( __FILE
 if( !defined( 'EDUPRESS_CLASS_DIR') ) define( 'EDUPRESS_CLASS_DIR', EDUPRESS_PATH .'includes/class/' );
 if( !defined( 'EDUPRESS_ADMIN_DIR') ) define( 'EDUPRESS_ADMIN_DIR', EDUPRESS_PATH .'includes/admin/' );
 if( !defined( 'EDUPRESS_LIB_DIR') ) define( 'EDUPRESS_LIB_DIR', EDUPRESS_PATH .'includes/libs/' );
+if( !defined( 'EDUPRESS_LANG_DIR') ) define( 'EDUPRESS_LANG_DIR', EDUPRESS_PATH .'languages/' );
 if( !defined( 'EDUPRESS_URL') ) define( 'EDUPRESS_URL', plugin_dir_url( __FILE__ ) );
 if( !defined( 'EDUPRESS_IMG_URL') ) define( 'EDUPRESS_IMG_URL', EDUPRESS_URL . 'assets/img/' );
 if( !defined( 'EDUPRESS_CSS_URL') ) define( 'EDUPRESS_CSS_URL', EDUPRESS_URL . 'assets/css/' );
@@ -45,6 +46,37 @@ $myUpdateChecker = PucFactory::buildUpdateChecker(
 
 //Set the branch that contains the stable release.
 $myUpdateChecker->setBranch('main');
+
+// Loading lanaguage strings 
+$file = EDUPRESS_LANG_DIR . 'bn.php';
+$GLOBALS['edupress_lang'] = include $file;
+
+function t($key, $text_domain = 'edupress'){
+    $org_key = $key;
+    $active_lang = Admin::getSetting('system_lang');
+    if($active_lang == 'en') return $key; 
+    $key = strtolower(trim($key));
+    return $GLOBALS['edupress_lang'][$key] ?? $org_key; 
+}
+
+function _t($key){
+    _e(t($key));
+}
+
+// translate digit 
+function td($number){
+    $active_lang = Admin::getSetting('system_lang');
+    if($active_lang == 'en') return $number;
+    
+    $en = ['0','1','2','3','4','5','6','7','8','9'];
+    $bn = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+    
+    return str_replace($en, $bn, $number);
+}
+
+function _td($number){
+    _e(td($number), 'edupress');
+}
 
 class EduPress
 {
@@ -739,7 +771,7 @@ class EduPress
 
                 $html .= "<select id='{$id}' class='{$class}' name='{$name}' {$readonly_string} {$disabled_string} {$required_string} {$data_string} {$multiple_string}>";
 
-                if( !empty($placeholder) ) $html .= "<option value=''>".__( $placeholder, 'edupress')."</option>";
+                if( !empty($placeholder) ) $html .= "<option value=''>". t( $placeholder)."</option>";
                 if( !is_array($options) ) $options = explode(',', $options);
 
                 if( !empty($options) ){
@@ -902,6 +934,7 @@ class EduPress
                 'active_panel' => $_REQUEST['panel'] ?? "",
                 'transaction_sms' => Admin::getSetting('transaction_sms') == 'active' ? 1 : 0,
                 'transaction_print' => Admin::getSetting('transaction_print') == 'active' ? 1 : 0,
+                'lang' => Admin::getSetting('system_lang')
             )
         );
 
@@ -949,7 +982,7 @@ class EduPress
         global $post;
         ob_start();
 
-        if( !is_admin() && EduPress::isActive('print') && is_singular() && has_shortcode($post->post_content, 'edupress') ){ 
+        if( EduPress::isActive('print') && is_singular() && has_shortcode($post->post_content, 'edupress') ){ 
             ?>
             <div class="printMasterTable">
                 <span class="print-icon"><img src="<?php echo EDUPRESS_IMG_URL; ?>global-print.png" alt="Print"></span>

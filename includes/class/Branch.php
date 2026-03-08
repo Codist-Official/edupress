@@ -17,11 +17,6 @@ class Branch extends Post
     protected $post_type = 'branch';
 
     /**
-     * @var $list_title
-     */
-    protected $list_title = 'Branch List';
-
-    /**
      * Initialize instance
      *
      * @return self
@@ -113,9 +108,7 @@ class Branch extends Post
         $new_fields['address'] = array(
             'textarea',
             'address',
-            'settings'  => array(
-
-            )
+            'settings'  => []
         );
 
         return $fields + $new_fields;
@@ -138,7 +131,7 @@ class Branch extends Post
             'type' => 'textarea',
             'name' => 'address',
             'settings'  => array(
-                'label' => 'Address',
+                'label' => t('Address'),
                 'value' => $this->getMeta('address'),
                 'id' => 'address',
             )
@@ -147,7 +140,7 @@ class Branch extends Post
             'type' => 'text',
             'name'  => 'phone',
             'settings' => array(
-                'label' => 'Phone',
+                'label' => t('Phone'),
                 'value' => $this->getMeta('phone'),
                 'id'    => 'phone'
             )

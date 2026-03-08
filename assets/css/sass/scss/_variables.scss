@@ -32,4 +32,21 @@ $color-danger-light: rgba(255, 0, 0, 0.05);
     --ep-base-col: calc(100% / 12);
     --ep-default-column-gap: 10px;
     --ep-default-row-gap: 10px;
+
+    --ep-border-radius: 4px;
+
+    --ep-success-color: #22C55E;
+    --ep-success-bg-color: #D1FADF;
+    
+    --ep-error-color: #EF4444;
+    --ep-error-color: #FEF0C7;
+    
+    --ep-warning-color: #1d1c1b;
+    --ep-warning-color: #1d1c1b;
+
+    --ep-info-color: #3B82F6;
+    --ep-info-bg-color: #D1E9FF;
+
+    --ep-mention-color: #8B5CF6;
+    --ep-mention-bg-color: #F4EBFF;
 }

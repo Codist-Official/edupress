@@ -16,7 +16,6 @@ class Section extends Klass
      */
     protected $post_type = 'section';
 
-    protected $list_title = 'Section List';
 
     /**
      * Initialize instance

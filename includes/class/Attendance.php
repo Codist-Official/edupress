@@ -23,7 +23,6 @@ class Attendance extends CustomPost
     /**
      * @var $list_title
      */
-    protected $list_title = 'Attendance Report';
 
     /**
      * Initialize instance
@@ -98,7 +97,7 @@ class Attendance extends CustomPost
                 <div id='edupress_online_device_status'><?php echo $this->getDevicesOnlineStatusHTML(); ?></div>
             </div>
             <div class='ep-flex-8 ep-mb-flex-12'>
-                <div style="text-align: center; font-weight: bold;"><?php _e( 'Attendance Sumamry of ' . date('d/m/Y', strtotime($start_date)), 'edupress'); ?></div>
+                <div style="text-align: center; font-weight: bold;"><?php _t( 'Attendance Sumamry of', 'edupress'); echo ' '; _td(date('d/m/Y', strtotime($start_date))); ?></div>
                 <?php echo self::getDayStatsHTML($start_date); ?>
             </div>
         </div>
@@ -141,9 +140,9 @@ class Attendance extends CustomPost
                     <table class="ep-table edupress-table" style="width: 100%; max-width: 500px;">
                         <thead>
                             <tr>
-                                <th style="text-align: left;"><?php _e('Branch', 'edupress'); ?></th>
-                                <th style="text-align: left;"><?php _e('Device ID', 'edupress'); ?></th>
-                                <th style="text-align: left;"><?php _e('Online Status', 'edupress'); ?></th>
+                                <th style="text-align: left;"><?php _t('Branch', 'edupress'); ?></th>
+                                <th style="text-align: left;"><?php _t('Device ID', 'edupress'); ?></th>
+                                <th style="text-align: left;"><?php _t('Online Status', 'edupress'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -158,7 +157,7 @@ class Attendance extends CustomPost
                             echo "<tr>";
                             echo "<td style='background-color: {$online_color} !important;'>{$branch_title}</td>";
                             echo "<td style='background-color: {$online_color} !important;'>{$id}</td>";
-                            echo "<td style='background-color: {$online_color} !important;'>{$online_status}</td>";
+                            echo "<td style='background-color: {$online_color} !important;'>".t($online_status)."</td>";
                             echo "</tr>";
                         }
                         ?>
@@ -215,17 +214,17 @@ class Attendance extends CustomPost
 
                 <thead>
                     <tr>
-                        <?php if($branch_active): ?><th><?php _e( 'Branch', 'edupress' ); ?></th><?php endif; ?>
-                        <th><?php _e( 'Roll', 'edupress' ); ?></th>
-                        <th><?php _e( 'User', 'edupress' ); ?></th>
-                        <th><?php _e( 'Date', 'edupress' ); ?></th>
-                        <th><?php _e( 'Time', 'edupress' ); ?></th>
-                        <th><?php _e( 'Role', 'edupress' ); ?></th>
-                        <?php if($shift_active): ?><th><?php _e( 'Shift', 'edupress' ); ?></th><?php endif; ?>
-                        <?php if($class_active): ?><th><?php _e( 'Class', 'edupress' ); ?></th><?php endif; ?>
-                        <?php if($section_active): ?><th><?php _e( 'Section', 'edupress' ); ?></th><?php endif; ?>
-                        <?php if($sms_active): ?><th><?php _e( 'SMS', 'edupress' ); ?></th><?php endif; ?>
-                        <th><?php _e( 'Record Time', 'edupress' ); ?></th>
+                        <?php if($branch_active): ?><th><?php _t( 'Branch', 'edupress' ); ?></th><?php endif; ?>
+                        <th><?php _t( 'Roll', 'edupress' ); ?></th>
+                        <th><?php _t( 'User', 'edupress' ); ?></th>
+                        <th><?php _t( 'Date', 'edupress' ); ?></th>
+                        <th><?php _t( 'Time', 'edupress' ); ?></th>
+                        <th><?php _t( 'Role', 'edupress' ); ?></th>
+                        <?php if($shift_active): ?><th><?php _t( 'Shift', 'edupress' ); ?></th><?php endif; ?>
+                        <?php if($class_active): ?><th><?php _t( 'Class', 'edupress' ); ?></th><?php endif; ?>
+                        <?php if($section_active): ?><th><?php _t( 'Section', 'edupress' ); ?></th><?php endif; ?>
+                        <?php if($sms_active): ?><th><?php _t( 'SMS', 'edupress' ); ?></th><?php endif; ?>
+                        <th><?php _t( 'Record Time', 'edupress' ); ?></th>
                     </tr>
                 </thead>
 
@@ -392,13 +391,13 @@ class Attendance extends CustomPost
                             <th style="text-align: center; font-size: 12px;"><?php _e('Entry', 'edupress'); ?></th>
                             <th style="text-align: center; font-size: 12px;"><?php _e('Exit', 'edupress'); ?></th>
                         <?php endif; ?>
-                        <th style="text-align: center; font-size: 12px;"><?php _e('Total', 'edupress'); ?></th>
-                        <th style="text-align: center; font-size: 12px;"><?php _e('Open', 'edupress'); ?></th>
-                        <th style="text-align: center; font-size: 12px;"><?php _e('Close', 'edupress'); ?></th>
-                        <th style="text-align: center; font-size: 12px;"><?php _e('Holidays', 'edupress'); ?></th>
-                        <th style="text-align: center; font-size: 12px;"><?php _e('Present', 'edupress'); ?></th>
-                        <th style="text-align: center; font-size: 12px;"><?php _e('Absent', 'edupress'); ?></th>
-                        <th style="text-align: center; font-size: 12px;"><?php _e('Presence<br>%', 'edupress'); ?></th>
+                        <th style="text-align: center; font-size: 12px;"><?php _t('Total', 'edupress'); ?></th>
+                        <th style="text-align: center; font-size: 12px;"><?php _t('Open', 'edupress'); ?></th>
+                        <th style="text-align: center; font-size: 12px;"><?php _t('Close', 'edupress'); ?></th>
+                        <th style="text-align: center; font-size: 12px;"><?php _t('Holidays', 'edupress'); ?></th>
+                        <th style="text-align: center; font-size: 12px;"><?php _t('Present', 'edupress'); ?></th>
+                        <th style="text-align: center; font-size: 12px;"><?php _t('Absent', 'edupress'); ?></th>
+                        <th style="text-align: center; font-size: 12px;"><?php _t('Presence<br>%', 'edupress'); ?></th>
                     </tr>
                 </thead>
                 <?php
@@ -509,15 +508,15 @@ class Attendance extends CustomPost
         <div id="single-day-count" data-day="<?php echo $date; ?>">
             <div class="day-count-item">
                 <div id='single_day_total_users' class='value'><?php echo $stats['total']; ?></div>
-                <div class="label"><?php _e('Total', 'edupress'); ?></div>
+                <div class="label"><?php _t('Total', 'edupress'); ?></div>
             </div> 
             <div class="day-count-item">
                 <div id='single_day_total_present' class='value'><?php echo $stats['present']; ?></div>
-                <div class="label"><?php _e('Present', 'edupress'); ?></div>
+                <div class="label"><?php _t('Present', 'edupress'); ?></div>
             </div> 
             <div class="day-count-item">
                 <div id='single_day_total_absent' class='value'><?php echo $stats['absent']; ?></div>
-                <div class="label"><?php _e('Absent', 'edupress'); ?></div>
+                <div class="label"><?php _t('Absent', 'edupress'); ?></div>
             </div> 
         </div>
         <?php 
@@ -759,7 +758,7 @@ class Attendance extends CustomPost
             'settings' => array(
                 'options' => $branch->getPosts( [], true ),
                 'required' => true,
-                'placeholder' => 'Select a branch',
+                'placeholder' => t('Select a branch'),
                 'label' => 'Branch'
             )
         );
@@ -777,8 +776,8 @@ class Attendance extends CustomPost
             'name'  => 'a_user',
             'settings' => array(
                 'required' => true,
-                'label' => 'User Name',
-                'placeholder' => 'Type a name...',
+                'label' => td('User Name'),
+                'placeholder' => td('Type a name...'),
                 'class' => 'a_user'
             )
         );
@@ -787,7 +786,7 @@ class Attendance extends CustomPost
             'name'  => 'user_id',
             'settings' => array(
                 'required' => true,
-                'label' => 'User Id',
+                'label' => t('User Id'),
                 'readonly' => true,
                 'class' => 'user_id',
             )
@@ -797,7 +796,7 @@ class Attendance extends CustomPost
             'name'  => 'report_time',
             'settings' => array(
                 'required' => true,
-                'label' => 'Attendance Time',
+                'label' => t('Attendance Time'),
                 'value' => current_time('mysql'),
             )
         );
@@ -1322,7 +1321,7 @@ class Attendance extends CustomPost
                 'type' => 'select',
                 'name' => 'section_id',
                 'settings' => array(
-                    'label' => 'Section',
+                    'label' => t('Section'),
                     'id'=>'section_id',
                     'placeholder' => 'Select',
                     'required' => true,
@@ -1331,12 +1330,12 @@ class Attendance extends CustomPost
         }
         ob_start();
         ?>
-        <h3 class="text-center"><?php echo __('Add Manual Attendance', 'edupress'); ?></h3>
+        <h3 class="text-center"><?php _t('Add Manual Attendance', 'edupress'); ?></h3>
         <form action="" class="edupress-form edupress-ajax-form edupress-filter-list">
             <?php foreach($fields as $field): ?>
                <div class="form-column">
                     <div class="label-wrap">
-                        <label for="<?php echo $field['settings']['id']; ?>"><?php echo $field['settings']['label']; ?></label>
+                        <label for="<?php echo $field['settings']['id']; ?>"><?php _t($field['settings']['label']); ?></label>
                     </div>
                     <div class="value-wrap">
                         <?php echo EduPress::generateFormElement($field['type'], $field['name'], $field['settings']); ?>
@@ -1347,7 +1346,7 @@ class Attendance extends CustomPost
                 <div class="label-wrap"><label> &nbsp; </label></div>
                 <div class="value-wrap">
                     <?php
-                        echo EduPress::generateFormElement('submit', 'submit', array('value' => 'Show')); 
+                        echo EduPress::generateFormElement('submit', 'submit', array('value' => t('Show'))); 
                         echo EduPress::generateFormElement('hidden', 'ajax_action', array('value' => 'showUsersToAddManualAttendance')); 
                         echo EduPress::generateFormElement('hidden', 'action', array('value' => 'edupress_admin_ajax')); 
                         echo EduPress::generateFormElement('hidden', 'success_callback', array('value' => 'insertAttendanceUsersInPopup') ); 
@@ -1389,14 +1388,14 @@ class Attendance extends CustomPost
                 <table class="edupress-table tablesorter" style="width: 100%;max-width: 750px;margin: 0;">
                     <thead> 
                         <tr>
-                            <th><?php _e('Roll', 'edupress'); ?></th>
-                            <th><?php _e('Name', 'edupress'); ?></th>
+                            <th><?php _t('Roll', 'edupress'); ?></th>
+                            <th><?php _t('Name', 'edupress'); ?></th>
                             <th>
-                                <?php _e('Status', 'edupress'); ?>
-                                <?php echo EduPress::generateFormElement('select', 'attendance-bulk-status', array( 'class' => 'attendance-bulk-status', 'options' => array( '' => 'Select', 'present' => 'Present', 'absent' => 'Absent' ), 'value' => '' )); ?>
+                                <?php _t('Status', 'edupress'); ?><br>
+                                <?php echo EduPress::generateFormElement('select', 'attendance-bulk-status', array( 'class' => 'attendance-bulk-status', 'options' => array( '' => t('Select'), 'present' => 'Present', 'absent' => 'Absent' ), 'value' => '' )); ?>
                             </th>
                             <th>
-                                <?php _e('Date', 'edupress'); ?>
+                                <?php _t('Date', 'edupress'); ?><br>
                                 <?php echo EduPress::generateFormElement('datetime-local', 'attendance-bulk-date', array( 'class' => 'attendance-bulk-date', 'value' => current_time('YYYY-MM-DDTHH:mm') )); ?>
                             </th>
                         </tr>
@@ -1414,7 +1413,7 @@ class Attendance extends CustomPost
                         <td style="<?php echo $style; ?>">
                             <input type="hidden" name="user_id[]" value="<?php echo $user->id; ?>">
                             <input type="hidden" name="attendance_id[]" value="<?php echo $user->getMeta('attendance_id'); ?>">
-                            <?php echo EduPress::generateFormElement('select', 'status[]', array( 'options' => array( '' => 'Select', 'present' => 'Present', 'absent' => 'Absent' ), 'value' => '' )); ?>
+                            <?php echo EduPress::generateFormElement('select', 'status[]', array( 'options' => array( '' => t('Select'), 'present' => 'Present', 'absent' => 'Absent' ), 'value' => '' )); ?>
                             <?php //if($is_present): echo "<strong>Already Present</strong>"; endif; ?>
                         </td>
                         <td style="<?php echo $style; ?>">
@@ -1430,7 +1429,7 @@ class Attendance extends CustomPost
                                 echo EduPress::generateFormElement('hidden', 'class_id', array( 'value' => $args['class_id'] ));
                                 echo EduPress::generateFormElement('hidden', 'section_id', array( 'value' => $args['section_id'] ));
                                 echo EduPress::generateFormElement('hidden', 'shift_id', array( 'value' => $args['shift_id'] ));
-                                echo EduPress::generateFormElement('submit', 'submit', array( 'value' => 'Save' )); 
+                                echo EduPress::generateFormElement('submit', 'submit', array( 'value' => t('Save') )); 
                                 echo EduPress::generateFormElement('hidden', 'ajax_action', array( 'value' => 'insertManualAttendance' )); 
                                 echo EduPress::generateFormElement('hidden', 'action', array( 'value' => 'edupress_admin_ajax' )); 
                                 wp_nonce_field('edupress', '_wpnonce');

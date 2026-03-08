@@ -71,6 +71,9 @@ class Post
 
         $this->id = $id;
 
+        $term = ucwords(str_replace('_', ' ', $this->post_type));
+        if(empty($this->list_title)) $this->list_title = t($term) . ' ' . t('List');
+
         $this->posts_per_page = isset($_REQUEST['posts_per_page']) && intval($_REQUEST['posts_per_page']) ? intval($_REQUEST['posts_per_page']) : Admin::getSetting('display_posts_per_page');
         if(empty($this->posts_per_page)) $this->posts_per_page = 20;
 
@@ -277,13 +280,13 @@ class Post
      */
     public function getPublishFields()
     {
-
+        $term = ucwords(str_replace( '_', ' ' , $this->post_type )) ;
         $fields = array(
             'post_title' => array(
                 'type'  => 'text',
                 'name'  => 'post_title',
                 'settings'=> array(
-                    'label'     => ucwords(str_replace( '_', ' ' , $this->post_type ) . ' name'),
+                    'label'     => t($term) . ' ' . t('name'),
                     'required' => true,
                     'id' => 'post_title'
                 )
@@ -346,7 +349,7 @@ class Post
                 ?>
 
                 <div class="form-row <?php echo $field['name'] ?? ''; ?>">
-                    <div class="label-wrap"><label for="<?php echo $field['settings']['id'] ?? ''; ?>"><?php _e( $label, 'edupress' ); ?></label></div>
+                    <div class="label-wrap"><label for="<?php echo $field['settings']['id'] ?? ''; ?>"><?php _t($label); ?></label></div>
                     <div class="value-wrap"><?php echo EduPress::generateFormElement( $field['type'], $field['name'], $field['settings'] ); ?></div>
                 </div>
 
@@ -636,7 +639,7 @@ class Post
 
                     ?>
                     <div class="form-column" data-name="<?php echo $field['name'] ?? ''; ?>">
-                        <div class="label-wrap"><label for="<?php echo $field['settings']['id'] ?? ''; ?>"><?php _e($field['settings']['label'] ?? '', 'edupress'); ?></label></div>
+                        <div class="label-wrap"><label for="<?php echo $field['settings']['id'] ?? ''; ?>"><?php _t($field['settings']['label'] ?? ''); ?></label></div>
                         <div class="value-wrap"><?php echo EduPress::generateFormElement( $field['type'], $field['name'], $field['settings'] ); ?></div>
                     </div>
                 <?php } ?>
@@ -648,7 +651,7 @@ class Post
                     <div class="value-wrap">
                         <?php
                             echo implode( ' ', $hidden_fields ) ;
-                            echo EduPress::generateFormElement( 'submit', '', array('value'=>'Filter'));
+                            echo EduPress::generateFormElement( 'submit', '', array('value'=> t('Filter')));
                             echo EduPress::generateFormElement( 'hidden', 'panel', array('value'=>$this->post_type));
                         ?>
                     </div>
@@ -760,9 +763,10 @@ class Post
 
         if( !User::currentUserCan('publish',  $this->post_type ) ) return '';
         ob_start();
+        $term = ucwords( str_replace( '_', ' ', $this->post_type ) );
         ?>
         <div class="edupress-publish-btn-wrap no-print">
-            <button data-post_type="<?php echo $this->post_type; ?>" class="edupress-btn edupress-publish-post"><?php _e( 'Add New ' . ucwords( str_replace( '_', ' ', $this->post_type ) ), 'edupress' ); ?></button>
+            <button data-post_type="<?php echo $this->post_type; ?>" class="edupress-btn edupress-publish-post"> + <?php Admin::getSetting('system_lang' == 'en') ? _e('Add New '. $term, 'edupress' ): _e('নতুন '  . t($term).  ' যোগ করুন'); ?> </button>
         </div>
 
         <?php
@@ -804,17 +808,17 @@ class Post
                         <?php if( User::currentUserCan('delete', $this->post_type ) ): ?>
                             <th class="no-print">
                                 <input id="select_all" title="Select All" type="checkbox"  class="edupress-bulk-select-all" data-post_type="<?php echo $this->post_type; ?>">
-                                <label for="select_all"><?php _e( 'All', 'edupress' ); ?></label>
+                                <label for="select_all"><?php _t( 'All' ); ?></label>
                                 <a style="float: right" href="javascript:void(0)" class="edupress-bulk-delete" data-post_type="<?php echo $this->post_type;?>"><?php echo EduPress::getIcon('delete'); ?></a>
                             </th>
                         <?php endif; ?>
 
                         <?php foreach($this->getListFields() as $k=>$v) : ?>
-                            <th><?php echo $v; ?></th>
+                            <th><?php _t($v); ?></th>
                         <?php endforeach; ?>
 
                         <?php if( $this->post_type == 'exam' || User::currentUserCan('edit', $this->post_type )): ?>
-                            <th class="no-print">Action</th>
+                            <th class="no-print"><?php _t('Action') ?></th>
                         <?php endif; ?>
 
                     </tr>

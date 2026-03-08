@@ -723,7 +723,24 @@ button.none{
 .page-break{
   page-break-after: always;
 }
-
+.ep-search-toggle-btn{
+  width: 100%;
+  height: auto;
+  line-height: 2;
+  box-shadow: $light-box-shadow;
+  display: inline-block;
+  padding: 5px 10px;
+  box-sizing: border-box;
+  margin-bottom: 15px;
+  background-color: $color-white;
+  border-radius: var(--ep-border-radius);
+  background-color: var(--ep-mention-color);
+  color: $color-white !important;
+  text-align: center;
+}
+.ep-search-toggle-btn[data-active='1']{
+  background-color: var(--ep-info-color);
+}
 
 /* TableSorter */
 .tablesorter-default{width:100%;color:#333;background-color:#fff;border-spacing:0;margin:10px 0 15px;text-align:left}

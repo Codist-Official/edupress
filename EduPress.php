@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.7.5
+Version: 1.7.6
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -53,7 +53,7 @@ $GLOBALS['edupress_lang'] = include $file;
 
 function t($key, $text_domain = 'edupress'){
     $org_key = $key;
-    $active_lang = Admin::getSetting('system_lang');
+    $active_lang = Admin::getSetting('system_lang', 'en');
     if($active_lang == 'en') return $key; 
     $key = strtolower(trim($key));
     return $GLOBALS['edupress_lang'][$key] ?? $org_key; 
@@ -710,7 +710,7 @@ class EduPress
         $readonly = $settings['readonly'] ?? false;
         $disabled = $settings['disabled'] ?? false;
         $button = $settings['button'] ?? false;
-        $placeholder = $settings['placeholder'] ?? '';
+        $placeholder = t($settings['placeholder'] ?? '');
         $value = $settings['value'] ?? '';
         $id = $settings['id'] ?? '';
         $class = $settings['class'] ?? '';

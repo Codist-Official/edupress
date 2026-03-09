@@ -474,14 +474,18 @@ jQuery(document).ready(function(){
     updateBaseUrl();
 
     // Toggle form under current parent
-    $j(document).on('click', '.toggleForm', function(e){
+    $j(document).on('click', '.toggleUserForm', function(e){
         preventDefault(e);
-        $j(this).parents('div').find('form:eq(0)').toggle();
-        let curText = $j(this).text();
-        if( curText === '[Show]'){
-            $j(this).text('[Hide]');
+        $j(this).parents('div').find('form:eq(0)').slideToggle();
+        let active = $j(this).attr('data-active');
+        if(active == 0){
+            let txt = edupress.lang == 'bn' ? '- ইউজার ফরম লুকান' : '- Hide User Form';
+            $j(this).text(txt);
+            $j(this).attr('data-active', 1);
         } else {
-            $j(this).text('[Show]');
+            let txt = edupress.lang == 'bn' ? '+ ইউজার ফরম দেখান' : '+ Show User Form';
+            $j(this).text(txt);
+            $j(this).attr('data-active', 1);
         }
     })
 

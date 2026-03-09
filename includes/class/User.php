@@ -550,7 +550,7 @@ class User
             'type' => 'select',
             'name' => 'branch_id',
             'settings' => array(
-                'label' => 'Branch',
+                'label' => t('Branch'),
                 'id'=>'branch_id',
                 'options' => $branch_options,
                 'placeholder' => 'Select',
@@ -564,7 +564,7 @@ class User
                 'type' => 'select',
                 'name' => 'shift_id',
                 'settings' => array(
-                    'label' => 'Shift',
+                    'label' => t('Shift'),
                     'id'=>'shift_id',
                     'placeholder' => 'Select',
                 )
@@ -577,7 +577,7 @@ class User
                 'type' => 'select',
                 'name' => 'class_id',
                 'settings' => array(
-                    'label' => 'Class',
+                    'label' => t('Class'),
                     'id'=>'class_id',
                     'placeholder' => 'Select',
                     'value' => sanitize_text_field($_REQUEST['class_id'] ?? ''),
@@ -590,7 +590,7 @@ class User
                 'type' => 'select',
                 'name' => 'section_id',
                 'settings' => array(
-                    'label' => 'Section',
+                    'label' => t('Section'),
                     'id'=>'section_id',
                     'placeholder' => 'Select',
                 )
@@ -600,7 +600,7 @@ class User
             'type' => 'text',
             'name' => 'first_name',
             'settings' => array(
-                'label' => 'Name',
+                'label' => t('Name'),
                 'value' => sanitize_text_field($_REQUEST['first_name'] ?? ''),
                 'id'=>'first_name'
             )
@@ -609,7 +609,7 @@ class User
             'type' => 'number',
             'name' => 'roll',
             'settings' => array(
-                'label' => 'Roll / Student ID',
+                'label' => t('Roll / Student ID'),
                 'value' => sanitize_text_field($_REQUEST['roll'] ?? ''),
                 'id'=>'roll'
             )
@@ -619,7 +619,7 @@ class User
             'name'  => 'mobile',
             'settings' => array(
                 'value' => sanitize_text_field($_REQUEST['mobile'] ?? ''),
-                'label' => 'Mobile',
+                'label' => t('Mobile'),
                 'id'=>'mobile'
             )
         );
@@ -635,9 +635,9 @@ class User
             'settings' => array(
                 'options' => $all_roles,
                 'value' => sanitize_text_field($_REQUEST['role'] ?? ''),
-                'label' => 'Role',
+                'label' => t('Role'),
                 'id'=>'user_role',
-                'placeholder'=> 'Select a role'
+                'placeholder'=> t('Select a role')
             )
         );
         $users_options = array(
@@ -651,7 +651,7 @@ class User
             'type' => 'select',
             'name' => 'posts_per_page',
             'settings' => array(
-                'label' => 'Users Per Page',
+                'label' => t('Users Per Page'),
                 'value' => intval( $_REQUEST['posts_per_page'] ?? 25 ),
                 'options' => $users_options,
             )
@@ -744,7 +744,7 @@ class User
             'name'  => 'branch_id[]',
             'type'  => 'select',
             'settings' => array(
-                'label' => 'Branch',
+                'label' => t('Branch'),
                 'options' => $branch_options,
                 'value' => $settings['branch_id'] ?? '',
                 'required' => true,
@@ -772,11 +772,11 @@ class User
                     'name'  => 'shift_id[]',
                     'type'  => 'select',
                     'settings' => array(
-                        'label' => 'Shift',
+                        'label' => t('Shift'),
                         'options' => $shift->getPosts( $args, true ),
                         'value' => $shift_id,
                         'required' => isset($settings['role']) && $settings['role'] === 'student' ? true : false,
-                        'placeholder'=> 'Select'
+                        'placeholder'=> t('Select')
                     )
                 );
                 if( $shift_id ){
@@ -799,7 +799,7 @@ class User
                     'name'  => 'class_id[]',
                     'type'  => 'select',
                     'settings'  => array(
-                        'label' => 'Class',
+                        'label' => t('Class'),
                         'value' => $class_id,
                         'options' => $class->getPosts( $args, true ),
                         'required' =>  isset($settings['role']) && $settings['role'] === 'student' ? true : false,
@@ -825,7 +825,7 @@ class User
                     'name'  => 'section_id[]',
                     'type'  => 'select',
                     'settings'  => array(
-                        'label' => 'Section',
+                        'label' => t('Section'),
                         'value' => $section_id,
                         'options' => $section->getPosts( $args, true ),
                         'required' => isset($settings['role']) && $settings['role'] === 'student' ? true : false,
@@ -846,7 +846,7 @@ class User
             'name'  => 'role[]',
             'type'  => 'select',
             'settings'=>array(
-                'label' => 'Role',
+                'label' => t('Role'),
                 'options' => self::getRoles(),
                 'value' => $settings['role'] ?? '',
             )
@@ -856,8 +856,8 @@ class User
             'name'  => 'first_name[]',
             'type'  => 'text',
             'settings'=> array(
-                'label' => 'Name',
-                'placeholder' => 'Full name',
+                'label' => t('Name'),
+                'placeholder' => t('Full name'),
                 'value' => $settings['first_name'] ?? '',
                 'required' => true,
             )
@@ -868,9 +868,9 @@ class User
                 'name'  => 'roll[]',
                 'type'  => 'text',
                 'settings'=>array(
-                    'label' => 'Roll / Student ID',
+                    'label' => t('Roll / Student ID'),
                     'value' => $settings['roll'] ?? '',
-                    'placeholder' => 'Roll / Student ID',
+                    'placeholder' => t('Roll / Student ID'),
                     'required' => true,
                 )
             );
@@ -880,8 +880,8 @@ class User
             'name'  => 'mobile[]',
             'type'  => 'text',
             'settings'=> array(
-                'label' => 'Mobile',
-                'placeholder' => 'Mobile',
+                'label' => t('Mobile'),
+                'placeholder' => t('Mobile'),
                 'value' => $settings['mobile'] ?? '',
             )
         );
@@ -890,8 +890,8 @@ class User
             'name'  => 'user_email[]',
             'type'  => 'email',
             'settings'=> array(
-                'label' => 'Email',
-                'placeholder' => 'Email',
+                'label' => t('Email'),
+                'placeholder' => t('Email'),
                 'value' => $settings['user_email'] ?? '',
             )
         );
@@ -900,8 +900,8 @@ class User
             'name'  => 'user_pass[]',
             'type'  => 'password',
             'settings'=> array(
-                'label' => 'Password',
-                'placeholder' => 'Password',
+                'label' => t('Password'),
+                'placeholder' => t('Password'),
             )
         );
 
@@ -913,10 +913,10 @@ class User
                     'name'  => 'optional_subject_id[]',
                     'type'  => 'select',
                     'settings' => array(
-                        'label' => 'Optional Subject',
+                        'label' => t('Optional Subject'),
                         'options' => $subject->getPosts( [], true ),
                         'value' => $settings['optional_subject_id'] ?? '',
-                        'placeholder' => 'Select a subject'
+                        'placeholder' => t('Select a subject')
                     )
                 );
             }
@@ -926,10 +926,10 @@ class User
                     'name'  => 'payment_type[]',
                     'type'  => 'select',
                     'settings' => array(
-                        'label' => 'Payment Type',
-                        'options' => array('Monthly' => 'Monthly', 'Package' => 'Package'),
+                        'label' => t('Payment Type'),
+                        'options' => array('Monthly' => t('Monthly'), 'Package' => t('Package')),
                         'required' => true,
-                        'placeholder' => 'Select a payment type',
+                        'placeholder' => t('Select a payment type'),
                         'value' => $settings['payment_type'] ?? '',
                     )
                 );
@@ -938,9 +938,9 @@ class User
                     'name'  => 'payment_amount[]',
                     'type'  => 'number',
                     'settings' => array(
-                        'label' => 'Payment Amount',
+                        'label' => t('Payment Amount'),
                         'required' => true,
-                        'placeholder' => 'Enter an amount',
+                        'placeholder' => t('Enter an amount'),
                         'value' => $settings['payment_amount']
                     )
                 );
@@ -1087,7 +1087,7 @@ class User
                     <!-- submit -->
                     <tr>
                         <td colspan="<?php echo count($value_uav) + 1; ?>">
-                            <?php echo EduPress::generateFormElement( 'submit', '', array('value'=>'Add Users', 'class' => 'edupress-btn')); ?>
+                            <?php echo EduPress::generateFormElement( 'submit', '', array('value'=>t('Add Users'), 'class' => 'edupress-btn')); ?>
                             <?php echo EduPress::generateFormElement( 'hidden', 'action', array('value'=>'edupress_admin_ajax')); ?>
                             <?php echo EduPress::generateFormElement( 'hidden', 'ajax_action', array('value'=>'publishBulkUser')); ?>
                             <?php echo EduPress::generateFormElement( 'hidden', 'before_send_callback', array('value'=>'publishBulkUserBeforeSendCallback')); ?>
@@ -1450,8 +1450,11 @@ class User
                 </thead>
 
 
+            
 
-                <?php foreach( $results as $user ) :
+                <?php 
+                $current_user_id = get_current_user_id();
+                foreach( $results as $user ) :
                     $this->__construct( $user );
                 ?>
                 <tr data-id="<?php echo $this->id; ?>" data-user-id="<?php echo $this->id; ?>" data-attendance-id="<?php echo $this->getMeta('attendance_id'); ?>">
@@ -1459,7 +1462,7 @@ class User
 
                         <?php
                             // current user cannot delete himself
-                            $disable_own = $this->id === get_current_user_id() ? " disabled='disabled' " :  '';
+                            $disable_own = $this->id === $current_user_id ? " disabled='disabled' " :  '';
 
                             $user_visible_id = $this->id;
                             if(EduPress::isActive('attendance')){
@@ -1502,7 +1505,7 @@ class User
                     <?php if( User::currentUserCan( 'edit', $this->post_type ) ): ?>
                         <td data-field="action" align="center" style="text-align: center;" class="no-print">
                             <a href="javascript:void(0)" data-action="edit" class="edupress-modify-user no-print" data-user-id="<?php echo $this->id; ?>"> <?php echo EduPress::getIcon('edit'); ?></a>
-                            <?php if ( self::currentUserCan('delete', $this->post_type ) ) : ?>
+                            <?php if ( self::currentUserCan('delete', $this->post_type ) && $current_user_id !== $this->id ) : ?>
                                 <a href="javascript:void(0)" data-action="delete" class="edupress-modify-user" data-user-id="<?php echo $this->id; ?>"><?php echo EduPress::getIcon('delete'); ?></a>
                             <?php endif; ?>
                         </td>
@@ -1565,25 +1568,25 @@ class User
         <form style="display: none;" action="" method="POST" data-action="showPublishBulkUserForm" class="<?php echo EduPress::getClassNames(array('edupress-ajax', 'form-bulk-add-user', 'grid-4-col'), 'form' ); ?>">
             
             <div class="form-col rows">
-                <div class="label-wrap"><label for="rows"><?php _e( 'No. of users', 'edupress' ); ?></label></div>
+                <div class="label-wrap"><label for="rows"><?php _t( 'No. of users', 'edupress' ); ?></label></div>
                 <div class="value-wrap"><?php echo EduPress::generateFormElement( 'number', 'rows', array( 'value' => 1, 'required' => true, 'id' => 'rows', 'data' => array( 'min' => 1 ) ) ); ?></div>
             </div>
 
             <div class="form-col role">
-                <div class="label-wrap"><label for="role"><?php _e( 'Role', 'edupress' ); ?></label></div>
+                <div class="label-wrap"><label for="role"><?php _t( 'Role', 'edupress' ); ?></label></div>
                 <div class="value-wrap"><?php echo EduPress::generateFormElement( 'select', 'role', array( 'options' => self::getRoles(), 'required' => true, 'id' => 'role', 'placeholder' => 'Select' ) ); ?></div>
             </div>
 
             <?php $branch = new Branch(); ?>
             <div class="form-col branch_id">
-                <div class="label-wrap"><label for="branch_id"><?php _e( 'Branch', 'edupress' ); ?></label></div>
+                <div class="label-wrap"><label for="branch_id"><?php _t( 'Branch', 'edupress' ); ?></label></div>
                 <div class="value-wrap"><?php echo EduPress::generateFormElement( 'select', 'branch_id', array( 'options' => $branch->getPosts( [], true ), 'required' => true, 'id' => 'branch_id', 'placeholder' => 'Select' ) ); ?></div>
             </div>
 
             <!-- shift -->
             <?php if( EduPress::isActive('shift') ) : ?>
                 <div class="form-col shift_id">
-                    <div class="label-wrap"><label for="shift_id"><?php _e( 'Shift', 'edupress' ); ?></label></div>
+                    <div class="label-wrap"><label for="shift_id"><?php _t( 'Shift', 'edupress' ); ?></label></div>
                     <div class="value-wrap"><?php echo EduPress::generateFormElement( 'select', 'shift_id', array( 'options' => [], 'required' => false, 'id' => 'shift_id', 'placeholder' => 'Select' ) ); ?></div>
                 </div>
             <?php endif; ?>
@@ -1591,7 +1594,7 @@ class User
             <!-- class -->
             <?php if( EduPress::isActive('class') ) : ?>
                 <div class="form-col class_id">
-                    <div class="label-wrap"><label for="class_id"><?php _e( 'Class', 'edupress' ); ?></label></div>
+                    <div class="label-wrap"><label for="class_id"><?php _t( 'Class', 'edupress' ); ?></label></div>
                     <div class="value-wrap"><?php echo EduPress::generateFormElement( 'select', 'class_id', array( 'options' => [], 'required' => false, 'id' => 'class_id', 'placeholder' => 'Select' ) ); ?></div>
                 </div>
             <?php endif; ?>
@@ -1599,7 +1602,7 @@ class User
             <!-- section -->
             <?php if( EduPress::isActive('section') ) : ?>
                 <div class="form-col section_id">
-                    <div class="label-wrap"><label for="section_id"><?php _e( 'Section', 'edupress' ); ?></label></div>
+                    <div class="label-wrap"><label for="section_id"><?php _t( 'Section', 'edupress' ); ?></label></div>
                     <div class="value-wrap"><?php echo EduPress::generateFormElement( 'select', 'section_id', array( 'options' => [], 'required' => false, 'id' => 'section_id', 'placeholder' => 'Select' ) ); ?></div>
                 </div>
             <?php endif; ?>
@@ -1608,8 +1611,8 @@ class User
             <div class="form-col submit">
                 <div class="label-wrap"><label for="bulkSubmit"> &nbsp; </label></div>
                 <div class="value-wrap">
-                    <?php echo EduPress::generateFormElement( 'submit', '', array( 'value' => 'Show Form' ) ); ?>
-                    <?php echo EduPress::generateFormElement( 'button', '', array( 'value' => 'CSV Upload', 'class'=>'showFormToUploadCsvToAddUsers' ) ); ?>
+                    <?php echo EduPress::generateFormElement( 'submit', '', array( 'value' => t('Show Form') ) ); ?>
+                    <?php echo EduPress::generateFormElement( 'button', '', array( 'value' => t('CSV Upload'), 'class'=>'showFormToUploadCsvToAddUsers' ) ); ?>
                     <?php echo EduPress::generateFormElement( 'hidden', 'action', array( 'value' => 'edupress_admin_ajax' ) ); ?>
                     <?php echo EduPress::generateFormElement( 'hidden', 'ajax_action', array( 'value' => 'showPublishBulkUserForm' ) ); ?>
                     <?php echo EduPress::generateFormElement( 'hidden', 'before_send_callback', array( 'value' => 'bulkUserBeforeSendCallback' ) ); ?>
@@ -1621,7 +1624,7 @@ class User
                     </div>
                 </div>
                 <?php $csv_url = EDUPRESS_URL . 'assets/csv/demo-user-data.csv'; ?>
-                <?php echo EduPress::generateFormElement( 'html', '', array( 'html' => "<a download target='_blank' href='{$csv_url}'>Demo CSV File</a>" ) ); ?>
+                <?php echo EduPress::generateFormElement( 'html', '', array( 'html' => "<a download target='_blank' href='{$csv_url}'>".t('Demo CSV File')."</a>" ) ); ?>
 
             </div>
 
@@ -1631,8 +1634,7 @@ class User
         $html = ob_get_clean();
 
         if ( !$wrap ) return $html;
-
-        return EduPress::wrapInContentBox( "ADD NEW USERS <a style='color: #fff;' href='javascript:void(0)' class='toggleForm'>[Show]</a>", $html );
+        return EduPress::wrapInContentBox( "<a style='color: #fff;' href='javascript:void(0)' data-active='0' class='toggleUserForm'>".t('+ Show User Form')."</a>", $html );
 
     }
 

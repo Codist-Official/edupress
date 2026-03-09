@@ -121,9 +121,9 @@ class GradeTable extends Post
                             for($i = 0; $i < count($grade_data['grade_point']); $i ++ ){
                                 ?>
                                 <li>
-                                    <?php echo EduPress::generateFormElement( 'number', 'range_start[]', array( 'value'=> $grade_data['range_start'][$i], 'placeholder'=>'Range starts', 'required'=> true, 'data' => array( 'step' => 'any', 'min' => 0, ) )); ?>
-                                    <?php echo EduPress::generateFormElement( 'number', 'range_end[]', array( 'value'=> $grade_data['range_end'][$i], 'placeholder'=>'Range ends', 'required'=> true, 'data' => array( 'step' => 'any',  'min' => 0, ) )); ?>
-                                    <?php echo EduPress::generateFormElement( 'number', 'grade_point[]', array( 'value'=> $grade_data['grade_point'][$i], 'placeholder'=>'Grade Point', 'required'=> true, 'data' => array( 'step' => 'any',  'min' => 0, ) )); ?>
+                                    <?php echo EduPress::generateFormElement( 'number', 'range_start[]', array( 'value'=> $grade_data['range_start'][$i], 'placeholder'=> t('Range starts'), 'required'=> true, 'data' => array( 'step' => 'any', 'min' => 0, ) )); ?>
+                                    <?php echo EduPress::generateFormElement( 'number', 'range_end[]', array( 'value'=> $grade_data['range_end'][$i], 'placeholder'=>t('Range ends'), 'required'=> true, 'data' => array( 'step' => 'any',  'min' => 0, ) )); ?>
+                                    <?php echo EduPress::generateFormElement( 'number', 'grade_point[]', array( 'value'=> $grade_data['grade_point'][$i], 'placeholder'=>t('Grade Point'), 'required'=> true, 'data' => array( 'step' => 'any',  'min' => 0, ) )); ?>
                                     <?php echo EduPress::generateFormElement( 'text', 'grade[]', array( 'value'=> $grade_data['grade'][$i], 'placeholder'=>'Grade', 'required'=> true, 'data' => array( 'step' => 'any' ) )); ?>
                                     <div class="action">
                                         <a href="javascript:void(0)" class="copy-grade-table-row">+</a>
@@ -135,10 +135,10 @@ class GradeTable extends Post
                         } else {
                             ?>
                             <li>
-                                <?php echo EduPress::generateFormElement( 'number', 'range_start[]', array('placeholder'=>'Range starts', 'required'=> true, 'data' => array( 'step' => 'any', 'min' => 0, ) )); ?>
-                                <?php echo EduPress::generateFormElement( 'number', 'range_end[]', array('placeholder'=>'Range ends', 'required'=> true, 'data' => array( 'step' => 'any',  'min' => 0, ) )); ?>
-                                <?php echo EduPress::generateFormElement( 'number', 'grade_point[]', array('placeholder'=>'Grade Point', 'required'=> true, 'data' => array( 'step' => 'any',  'min' => 0, ) )); ?>
-                                <?php echo EduPress::generateFormElement( 'text', 'grade[]', array('placeholder'=>'Grade', 'required'=> true, 'data' => array( 'step' => 'any' ) )); ?>
+                                <?php echo EduPress::generateFormElement( 'number', 'range_start[]', array('placeholder'=>t('Range starts'), 'required'=> true, 'data' => array( 'step' => 'any', 'min' => 0, ) )); ?>
+                                <?php echo EduPress::generateFormElement( 'number', 'range_end[]', array('placeholder'=>t('Range ends'), 'required'=> true, 'data' => array( 'step' => 'any',  'min' => 0, ) )); ?>
+                                <?php echo EduPress::generateFormElement( 'number', 'grade_point[]', array('placeholder'=>t('Grade Point'), 'required'=> true, 'data' => array( 'step' => 'any',  'min' => 0, ) )); ?>
+                                <?php echo EduPress::generateFormElement( 'text', 'grade[]', array('placeholder'=>t('Grade'), 'required'=> true, 'data' => array( 'step' => 'any' ) )); ?>
                                 <div class="action">
                                     <a href="javascript:void(0)" class="copy-grade-table-row">+</a>
                                     <a href="javascript:void(0)" class="remove-grade-table-row">-</a>
@@ -285,9 +285,9 @@ class GradeTable extends Post
         <div class="edupress-table-wrap">
             <table class="edupress-table">
                 <tr>
-                    <th><?php _e( 'Interval', 'edupress' ); ?></th>
-                    <th style="text-align:center;"><?php _e( 'Grade Point', 'edupress' ); ?></th>
-                    <th style="text-align:center;"><?php _e( 'Letter Grade', 'edupress' ); ?></th>
+                    <th><?php _t( 'Interval', 'edupress' ); ?></th>
+                    <th style="text-align:center;"><?php _t( 'Grade Point', 'edupress' ); ?></th>
+                    <th style="text-align:center;"><?php _t( 'Letter Grade', 'edupress' ); ?></th>
                 </tr>
                 <?php
                     for( $i=0; $i < count($data['range_start']); $i++ ){

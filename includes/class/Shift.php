@@ -147,7 +147,7 @@ class Shift extends Post
     {
 
         unset($fields['status']);
-        $fields['total'] = 'Total<br>Students';
+        $fields['total'] = 'Students';
         $fields['status'] = 'Status';
         $new_fields = [];
         $new_fields['branch_id'] = 'Branch';

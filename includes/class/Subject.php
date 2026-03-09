@@ -163,7 +163,7 @@ class Subject extends Post
         $fields['connected_subject_id'] = 'Connected Subject';
         $fields['shortname'] = 'Shortname for SMS';
         $fields['combined_name'] = 'Combined Name';
-        $fields['post_content'] = 'Details';
+        $fields['post_content'] = 'Description';
         $fields['status'] = 'Status';
 
         return $fields;

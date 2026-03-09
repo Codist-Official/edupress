@@ -304,7 +304,7 @@ class Post
                 'type'  => 'submit',
                 'name' => 'submit',
                 'settings'=> array(
-                    'value' => 'Submit'
+                    'value' => t('Submit')
                 )
             )
         );
@@ -361,7 +361,7 @@ class Post
                 <div class="label-wrap"></div>
                 <div class="value-wrap">
                     <?php
-                        echo EduPress::generateFormElement( 'submit', 'submit', array( 'value' => $action == 'edit' ? 'Update' : 'Publish' ) );
+                        echo EduPress::generateFormElement( 'submit', 'submit', array( 'value' => $action == 'edit' ? t('Update') : t('Publish') ) );
                         echo EduPress::generateFormElement( 'hidden', 'action', array( 'value' => 'edupress_admin_ajax' ) );
                         echo EduPress::generateFormElement( 'hidden', 'ajax_action', array( 'value' => $action.'Post' ) );
                         echo EduPress::generateFormElement( 'hidden', 'post_type', array( 'value' => $this->post_type ) );

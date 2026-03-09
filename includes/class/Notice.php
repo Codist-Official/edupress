@@ -108,7 +108,7 @@ class Notice extends Post
                     'options' => $branch->getPosts( [], true ), 
                     'label' => 'Branch',
                     'value' => $this->getMeta('branch_id'),
-                    'placeholder' => 'Select Branch'
+                    'placeholder' => 'Select a Branch'
                 )
             );
         }
@@ -121,7 +121,7 @@ class Notice extends Post
                     'options' => $shift->getPosts( [], true ), 
                     'label' => 'Shift',
                     'value' => $this->getMeta('shift_id'),
-                    'placeholder' => 'Select Shift'
+                    'placeholder' => 'Select a Shift'
                 )
             );
         }
@@ -134,7 +134,7 @@ class Notice extends Post
                     'options' => $class->getPosts( [], true ), 
                     'value' => $this->getMeta('class_id'), 
                     'label' => 'Class',
-                    'placeholder' => 'Select Class'
+                    'placeholder' => 'Select a Class'
                 )
             );
         }
@@ -147,7 +147,7 @@ class Notice extends Post
                     'options' => $section->getPosts( [], true ), 
                     'label' => 'Section',
                     'value' => $this->getMeta('section_id'),
-                    'placeholder' => 'Select Section'
+                    'placeholder' => 'Select a Section'
                 )
             );
         }
@@ -181,7 +181,7 @@ class Notice extends Post
         if( EduPress::isActive('shift') ) $fields['shift_id'] = 'Shift';
         if( EduPress::isActive('class') ) $fields['class_id'] = 'Class';
         if( EduPress::isActive('section') ) $fields['section_id'] = 'Section';
-        $fields['view_action'] = 'Details';
+        $fields['view_action'] = 'Description';
         return $fields;
     }
 

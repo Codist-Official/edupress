@@ -52,10 +52,12 @@
         padding: 0;
         display: flex;
         gap: 20px;
+        align-items: center;
         li{
           list-style: none;
           a{
             color: $secondary-color;
+            font-size: 14px;
           }
         }
       }
@@ -232,6 +234,28 @@ ul.top-breadcrumb-bar{
   }
 }
 
+.ep-lang-switcher{
+  display: flex;
+  flex: 1;
+  gap: 3px;
+  line-height: 1;
+  li{
+    list-style: none;
+    line-height: 1;
+    a{
+      font-size: 14px;
+      text-decoration: none;
+      padding: 0 5px;
+      line-height: 1 !important;
+      &[data-active='1']{
+        background-color: $primary-color;
+        color: $color-white !important;
+      }
+      &[data-active='0']{}
+    }
+  }
+}
+
 /* MOBILE */
 @media screen and (max-width: 768px) {
   .edupress-frontend-panel-wrap{
@@ -298,5 +322,15 @@ ul.top-breadcrumb-bar{
   }
   .edupress-admin-panel-wrap{
     flex-direction: column;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .topbar-wrap{
+    .top-menu-wrap{
+      ul.menu-links{
+        gap: 10px !important;
+      }
+    }
   }
 }

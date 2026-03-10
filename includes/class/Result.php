@@ -404,7 +404,7 @@ class Result extends Post
         if( Admin::getSetting('class_active') ) $min_req_fields++;
         if( Admin::getSetting('section_active') ) $min_req_fields++;
 
-        if( !isset($args['meta_query']) || (is_array($args['meta_query']) && count($args['meta_query']) < $min_req_fields) ) return __( 'Please select all fields!', 'edupress' );
+        if( !isset($args['meta_query']) || (is_array($args['meta_query']) && count($args['meta_query']) < $min_req_fields) ) return t( 'Please select all fields!', 'edupress' );
 
 
 

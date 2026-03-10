@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.7.6
+Version: 1.7.7
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -530,7 +530,7 @@ class EduPress
             
         } else if ( $k == 'view_action' && $post->post_type == 'notice'){
 
-            $value = "<a href='javascript:void(0)' class='edupress-ajax-link' data-success_callback='showPopupOnCallback' data-ajax_action='viewPost' data-post_type='{$post->post_type}' data-id='{$post->ID}' href='javascript:void(0)'>View</a> ";
+            $value = "<a href='javascript:void(0)' class='edupress-ajax-link' data-success_callback='showPopupOnCallback' data-ajax_action='viewPost' data-post_type='{$post->post_type}' data-id='{$post->ID}' href='javascript:void(0)'>".t('View')."</a> ";
 
         } else {
 
@@ -981,6 +981,12 @@ class EduPress
 
         global $post;
         ob_start();
+
+        if(Admin::getSetting('system_lang') == 'bn'){
+            ?>
+            <div class="ep-footer-lang-info ep-info no-print">ভাষা বাংলা হলেও যেখানে সংখ্যা ইনপুট দিতে হবে সেখানে অবশ্যই ইংরেজি সংখ্যা ইনপুট দিবেন। যেমন মোবাইল, ফি ইত্যাদি </div>
+            <?php 
+        }
 
         if( EduPress::isActive('print') && is_singular() && has_shortcode($post->post_content, 'edupress') ){ 
             ?>
@@ -1624,6 +1630,32 @@ class EduPress
 
         return Admin::getSetting( strtolower(trim($feature)).'_active' ) == 'active';
 
+    }
+
+    /**
+     * Language switcher 
+     * 
+     * @return string 
+     * @since 1.7.6
+     * @access public
+     * @static 
+     */
+    public static function languageSwitcherHTML()
+    {
+        $current_lang = Admin::getSetting('system_lang');
+        $langs = array('en'=>'EN', 'bn'=>'বা');
+        ob_start();
+        ?>
+        <ul class="ep-lang-switcher">
+            <li><?php echo EduPress::getIcon('fa-solid fa-language'); ?></li>
+            <?php 
+            foreach($langs as $k => $v):
+                $active = $current_lang == $k ? 1 : 0;
+                echo "<li><a class='edupress-ajax-link' data-success_callback='reload' data-ajax_action='switchLanguage' data-before_send_callback='langSwitchCallback' href='javascript:void(0)' data-lang='{$k}' data-active='{$active}'>{$v}</a></li>";
+            endforeach; ?>
+        </ul>
+        <?php
+        return ob_get_clean();
     }
 
 

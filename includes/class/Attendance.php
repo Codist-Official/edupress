@@ -85,10 +85,11 @@ class Attendance extends CustomPost
         ob_start();
         $start_date = sanitize_text_field($_REQUEST['start_date'] ?? current_time('Y-m-d'));
         $end_date = sanitize_text_field($_REQUEST['end_date'] ?? current_time('Y-m-d'));
+        $term = ucwords( str_replace( '_', ' ', $this->post_type ?? '' ) );
         ?>
         <div class="edupress-publish-btn-wrap no-print">
-            <button data-post_type="<?php echo $this->post_type; ?>" class="edupress-btn edupress-publish-post"><?php _e( 'Add New ' . ucwords( str_replace( '_', ' ', $this->post_type ?? '' ) ), 'edupress' ); ?></button>
-            <button data-post_type="<?php echo $this->post_type; ?>" data-ajax_action="showScreenToAddManualAttendance" data-success_callback="showPopupOnCallback" class="edupress-btn edupress-ajax-link edupress-manual-attendance"><?php _e( 'Manual Attendance', 'edupress' ); ?></button>
+            <button data-post_type="<?php echo $this->post_type; ?>" class="edupress-btn edupress-publish-post"><?php _t( 'Add New ' . $term, 'edupress' ); ?></button>
+            <button data-post_type="<?php echo $this->post_type; ?>" data-ajax_action="showScreenToAddManualAttendance" data-success_callback="showPopupOnCallback" class="edupress-btn edupress-ajax-link edupress-manual-attendance"><?php _t( 'Manual Attendance', 'edupress' ); ?></button>
         </div>
 
         <?php if($start_date == $end_date) : ?>
@@ -135,7 +136,7 @@ class Attendance extends CustomPost
             ob_start();
             ?>
             <div class="ep-online-device-wrap no-print">
-                <?php _e('Last Update: ', 'edupress'); ?> <?php echo current_time('h:i:s a d/m/Y'); ?>
+                <?php _t('Last Update', 'edupress'); ?>: <?php echo current_time('h:i:s a d/m/Y'); ?>
                 <div class="edupress-table-wrap">
                     <table class="ep-table edupress-table" style="width: 100%; max-width: 500px;">
                         <thead>
@@ -507,15 +508,15 @@ class Attendance extends CustomPost
         ?>
         <div id="single-day-count" data-day="<?php echo $date; ?>">
             <div class="day-count-item">
-                <div id='single_day_total_users' class='value'><?php echo $stats['total']; ?></div>
+                <div id='single_day_total_users' class='value'><?php _td($stats['total']); ?></div>
                 <div class="label"><?php _t('Total', 'edupress'); ?></div>
             </div> 
             <div class="day-count-item">
-                <div id='single_day_total_present' class='value'><?php echo $stats['present']; ?></div>
+                <div id='single_day_total_present' class='value'><?php _td($stats['present']) ; ?></div>
                 <div class="label"><?php _t('Present', 'edupress'); ?></div>
             </div> 
             <div class="day-count-item">
-                <div id='single_day_total_absent' class='value'><?php echo $stats['absent']; ?></div>
+                <div id='single_day_total_absent' class='value'><?php _td($stats['absent']); ?></div>
                 <div class="label"><?php _t('Absent', 'edupress'); ?></div>
             </div> 
         </div>

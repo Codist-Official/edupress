@@ -149,16 +149,16 @@ jQuery(document).ready(function(){
 
         let link = $j(this);
         let data = link.data();
+        data.action = 'edupress_admin_ajax';
+        data._wpnonce = edupress.wpnonce;
+
         let params = new URLSearchParams(data);
 
         let beforeSendCallback = params.get('before_send_callback');
         let successCallback = params.get('success_callback');
         let errorCallback = params.get('error_callback');
-
-        clog(`BeforeSend: ${beforeSendCallback} Success: ${successCallback} Error: ${errorCallback}`);
-
-        data.action = 'edupress_admin_ajax';
-        data._wpnonce = edupress.wpnonce;
+        clog(`BeforeSend: ${beforeSendCallback} Success: ${successCallback} Error: ${errorCallback} ` );
+        clog(data);
 
         $j.ajax({
             url: edupress.ajax_url,
@@ -166,9 +166,8 @@ jQuery(document).ready(function(){
             dataType: 'JSON',
             method: 'POST',
             beforeSend: function (){
-                clog(data);
                 if( typeof window[beforeSendCallback] !== 'undefined' && typeof window[beforeSendCallback] === 'function' ){
-                    let r = window[beforeSendCallback]( { data: data } );
+                    let r = window[beforeSendCallback]( { data: data }, link );
                     if( !r ) return false;
                 } else {
                     showEduPressLoading();
@@ -194,8 +193,6 @@ jQuery(document).ready(function(){
                 }
             }
         })
-
-
     })
 
      // Adding portion to show filter wrap 
@@ -1863,4 +1860,14 @@ function printUserListAfterSuccess(data){
     if(data != ''){
         printDataOnCallback(data);
     }
+}
+
+window.langSwitchCallback = function(data, ele){
+    if(parseInt(ele.attr('data-active')) == 1) return false;
+    showEduPressLoading();
+    return true;
+}
+
+window.reload = function(){
+    window.location.reload();
 }

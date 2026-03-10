@@ -1,3 +1,11 @@
+
+.edupress-frontend-panel-wrap {
+  a,
+  a:hover{
+    text-decoration: none;
+  }
+}
+
 .edupress-popup-overlay{
   content: " ";
   background-color: rgba( 255, 255, 255, .75);
@@ -742,6 +750,62 @@ button.none{
   background-color: var(--ep-info-color);
 }
 
+.ep-tag{
+  &-rounded{
+    background-color: $primary-color;
+    display: inline-block;
+    border-radius: 100%;
+    padding: 3px;
+    line-height: 1;
+    height: 20px;
+    width: 20px;
+    text-align: center;
+    color: $color-white !important;
+    &:hover{
+      background-color: $secondary-color;
+    }
+  }
+}
+
+/* info warning */
+.ep{
+  &-info{
+    background-color: var(--ep-info-bg-color);
+    border: 1px solid var(--ep-info-color);
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1;
+    border-radius: var(--ep-border-radius);
+    margin-bottom: 15px;
+    padding: 5px;
+    box-sizing: border-box;
+    box-shadow: var(--ep-box-shadow);
+  }
+}
+
+.ep-footer-lang-info{
+  position: fixed;
+  bottom: 0;
+  left: 1%;
+  z-index: 9999;
+  width: 98%;
+  margin: 0 !important;
+}
+
+/* Fixing Elemnetor Theme */
+div#site-footer, 
+div.page-header { 
+  display: none !important;
+}
+main#content .page-content {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%
+}
+
 /* TableSorter */
 .tablesorter-default{width:100%;color:#333;background-color:#fff;border-spacing:0;margin:10px 0 15px;text-align:left}
 .tablesorter-default th,.tablesorter-default thead td{font-weight:700;color:#000;background-color:#fff;border-collapse:collapse;border-bottom:#ccc 2px solid;}
@@ -794,4 +858,13 @@ button.none{
   #edupress-popup-wrap{
     padding: 20px;
   }
+  .ep{
+    &-no-mobile{
+      display: none;
+    }
+    &-info{
+      font-size: 12px;
+    }
+  }
+
 }

@@ -90,15 +90,15 @@ class Voice extends CustomPost
         if( empty( $results ) ) return __( "No {$this->post_type} found!", 'edupress' );
         ob_start();
         ?>
-        <h3><?php _e( 'Current balance: ৳', 'edupress' ); ?> <span class="voice-current-balance"><?php echo number_format(self::getBalance(), 2); ?></span></h3>
+        <h3><?php _t( 'Current balance', 'edupress' ); ?>: ৳<span class="voice-current-balance"><?php echo number_format(self::getBalance(), 2); ?></span></h3>
 
         <div>
             <!-- View Balance History --> 
-            <button data-success_callback="showPopupOnCallback" class="edupress-btn edupress-btn-primary edupress-ajax-link" data-ajax_action="viewBalanceHistoryHTML"><?php _e( 'View Balance History', 'edupress' ); ?></button>
+            <button data-success_callback="showPopupOnCallback" class="edupress-btn edupress-btn-primary edupress-ajax-link" data-ajax_action="viewBalanceHistoryHTML"><?php _t( 'View Balance History', 'edupress' ); ?></button>
             
             <?php if(current_user_can('manage_options')): ?>
                 <!-- Add Balance --> 
-                <button data-success_callback="showPopupOnCallback" class="edupress-btn edupress-btn-primary edupress-ajax-link" data-ajax_action="updateBalanceHTML"><?php _e( 'Add Balance', 'edupress' ); ?></button>
+                <button data-success_callback="showPopupOnCallback" class="edupress-btn edupress-btn-primary edupress-ajax-link" data-ajax_action="updateBalanceHTML"><?php _t( 'Add Balance', 'edupress' ); ?></button>
             <?php endif; ?>
         </div>
 
@@ -108,12 +108,12 @@ class Voice extends CustomPost
 
                 <thead>
                     <tr>
-                        <th><?php _e( 'ID', 'edupress' ); ?></th>
-                        <th><?php _e( 'Mobile', 'edupress' ); ?></th>
-                        <th><?php _e( 'User', 'edupress' ); ?></th>
-                        <th><?php _e( 'Cost', 'edupress' ); ?></th>
-                        <th><?php _e( 'Status', 'edupress' ); ?></th>
-                        <th><?php _e( 'Sent On', 'edupress' ); ?></th>
+                        <th><?php _t( 'ID', 'edupress' ); ?></th>
+                        <th><?php _t( 'Mobile', 'edupress' ); ?></th>
+                        <th><?php _t( 'User', 'edupress' ); ?></th>
+                        <th><?php _t( 'Cost', 'edupress' ); ?></th>
+                        <th><?php _t( 'Status', 'edupress' ); ?></th>
+                        <th><?php _t( 'Record Time', 'edupress' ); ?></th>
                     </tr>
                 </thead>
 

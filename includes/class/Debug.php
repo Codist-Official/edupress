@@ -47,6 +47,8 @@ class Debug
     public function debug()
     {
     
+        echo EduPress::languageSwitcherHTML();
+        return;
         var_dump(ept('school'));
         return;
         $voice = Voice::send('01913919597', 'edupress_ramadan_campaign_1');

@@ -147,6 +147,7 @@ class Frontend
         ?>
         <div class="top-menu-wrap">
             <ul class="menu-links">
+                <li><?php echo EduPress::languageSwitcherHTML(); ?></li>
                 <li>
                     <?php
                     if( is_user_logged_in() ):
@@ -156,16 +157,30 @@ class Frontend
                         if( empty($name) ) $name = ucwords( $user->getUser()->display_name );
                         $names = explode( ' ', $name );
                         $names = array_map( 'ucwords', $names );
-                        echo _e('Welcome ', 'edupress') . reset($names) . '!';
-
+                        echo "<div class='ep-no-mobile'>" . t('Welcome', 'edupress') . ' ' . reset($names) . '!' . "</div>";
                     endif;
                     ?>
                 </li>
                 <?php if(is_user_logged_in()) : ?>
-                    <li><a data-user-id="<?php echo get_current_user_id(); ?>" data-action="edit" data-success_callback="showProfileUpdateFormCallback" href="javascript:void(0)" class="edupress-modify-user"><?php _e( 'Update Profile', 'edupress' ); ?></a></li>
-                    <li><a href="<?php echo wp_logout_url( EduPress::getCurrentUrl() ); ?>"><?php _e( 'Logout', 'edupress' ); ?></a></li>
+                    <li title='<?php _t('Update Profile'); ?>'>
+                        <a data-user-id="<?php echo get_current_user_id(); ?>" data-action="edit" data-success_callback="showProfileUpdateFormCallback" href="javascript:void(0)" class="edupress-modify-user">
+                            <?php echo EduPress::getIcon('fa-solid fa-user'); ?>
+                            <span class="ep-no-mobile"><?php _t( 'Update Profile', 'edupress' ); ?></span>    
+                        </a>
+                    </li>
+                    <li title='<?php _t('Logout'); ?>'>
+                        <a href="<?php echo wp_logout_url( EduPress::getCurrentUrl() ); ?>">
+                        <span class="ep-no-mobile"><?php _t( 'Logout', 'edupress' ); ?></span>    
+                            <?php echo EduPress::getIcon('fa-solid fa-arrow-right-from-bracket'); ?>
+                        </a>
+                    </li>
                 <?php else: ?>
-                    <li><a data-ajax_action="getLoginForm" data-success_callback="getLoginFormSuccessCallback" class="<?php echo EduPress::getClassNames('showEduPressLoginForm', 'link'); ?>" href="javascript:void(0)"><?php _e( 'Login', 'edupress' ); ?></a></li>
+                    <li title='<?php _t('Login'); ?>'>
+                        <a data-ajax_action="getLoginForm" data-success_callback="getLoginFormSuccessCallback" class="<?php echo EduPress::getClassNames('showEduPressLoginForm', 'link'); ?>" href="javascript:void(0)">
+                            <span class="ep-no-mobile"><?php _t( 'Login', 'edupress' ); ?></span>    
+                            <?php echo EduPress::getIcon('fa-solid fa-arrow-right-to-bracket'); ?>
+                        </a>
+                    </li>
                 <?php endif; ?>
             </ul>
         </div>
@@ -208,12 +223,12 @@ class Frontend
         <div class="mobile-nav-menu">
             <select name="mobile-menu" id="mobileMenu">
                 <?php if(User::currentUserCan('delete', 'user')): ?>
-                    <option value="<?php echo $current_link; ?>?panel=dashboard">Dashboard</option>
+                    <option value="<?php echo $current_link; ?>?panel=dashboard"><?php _t('Dashboard'); ?></option>
                 <?php endif; ?>
                 <?php
                 foreach( $menus as $k => $v ):
                     $selected = $k === $active_panel ? " selected='selected' " : ''; ?>
-                    <option value="<?php echo "{$current_link}?panel={$k}"; ?>" <?php echo $selected; ?>><?php _e( $v['title'], 'edupress' ) ; ?></option>
+                    <option value="<?php echo "{$current_link}?panel={$k}"; ?>" <?php echo $selected; ?>><?php _t( $v['title'], 'edupress' ) ; ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -422,7 +437,7 @@ class Frontend
                 break;
         }
 
-        if( !is_user_logged_in() && empty($panel) ) return __( "Please select a menu item.", 'edupress' );
+        if( !is_user_logged_in() && empty($panel) ) return t( "Please select a menu item.", 'edupress' );
 
 
         switch($panel){

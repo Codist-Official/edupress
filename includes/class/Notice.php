@@ -106,7 +106,7 @@ class Notice extends Post
                 'name'  => 'branch_id',
                 'settings' => array( 
                     'options' => $branch->getPosts( [], true ), 
-                    'label' => 'Branch',
+                    'label' => t('Branch'),
                     'value' => $this->getMeta('branch_id'),
                     'placeholder' => 'Select a Branch'
                 )
@@ -119,7 +119,7 @@ class Notice extends Post
                 'name'  => 'shift_id',
                 'settings' => array( 
                     'options' => $shift->getPosts( [], true ), 
-                    'label' => 'Shift',
+                    'label' => t('Shift'),
                     'value' => $this->getMeta('shift_id'),
                     'placeholder' => 'Select a Shift'
                 )
@@ -133,7 +133,7 @@ class Notice extends Post
                 'settings' => array( 
                     'options' => $class->getPosts( [], true ), 
                     'value' => $this->getMeta('class_id'), 
-                    'label' => 'Class',
+                    'label' => t('Class'),
                     'placeholder' => 'Select a Class'
                 )
             );
@@ -145,14 +145,14 @@ class Notice extends Post
                 'name'  => 'section_id',
                 'settings' => array( 
                     'options' => $section->getPosts( [], true ), 
-                    'label' => 'Section',
+                    'label' => t('Section'),
                     'value' => $this->getMeta('section_id'),
                     'placeholder' => 'Select a Section'
                 )
             );
         }
-        $fields['post_title']['settings']['label'] = __('Notice Title','edupress');
-        $fields['post_content']['settings']['label'] = __('Notice Details','edupress');
+        $fields['post_title']['settings']['label'] = t('Notice Title','edupress');
+        $fields['post_content']['settings']['label'] = t('Notice Details','edupress');
         $fields['post_content']['settings']['data'] = array( 'rows' => 5, 'cols' => 50 );
         $fields['post_content']['settings']['required'] = true;
         

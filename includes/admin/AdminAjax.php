@@ -1723,6 +1723,13 @@ class AdminAjax
         );
     }
 
+    public function switchLanguage()
+    {
+        $lang = $_REQUEST['lang'];
+        Admin::updateSettings('system_lang', $lang);
+        return ['status'=>1,'data'=>'Updated'];
+    }
+
 
 
 }

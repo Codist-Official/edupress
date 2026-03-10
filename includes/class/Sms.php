@@ -312,7 +312,7 @@ class Sms extends CustomPost
             <div class="form-row">
                 <div class="label-wrap"> &nbsp; </div>
                 <div class="value-wrap">
-                    <?php echo EduPress::generateFormElement( 'submit', '', array('value'=>'Compose SMS') ); ?>
+                    <?php echo EduPress::generateFormElement( 'submit', '', array('value'=> t('Compose SMS'))); ?>
                     <?php echo EduPress::generateFormElement( 'hidden', 'action', array('value'=>'edupress_admin_ajax') ); ?>
                     <?php echo EduPress::generateFormElement( 'hidden', 'ajax_action', array('value'=>'getSmsComposeForm') ); ?>
                     <?php echo EduPress::generateFormElement( 'hidden', 'before_send_callback', array('value'=>'smsBeforeSendCallback') ); ?>
@@ -397,7 +397,7 @@ class Sms extends CustomPost
                             return ob_get_clean();
                         }
                         ?>
-                        <h3>Users</h3>
+                        <h3><?php _t('Users'); ?></h3>
                         <ul class="sms-users-list">
                         <?php
                         foreach ( $user_qry->get_results() as $user ){
@@ -427,7 +427,7 @@ class Sms extends CustomPost
                         <?php echo EduPress::generateFormElement( 'textarea', 'sms_text', array( 'name' => 'sms_text', 'id'=>'sms_text', 'required' => true, 'placeholder' => 'Compose your SMS here' ) ); ?>
                     </div>
                     <div class="sms-form-item">
-                        <?php echo EduPress::generateFormElement( 'submit', '', array( 'value' => 'Send' ) ); ?>
+                        <?php echo EduPress::generateFormElement( 'submit', '', array( 'value' => t('Send') ) ); ?>
                         <?php echo EduPress::generateFormElement( 'hidden', 'action', array( 'value' => 'edupress_admin_ajax' ) ); ?>
                         <?php echo EduPress::generateFormElement( 'hidden', 'ajax_action', array( 'value' => 'sendSms' ) ); ?>
                         <?php echo EduPress::generateFormElement( 'hidden', 'before_send_callback', array( 'value' => 'smsComposeBeforeSendCallback' ) ); ?>
@@ -437,13 +437,13 @@ class Sms extends CustomPost
                     </div>
                 </div>
                 <div class="right-wrap">
-                    <h3>SMS Statistics</h3>
+                    <h3><?php _t('SMS Statistics'); ?></h3>
                     <ul class="statistics">
-                        <li><span class="label-wrap"><?php _e( 'Total Numbers', 'edupress' ); ?></span>: <strong class="value-wrap total_numbers"><?php echo $send_to === 'users' ? $user_qry->get_total() : 0; ?></strong></li>
-                        <li><span class="label-wrap"><?php _e( 'SMS Length', 'edupress' ); ?></span>: <strong class="value-wrap sms_len">0</strong></li>
-                        <li><span class="label-wrap"><?php _e( 'SMS Count', 'edupress' ); ?></span>: <strong class="value-wrap sms_count">0</strong></li>
-                        <li><span class="label-wrap"><?php _e( 'SMS Rate', 'edupress' ); ?></span>: <strong class="value-wrap sms_rate">0</strong></li>
-                        <li><span class="label-wrap"><?php _e( 'SMS Cost', 'edupress' ); ?></span>: <strong class="value-wrap sms_cost">0</strong></li>
+                        <li><span class="label-wrap"><?php _t( 'Total Numbers', 'edupress' ); ?></span>: <strong class="value-wrap total_numbers"><?php echo $send_to === 'users' ? $user_qry->get_total() : 0; ?></strong></li>
+                        <li><span class="label-wrap"><?php _t( 'SMS Length', 'edupress' ); ?></span>: <strong class="value-wrap sms_len">0</strong></li>
+                        <li><span class="label-wrap"><?php _t( 'SMS Count', 'edupress' ); ?></span>: <strong class="value-wrap sms_count">0</strong></li>
+                        <li><span class="label-wrap"><?php _t( 'SMS Rate', 'edupress' ); ?></span>: <strong class="value-wrap sms_rate">0</strong></li>
+                        <li><span class="label-wrap"><?php _t( 'SMS Cost', 'edupress' ); ?></span>: <strong class="value-wrap sms_cost">0</strong></li>
                     </ul>
                 </div>
             </div>

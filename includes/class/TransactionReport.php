@@ -75,10 +75,10 @@ class TransactionReport extends Post
             'type' => 'select',
             'name'  => 'branch_id',
             'settings' => array(
-                'label' => 'Branch',
+                'label' => t('Branch'),
                 'value' => sanitize_text_field($_REQUEST['branch_id'] ?? ''),
                 'options' => $branch->getPosts( [], true ),
-                'placeholder' => 'Select a branch',
+                'placeholder' => t('Select a branch'),
                 'required' => true,
             )
         );
@@ -86,14 +86,14 @@ class TransactionReport extends Post
             'type' => 'select',
             'name'  => 'report_type',
             'settings' => array(
-                'label' => 'Report Type',
+                'label' => t('Report Type'),
                 'value' => sanitize_text_field($_REQUEST['report_type'] ?? ''),
                 'options' => array(
                     'user' => 'User',
                     'class' => 'Class',
                     'duration' => 'Duration',
                 ),
-                'placeholder' => 'Select a report type',
+                'placeholder' => t('Select a report type'),
                 'required' => true,
             )
         );
@@ -101,7 +101,7 @@ class TransactionReport extends Post
             'type' => 'text',
             'name'  => 't_user',
             'settings' => array(
-                'label' => 'Name',
+                'label' => t('Name'),
                 'value' => sanitize_text_field($_REQUEST['t_user'] ?? ''),
                 'class' => 't_user',
             )
@@ -110,7 +110,7 @@ class TransactionReport extends Post
             'type' => 'hidden',
             'name'  => 't_user_id',
             'settings' => array(
-                'label' => 'User ID',
+                'label' => t('User ID'),
                 'value' => sanitize_text_field($_REQUEST['t_user_id'] ?? ''),
                 'class' => 't_user_id',
             )
@@ -120,7 +120,7 @@ class TransactionReport extends Post
                 'type' => 'select',
                 'name' => 'shift_id',
                 'settings' => array(
-                    'label' => 'Shift',
+                    'label' => t('Shift'),
                     'placeholder' => 'Select',
                     'data' => array(
                         'data-group' => 'class'
@@ -133,8 +133,8 @@ class TransactionReport extends Post
                 'type' => 'select',
                 'name' => 'class_id',
                 'settings' => array(
-                    'label' => 'Class',
-                    'placeholder' => 'Select',
+                    'label' => t('Class'),
+                    'placeholder' => t('Select'),
                     'data' => array(
                         'data-group' => 'class'
                     )
@@ -146,8 +146,8 @@ class TransactionReport extends Post
                 'type' => 'select',
                 'name' => 'section_id',
                 'settings' => array(
-                    'label' => 'Section',
-                    'placeholder' => 'Select',
+                    'label' => t('Section'),
+                    'placeholder' => t('Select'),
                     'data' => array(
                         'data-group' => 'class'
                     )
@@ -158,10 +158,10 @@ class TransactionReport extends Post
             'type' => 'select',
             'name' => 'duration',
             'settings'=> array(
-                'label' => 'Duration',
+                'label' => t('Duration'),
                 'options' => array(
                     'this_week' => 'This Week',
-                    'last_week'    => 'Last Week',
+                    'last_week' => 'Last Week',
                     'this_month' => 'This Month',
                     'last_month' => 'Last Month',
                     'this_year' => 'This Year',
@@ -177,7 +177,7 @@ class TransactionReport extends Post
             'type' => 'date',
             'name'  => 'start_date',
             'settings' => array(
-                'label' => __('Start Date', 'edupress'),
+                'label' => t('Start Date', 'edupress'),
                 'value' => sanitize_text_field($_REQUEST['start_date'] ?? ''),
                 'required'=> false,
             )
@@ -186,7 +186,7 @@ class TransactionReport extends Post
             'type' => 'date',
             'name'  => 'end_date',
             'settings' => array(
-                'label' => __('End Date', 'edupress'),
+                'label' => t('End Date', 'edupress'),
                 'value' => sanitize_text_field($_REQUEST['end_date'] ?? ''),
                 'required'=> false,
             )
@@ -329,13 +329,13 @@ class TransactionReport extends Post
                 <table class="edupress-table tablesorter compact edupress-master-table">
                     <thead>
                         <tr>
-                            <th style="text-align:left;"><?php _e('Name', 'edupress'); ?></th>
-                            <th style="text-align:left;"><?php _e('Roll', 'edupress'); ?></th>
+                            <th style="text-align:left;"><?php _t('Name', 'edupress'); ?></th>
+                            <th style="text-align:left;"><?php _t('Roll', 'edupress'); ?></th>
                             <?php foreach($data['months'] as $month){ ?>
                                 <?php $date = \DateTime::createFromFormat('!m', $month['month']); ?>
                                 <th style="text-align:left;"><?php echo $date->format('M') . ' '. $month['year']; ?></th>
                             <?php } ?>
-                            <th style="text-align:left;">Total</th>
+                            <th style="text-align:left;"><?php _t('Total'); ?></th>
                         </tr>
                     </thead>
                     <tbody>

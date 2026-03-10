@@ -1,8 +1,6 @@
 <?php
 namespace EduPress;
 
-use WP_User;
-
 defined( 'ABSPATH' ) || die();
 class User
 {
@@ -1068,8 +1066,8 @@ class User
                         <td data-row-id="<?php echo $i; ?>" data-cell="action">
 
                             <span class="publish-bulk-user-status" data-row-id="<?php echo $i; ?>"></span>
-                            <a href="javascript:void(0)" title="Delete" class="publish-bulk-user-delete" data-row-id="<?php echo $i; ?>">x</a>
-                            <a href="javascript:void(0)" title="Duplicate" class="publish-bulk-user-copy" data-row-id="<?php echo $i; ?>">+</a>
+                            <a href="javascript:void(0)" title="Delete" class="publish-bulk-user-delete ep-tag-rounded" data-row-id="<?php echo $i; ?>">x</a>
+                            <a href="javascript:void(0)" title="Duplicate" class="publish-bulk-user-copy ep-tag-rounded" data-row-id="<?php echo $i; ?>">+</a>
 
                             <!-- hidden fields that already have value -->
                             <?php foreach( $value_av as $field ): ?>
@@ -1404,11 +1402,11 @@ class User
         ?>
         <div class="ep-flex-wrap">
             <div class="ep-flex-8 ep-mb-flex-12">
-                <div class="count-results"><?php _e( 'Total ' .$qry->get_total() . ' users found!', 'edupress') ; ?> </div>
+                <div class="count-results no-print"><?php _t( 'Total', 'edupress' ); ?> <?php _td($qry->get_total()); ?> <?php _t( 'users found!', 'edupress') ; ?> </div>
             </div>
             <div class="ep-flex-4 ep-mb-flex-12">
                 <?php if(EduPress::isActive('attendance')) : ?>
-                    <button class="ep-mt-sm edupress-btn generate_attendance_ids" type="button"><?php _e('Sync User Attendance IDs', 'edupress'); ?></button>
+                    <button class="ep-mt-sm edupress-btn generate_attendance_ids no-print" type="button"><?php _e('Sync User Attendance IDs', 'edupress'); ?></button>
                 <?php endif; ?>
             </div>
         </div>
@@ -1440,6 +1438,7 @@ class User
 
                         <th><?php _t( 'Roll' ); ?></th>
 
+                        <th><?php _t( 'Mobile' ); ?></th>
                         <th><?php _t( 'Reg. Date' ); ?></th>
                         <?php if( self::currentUserCan( 'edit', $this->post_type ) ): ?>
 
@@ -1501,6 +1500,7 @@ class User
 
                     <td data-field="role"><?php echo $this->getRole() == 'student' ? $this->getMeta('roll') : ''; ?></td>
 
+                    <td data-field="register_date"><?php echo $this->getMeta('mobile'); ?> </td>
                     <td data-field="register_date"><?php echo $this->getRegisterDate(); ?> </td>
                     <?php if( User::currentUserCan( 'edit', $this->post_type ) ): ?>
                         <td data-field="action" align="center" style="text-align: center;" class="no-print">
@@ -1634,7 +1634,7 @@ class User
         $html = ob_get_clean();
 
         if ( !$wrap ) return $html;
-        return EduPress::wrapInContentBox( "<a style='color: #fff;' href='javascript:void(0)' data-active='0' class='toggleUserForm'>".t('+ Show User Form')."</a>", $html );
+        return EduPress::wrapInContentBox( "<a style='color: #fff;' href='javascript:void(0)' data-active='0' class='toggleUserForm no-print'>".t('+ Show User Form')."</a>", $html );
 
     }
 
@@ -2567,7 +2567,7 @@ class User
     {
         ob_start();
         ?>
-        <h3>Update Bulk Users</h3>
+        <h3><?php _t('Update Bulk Users'); ?></h3>
         <form action="" class="<?php echo EduPress::getClassNames(array('updateBulkUsers'), 'form'); ?>">
             <div class="form-row">
                 <div class="label-wrap"><?php _e('Role', 'edupress'); ?></div>

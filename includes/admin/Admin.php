@@ -257,7 +257,7 @@ class Admin
                                 ?>
                                     <li class="<?php echo $activeClass; ?>">
                                         <a data-menu-id="<?php echo $id; ?>" href="<?php echo $url; ?>">
-                                            <?php _e($title, 'edupress'); ?>
+                                            <?php _t($title, 'edupress'); ?>
                                         </a>
                                         <?php
                                             if( !empty($info) ){
@@ -330,7 +330,7 @@ class Admin
                 <form action="" method="post" class="<?php echo EduPress::getClassNames(array('edupress-admin-settings-form', 'vertical', 'form-'.$form), 'form'); ?>">
                     <?php foreach( $fields as $field ): ?>
                         <div class="form-row <?php echo $field['name'] ?? ''; ?>">
-                            <div class="label-wrap"><label for="<?php echo $field['settings']['id'] ?? ''; ?>"><?php _e( $field['settings']['label'] ?? '' ); ?></label></div>
+                            <div class="label-wrap"><label for="<?php echo $field['settings']['id'] ?? ''; ?>"><?php _t( $field['settings']['label'] ?? '' ); ?></label></div>
                             <div class="value-wrap">
                                 <?php echo EduPress::generateFormElement( $field['type'] ?? '', $field['name'] ?? '', $field['settings'] ?? [] ); ?>
                             </div>
@@ -664,7 +664,7 @@ class Admin
                     'settings' => array(
                         'value' => Admin::getSetting('system_lang', 'en'),
                         'id' => 'system_lang',
-                        'label' => __('System Lanaguge', 'edupress'),
+                        'label' => __('Lanaguge', 'edupress'),
                         'options' => ['en'=>'English','bn'=>'বাংলা'],
                     )
                 );
@@ -726,7 +726,7 @@ class Admin
                     'name'  => 'institute_phone',
                     'settings' => array(
                         'value' => Admin::getSetting('institute_phone'),
-                        'label' => __('Phone Number', 'edupress')
+                        'label' => __('Mobile', 'edupress')
                     )
                 );
 
@@ -2017,13 +2017,13 @@ class Admin
         <div class="edupress-admin-panel-wrap">
             <div class="sidebar">
                 <div class="edupress-content-box">
-                    <div class="title">Settings Menu</div>
+                    <div class="title"><?php _t('Settings Menu'); ?></div>
                     <div class="content"><?php echo $this->showSettingsMenu(); ?></div>
                 </div>
             </div>
             <div class="main">
                 <div class="edupress-content-box">
-                    <div class="title"><?php echo $title; ?></div>
+                    <div class="title"><?php _t($title); ?></div>
                     <div class="content"><?php echo $this->getSettingsMenuContent( $page ); ?></div>
                 </div>
             </div>

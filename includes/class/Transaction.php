@@ -219,11 +219,11 @@ class Transaction extends CustomPost
         $transaction_html = "
         <ul class='transaction-details'>
             <li>
-                <div class='row-transaction-fee'>". __( 'Fee Name', 'edupress') . "</div>
-                <div class='row-transaction-amount'>". __( 'Amount', 'edupress') . "</div> 
-                <div class='row-transaction-due'>". __( 'Due', 'edupress') . "</div> 
-                <div class='row-transaction-month'>". __( 'Month', 'edupress') . "</div>   
-                <div class='row-transaction-year'>". __( 'Year', 'edupress') . "</div>   
+                <div class='row-transaction-fee'>". t( 'Fee Name', 'edupress') . "</div>
+                <div class='row-transaction-amount'>". t( 'Amount', 'edupress') . "</div> 
+                <div class='row-transaction-due'>". t( 'Due', 'edupress') . "</div> 
+                <div class='row-transaction-month'>". t( 'Month', 'edupress') . "</div>   
+                <div class='row-transaction-year'>". t( 'Year', 'edupress') . "</div>   
                 <div class='action-wrap'> </div> 
             </li>";
         if(!empty($this->data->items)){
@@ -231,8 +231,8 @@ class Transaction extends CustomPost
                 $transaction_html .= "
                     <li>
                         <div class='row-transaction-fee'>". EduPress::generateFormElement( 'select', 'fee_type[]', array( 'options' => array_combine( $fee_names, $fee_names ), 'required'=>true, 'value' => $item->item_name ))."</div>
-                        <div class='row-transaction-amount'><input type='number' min='0' step='any' name='fee_amount[]' value='{$item->item_amount}' class='fee_amount' placeholder='Fee amount'  step='any' required='required' aria-required='true'></div> 
-                        <div class='row-transaction-due'><input type='number' name='fee_due[]' value='{$item->item_due}' placeholder='Due'  step='any'></div> 
+                        <div class='row-transaction-amount'><input type='number' min='0' step='any' name='fee_amount[]' value='{$item->item_amount}' class='fee_amount' placeholder='".t('Fee amount')."'  step='any' required='required' aria-required='true'></div> 
+                        <div class='row-transaction-due'><input type='number' name='fee_due[]' value='{$item->item_due}' placeholder='".t('Due')."'  step='any'></div> 
                         <div class='row-transaction-month'>". EduPress::generateFormElement( 'select', 't_month[]', array( 'options' => $months, 'value' => $item->item_month ))."</div>   
                         <div class='row-transaction-year'>". EduPress::generateFormElement( 'select', 't_year[]', array( 'options' => $years, 'value' => $item->item_year ))."</div>   
                         <div class='action-wrap'>
@@ -246,8 +246,8 @@ class Transaction extends CustomPost
             $transaction_html .= "
             <li>
                 <div class='row-transaction-fee'>{$fee_html}</div>
-                <div class='row-transaction-amount'><input type='number' min='0' step='any' name='fee_amount[]' class='fee_amount' value='' placeholder='Fee amount'  step='any' required='required' aria-required='true'></div> 
-                <div class='row-transaction-due'><input type='number' name='fee_due[]' value='0' placeholder='Due'  step='any'></div> 
+                <div class='row-transaction-amount'><input type='number' min='0' step='any' name='fee_amount[]' class='fee_amount' value='' placeholder='".t('Fee amount')."'  step='any' required='required' aria-required='true'></div> 
+                <div class='row-transaction-due'><input type='number' name='fee_due[]' value='0' placeholder='".t('Due')."'  step='any'></div> 
                 <div class='row-transaction-month'>{$transaction_months}</div>   
                 <div class='row-transaction-year'>{$transaction_years}</div>   
                 <div class='action-wrap'>
@@ -479,17 +479,17 @@ class Transaction extends CustomPost
 
                 <thead>
                     <tr>
-                        <th><?php _e( 'Branch', 'edupress' ); ?></th>
-                        <th><?php _e( 'Type', 'edupress' ); ?></th>
-                        <th><?php _e( 'Amount', 'edupress' ); ?></th>
-                        <th><?php _e( 'Discount', 'edupress' ); ?></th>
-                        <th><?php _e( 'Paid By', 'edupress' ); ?></th>
-                        <th><?php _e( 'Tran. Time', 'edupress' ); ?></th>
-                        <th><?php _e( 'Details', 'edupress' ); ?></th>
-                        <th><?php _e( 'Note', 'edupress' ); ?></th>
-                        <th><?php _e( 'Entry By', 'edupress' ); ?></th>
-                        <th><?php _e( 'Entry Time', 'edupress' ); ?></th>
-                        <th><?php _e( 'Update Log', 'edupress' ); ?></th>
+                        <th><?php _t( 'Branch', 'edupress' ); ?></th>
+                        <th><?php _t( 'Type', 'edupress' ); ?></th>
+                        <th><?php _t( 'Amount', 'edupress' ); ?></th>
+                        <th><?php _t( 'Discount', 'edupress' ); ?></th>
+                        <th><?php _t( 'Paid By', 'edupress' ); ?></th>
+                        <th><?php _t( 'Tran. Time', 'edupress' ); ?></th>
+                        <th><?php _t( 'Details', 'edupress' ); ?></th>
+                        <th><?php _t( 'Note', 'edupress' ); ?></th>
+                        <th><?php _t( 'Entry By', 'edupress' ); ?></th>
+                        <th><?php _t( 'Entry Time', 'edupress' ); ?></th>
+                        <th><?php _t( 'Update Log', 'edupress' ); ?></th>
                     </tr>
                 </thead>
 

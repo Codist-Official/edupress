@@ -764,9 +764,12 @@ class Post
         if( !User::currentUserCan('publish',  $this->post_type ) ) return '';
         ob_start();
         $term = ucwords( str_replace( '_', ' ', $this->post_type ) );
+        $lang = Admin::getSetting('system_lang');
         ?>
         <div class="edupress-publish-btn-wrap no-print">
-            <button data-post_type="<?php echo $this->post_type; ?>" class="edupress-btn edupress-publish-post"> + <?php Admin::getSetting('system_lang' == 'en') ? _e('Add New '. $term, 'edupress' ): _e('নতুন '  . t($term).  ' যোগ করুন'); ?> </button>
+            <button data-post_type="<?php echo $this->post_type; ?>" class="edupress-btn edupress-publish-post"> + 
+                <?php $lang == 'bn' ? _e('নতুন '  . t($term).  ' যোগ করুন') : _e('Add New '. $term, 'edupress'); ?> 
+            </button>
         </div>
 
         <?php

@@ -53,6 +53,32 @@ class Support extends Post{
         return self::$_instance;
     }
 
+    public function getVideoList()
+    {
+        return [
+            [
+                'title' => 'How to set up Helix device, add users to device',
+                'title_bn' => 'হেলিক্স ডিভাইস কিভাবে সেটআপ করতে হয়, কিভাবে ইউজার এড করতে হয় ইত্যাদি',
+                'link' => 'https://www.youtube.com/watch?v=atGUaG56yWM'
+            ],
+            [
+                'title' => 'How to add class & section',
+                'title_bn' => 'কিভাবে ক্লাস এবং সেকশন ব্যবহার এড করতে হয়',
+                'link' => 'https://www.youtube.com/watch?v=tNNAgxTEkUQ'
+            ],
+            [
+                'title' => 'How to add and manage users',
+                'title_bn' => 'কিভাবে ইউজার এড করতে হয় এবং ম্যানেজ করতে হয়',
+                'link' => 'https://www.youtube.com/watch?v=cX2iaOZFXb4'
+            ],
+            [
+                'title' => 'How to use accounting',
+                'title_bn' => 'একাউন্টিং কিভাবে ব্যবহার করতে হয়',
+                'link' => 'https://www.youtube.com/watch?v=Es957-OmAxg'
+            ],
+        ];
+    }
+
     /**
      * List html
      *
@@ -79,16 +105,58 @@ class Support extends Post{
             </li>
         </ul>
         <div class="yt-playlist">
-            <h4><?php _e('Supporting videos on EduPress School Management Software', 'edupress'); ?></h4>
-            <iframe width="500" height="500" src="https://www.youtube.com/embed/videoseries?si=_5-LXzAXGPBaBm-J&amp;list=PLFwC56qOrdPkWVtyes7sn3aIWm1FWNb9h" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-        </div>
+            <h4><?php _t('Video Tutorials', 'edupress'); ?></h4>
+            <?php 
+                $videos = $this->getVideoList();
+                $lang = Admin::getSetting('system_lang');
+                if(!empty($videos)){
+                    echo "<ul class='video-list'>";
+                    foreach($videos as $video){
+                        $title = $lang == 'en' ? $video['title'] : $video['title_bn'];
+                        $query = parse_url($video['link'], PHP_URL_QUERY);
+                        parse_str($query, $params);
+                        $video_id = $params['v'] ?? null;
+                        echo "<li><a class='yt-link' data-id='{$video_id}' data-link='{$video['link']}' href='javacript:void(0)'>{$title}</a></li>";
+                    }
+                    echo "</ul>";
+                }
+            
+            ?>
+         </div>
         <style>
             .yt-playlist{
-                margin-top: 30px;
                 display: inline-block;
                 height:auto;
                 width: 100%;
                 max-width: 1024px;
+                margin: 30px 0 0;
+                padding: 0;
+            }
+
+            .video-list{
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                max-width: 600px;
+            }
+            .video-list li {
+                list-style: square;
+                list-style-position: inside;
+                margin: 0;
+                border-bottom: 1px solid #aaa;
+            }
+            .video-list li:nth-child(even){
+                background-color: #efefef;
+            }
+            .video-list li:hover{
+                background-color: #8ec532;
+            }
+            .video-list li:hover a{
+                color: #fff; 
+            }
+            body .edupress-frontend-panel-wrap .content-wrap ul.video-list li a {
+                font-size: 18px !important;
+                line-height: 2 !important;
             }
             .support-list {
                 list-style: none;
@@ -106,6 +174,17 @@ class Support extends Post{
                 font-size: 1.2em;
             }
         </style>
+        <script>
+            jQuery(document).ready(function(e){
+                
+                jQuery(document).on('click', '.yt-link', function(e){
+                    preventDefault(e);
+                    let id = $j(this).data('id');
+                    let html = `<iframe width="100%" height="100%" style="height: 100%; min-height: 500px;" src="https://www.youtube.com/embed/${id}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+                    showEduPressPopup(html);
+                })
+            })
+        </script>
         <?php
         return ob_get_clean();
     }

@@ -206,7 +206,8 @@ class Attendance extends CustomPost
         $shift_active = EduPress::isActive( 'shift' );
         $class_active = EduPress::isActive( 'class' );
         $section_active = EduPress::isActive( 'section' );
-        $sms_active = EduPress::isActive( 'sms' );
+        $sms_active = Admin::getSetting('attendance_sms') == 'active';
+        $voice_active = Admin::getSetting('attendance_voice') == 'active';
         $roles = User::getRoles();
         ob_start();
         ?>
@@ -225,6 +226,7 @@ class Attendance extends CustomPost
                         <?php if($class_active): ?><th><?php _t( 'Class', 'edupress' ); ?></th><?php endif; ?>
                         <?php if($section_active): ?><th><?php _t( 'Section', 'edupress' ); ?></th><?php endif; ?>
                         <?php if($sms_active): ?><th><?php _t( 'SMS', 'edupress' ); ?></th><?php endif; ?>
+                        <?php if($voice_active): ?><th><?php _t( 'Voice', 'edupress' ); ?></th><?php endif; ?>
                         <th><?php _t( 'Record Time', 'edupress' ); ?></th>
                     </tr>
                 </thead>
@@ -242,6 +244,7 @@ class Attendance extends CustomPost
                         $sms_text = $sms_id ? $wpdb->get_var("SELECT sms FROM {$wpdb->prefix}sms_logs WHERE id = {$sms_id} ") : '';
                         $role = $user->getRole();
                         $role_name = isset($roles[$role]) ? $roles[$role] : $role;
+                        $voice_status = !is_null($r->voice_id) ? $wpdb->get_var("SELECT status FROM {$wpdb->prefix}voice_logs WHERE id = {$r->voice_id}") : '';
                     ?>
                     <tr data-role="<?php echo $user->getRole(); ?>" data-user_id="<?php echo $r->user_id; ?>">
                         <?php if( $branch_active ): ?><td><?php  echo !empty($branch_id) ? get_the_title( $branch_id ) : ''; ?></td><?php endif; ?>
@@ -254,6 +257,7 @@ class Attendance extends CustomPost
                         <?php if( $class_active ): ?><td><?php echo !empty($class_id) && $user->getRole() == 'student' ? get_the_title( $class_id ) : ''; ?></td><?php endif; ?>
                         <?php if( $section_active ): ?><td><?php echo !empty($section_id) && $user->getRole() == 'student' ? get_the_title( $section_id ) : ''; ?></td><?php endif; ?>
                         <?php if( $sms_active ): ?><td><?php echo $sms_text;  ?></td><?php endif; ?>
+                        <?php if( $voice_active ): ?><td><?php echo $voice_status;  ?></td><?php endif; ?>
                         <td><?php echo date('h:i:s a d/m/y', strtotime($r->record_time) ); ?></td>
                     </tr>
                 <?php endforeach; ?>
@@ -854,6 +858,7 @@ class Attendance extends CustomPost
 
         if(empty($data['body_response']['data'])) return 'No data found';
 
+        $voice_notif = Admin::getSetting('attendance_voice');
         $sms_notif = Admin::getSetting('attendance_sms');
         $admin_notif = Admin::getSetting('attendance_sms_to_admin');
         $institute = Admin::getSetting('institute_name');
@@ -886,81 +891,106 @@ class Attendance extends CustomPost
 
             } else if($user_id && $insert){
 
-                if( $sms_notif !== 'active' && $admin_notif !== 'active') continue;
                 // if report time is not today then skip 
                 if( date('Y-m-d', strtotime($data['report_time'])) !== current_time('Y-m-d')) continue;
-
-
-                $aid = $wpdb->insert_id;
-
-                $time = date("h:i:s a, d/m/y", strtotime($data['report_time']));
-                $user = new User($user_id);
-                $name = $user->getMeta('first_name');
-                $role = $user->getRole();
-
-                $branch = $data['branch_id'] ? get_the_title($data['branch_id']) : '';
-                if(!empty($branch)) $branch = " $branch Branch ";
 
                 $action = self::getCardPunchStatus( $user_id, $data['report_time']);
                 $action = $action === 'entry' ? 'entered' : 'left';
 
-                $notifs = ['guardian_notification','admin_notification'];
-                foreach($notifs as $notif){
+                $user = new User($user_id);
+                $aid = $wpdb->insert_id;
 
+                if( $sms_notif == 'active' || $admin_notif == 'active'){
+
+                    $time = date("h:i:s a, d/m/y", strtotime($data['report_time']));
+                    
+                    $name = $user->getMeta('first_name');
+                    $role = $user->getRole();
+    
+                    $branch = $data['branch_id'] ? get_the_title($data['branch_id']) : '';
+                    if(!empty($branch)) $branch = " $branch Branch ";
+    
+    
+                    $notifs = ['guardian_notification','admin_notification'];
+                    foreach($notifs as $notif){
+    
+                        // skip if previous sms sending inactive
+                        $today = current_time('Y-m-d');
+                        $report_time = date('Y-m-d', strtotime($data['report_time']));
+                        if($report_time < $today && !$old_sms_enabled) continue;
+    
+                        if($notif == 'guardian_notification'){
+                            if( strtolower($sms_notif) !== 'active' || strtolower($role) !== 'student' ) continue;
+                            $mobile = get_user_meta($user_id, 'mobile', true);
+                            if(!$mobile) continue;
+                        }
+    
+                        if($notif == 'admin_notification'){
+    
+                            if($admin_notif !== 'active') continue;
+                            $allowed_roles = Admin::getSetting('attendance_sms_to_admin_for_roles');
+                            $allowed_roles = array_map('strtolower', $allowed_roles);
+                            if(!in_array($role, $allowed_roles)) continue;
+                            $mobile = Admin::getSetting('attendance_sms_to_admin_numbers');
+    
+                        }
+    
+                        $sms_format_key = $notif === 'guardian_notification' ? 'attendance_sms_format' : 'attendance_sms_format_to_admin';
+                        if($sms_format_key == 'attendance_sms_format'){
+                            $sms_format_key = $action === 'left' ? 'attendance_sms_format_exit' : 'attendance_sms_format_entry';
+                        }
+                        $sms_text = Admin::getSetting($sms_format_key);
+                        if(empty($sms_text)) $sms_text = Admin::getSetting('attendance_sms_format');
+                        $sms_text = str_replace("{name}", $name, $sms_text);
+                        $sms_text = str_replace("{role}", $role, $sms_text);
+                        $sms_text = str_replace("{action}", $action, $sms_text);
+                        $sms_text = str_replace("{time}", $time, $sms_text);
+                        $sms_text = str_replace("{institute}", $institute, $sms_text);
+                        $sms_text = str_replace("{branch}", $branch, $sms_text);
+    
+                        $sms_text = trim($sms_text);
+                        if(empty($sms_text)) return false;
+    
+                        $sms = [];
+                        $sms['sms'] = $sms_text;
+                        $sms['mobile'] = $mobile;
+                        $sms['user_id'] = $user_id;
+                        $send = SMS::send($sms);
+                        if($send['insert']){
+                            $wpdb->update(
+                                $wpdb->prefix.'attendance',
+                                array(
+                                    'sms_id' => $send['insert'],
+                                ),
+                                array(
+                                    'id'    => $aid,
+                                )
+                            );
+                        }
+                    }
+
+                }
+
+                if( $voice_notif == 'active' ){
                     // skip if previous sms sending inactive
                     $today = current_time('Y-m-d');
                     $report_time = date('Y-m-d', strtotime($data['report_time']));
                     if($report_time < $today && !$old_sms_enabled) continue;
-
-                    if($notif == 'guardian_notification'){
-                        if( strtolower($sms_notif) !== 'active' || strtolower($role) !== 'student' ) continue;
-                        $mobile = get_user_meta($user_id, 'mobile', true);
-                        if(!$mobile) continue;
-                    }
-
-                    if($notif == 'admin_notification'){
-
-                        if($admin_notif !== 'active') continue;
-                        $allowed_roles = Admin::getSetting('attendance_sms_to_admin_for_roles');
-                        $allowed_roles = array_map('strtolower', $allowed_roles);
-                        if(!in_array($role, $allowed_roles)) continue;
-                        $mobile = Admin::getSetting('attendance_sms_to_admin_numbers');
-
-                    }
-
-                    $sms_format_key = $notif === 'guardian_notification' ? 'attendance_sms_format' : 'attendance_sms_format_to_admin';
-                    if($sms_format_key == 'attendance_sms_format'){
-                        $sms_format_key = $action === 'left' ? 'attendance_sms_format_exit' : 'attendance_sms_format_entry';
-                    }
-                    $sms_text = Admin::getSetting($sms_format_key);
-                    if(empty($sms_text)) $sms_text = Admin::getSetting('attendance_sms_format');
-                    $sms_text = str_replace("{name}", $name, $sms_text);
-                    $sms_text = str_replace("{role}", $role, $sms_text);
-                    $sms_text = str_replace("{action}", $action, $sms_text);
-                    $sms_text = str_replace("{time}", $time, $sms_text);
-                    $sms_text = str_replace("{institute}", $institute, $sms_text);
-                    $sms_text = str_replace("{branch}", $branch, $sms_text);
-
-                    $sms_text = trim($sms_text);
-                    if(empty($sms_text)) return false;
-
-                    $sms = [];
-                    $sms['sms'] = $sms_text;
-                    $sms['mobile'] = $mobile;
-                    $sms['user_id'] = $user_id;
-                    $send = SMS::send($sms);
-                    if($send['insert']){
-                        $wpdb->update(
-                            $wpdb->prefix.'attendance',
-                            array(
-                                'sms_id' => $send['insert'],
-                            ),
-                            array(
-                                'id'    => $aid,
-                            )
-                        );
-                    }
+                    
+                    $mobile = $user->getMeta('mobile');
+                    $audio_id = $action == 'entry' ? 'voice_entry_audio_id' : 'voice_exit_audio_id';
+                    $send = Voice::send($mobile, Admin::getSetting($audio_id), $user_id);
+                    $wpdb->update(
+                        $wpdb->prefix.'attendance',
+                        array(
+                            'voice_id' => $send['id'],
+                        ),
+                        array(
+                            'id'    => $aid,
+                        )
+                    );
                 }
+
             }
         }
     }
@@ -1573,10 +1603,10 @@ class Attendance extends CustomPost
             echo "Calendar is open<br>";
 
             $o = $post->post_type == 'section' ? new Section($post->ID) : new Klass($post->ID);
-            $absence_sms_cutoff_time = $o->getMeta('absence_sms_cutoff_time');
+            $absence_cutoff_time = $o->getMeta('absence_cutoff_time');
             $current_time = current_time('H:i');
             
-            if($current_time > $absence_sms_cutoff_time){
+            if($current_time > $absence_cutoff_time){
                 // check if sms already sent 
                 $last_sent = $o->getMeta('absence_sms_last_sent');
                 if(empty($last_sent)) $last_sent = '1970-01-01';

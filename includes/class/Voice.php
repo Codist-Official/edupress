@@ -25,6 +25,7 @@ class Voice extends CustomPost
     public function __construct($id=0)
     {
         parent::__construct($id);
+
         // Filter list query
         add_filter( "edupress_list_{$this->post_type}_query", [ $this, 'filterListQuery' ] );
 
@@ -87,7 +88,6 @@ class Voice extends CustomPost
         global $wpdb;
 
         $results = $wpdb->get_results( $this->getListQuery() );
-        if( empty( $results ) ) return __( "No {$this->post_type} found!", 'edupress' );
         ob_start();
         ?>
         <h3><?php _t( 'Current balance', 'edupress' ); ?>: ৳<span class="voice-current-balance"><?php echo number_format(self::getBalance(), 2); ?></span></h3>
@@ -102,10 +102,14 @@ class Voice extends CustomPost
             <?php endif; ?>
         </div>
 
+        <?php if( empty( $results ) ){
+             _e( "No {$this->post_type} found!", 'edupress' ); 
+             return ob_get_clean();
+        } ?>
+
 
         <div class="edupress-table-wrap">
             <table class="edupress-table edupress-master-table tablesorter">
-
                 <thead>
                     <tr>
                         <th><?php _t( 'ID', 'edupress' ); ?></th>
@@ -117,9 +121,11 @@ class Voice extends CustomPost
                     </tr>
                 </thead>
 
+                <tbody>
                 <?php
                     foreach($results as $result){
-                        $error_class = !is_null($result->response_code) && $result->response_code != 202 ? "error" : "success";
+                        // $error_class = !is_null($result->response_code) && $result->response_code != 202 ? "error" : "success";
+                        $error_class = 'success';
                         ?>
                         <tr class="row-<?php echo $error_class; ?>">
                             <td><?php echo $result->id; ?></td>
@@ -139,6 +145,7 @@ class Voice extends CustomPost
                         <?php
                     }
                 ?>
+                </tbody>
             </table>
         </div>
         <?php echo $this->getPagination(); ?>
@@ -181,12 +188,12 @@ class Voice extends CustomPost
     }
 
 
-    public static function removeBalance( $amount = 0 )
+    public static function removeBalance( $amount = 0, $update_history = true )
     {
         $balance = self::getBalance();
         $balance = $balance - floatval($amount);
         update_option(self::$voice_balance_key, $balance);
-        self::addBalanceHistory($amount, 'remove');
+        if($update_history) self::addBalanceHistory($amount, 'remove');
         return $balance;
     }
 
@@ -287,6 +294,7 @@ class Voice extends CustomPost
 
     public static function send($mobile='', $audio_id=0, $user_id=null)
     {
+        $debug = true;
         // check balance 
         // if balance available submit to api 
         // otherwise make it pending by making msg_id  = 0 
@@ -305,13 +313,18 @@ class Voice extends CustomPost
         ];
 
         if( $rate > $balance ){
+            EduPress::logData('insufficient balance');
+
             // insufficient balance 
             $insert_data['msg_id'] = 0;
             $insert_data['status'] = 'INSUFFICIENT_BALANCE';
 
             $insert = $wpdb->insert($table, $insert_data);
 
-            return ['status' => 0, 'data' => 'Insufficient balance'];
+            if(!$insert) EduPress::logData($wpdb->last_error);
+
+            $res = ['status' => 0, 'data' => 'Insufficient balance', 'id'=>$wpdb->insert_id];
+            return $res;
         }
 
         // make api reqest 
@@ -332,26 +345,29 @@ class Voice extends CustomPost
             'timeout' => 20
         );
 
-        var_dump($args);
 
         // make wordpress post request 
         $response = wp_remote_post('https://api.awajdigital.com/api/broadcasts', $args );
 
         if(is_wp_error($response)){
             $insert_data['msg_id'] = 0;
-            $insert_data['status'] = 'PENDING';
+            $insert_data['status'] = 'ERROR';
+            $insert_data['error'] = $response->get_error_message();
             $wpdb->insert($table, $insert_data);
-            return ['status' => 0, 'data'=>$response->get_error_message()];
+            return ['status' => 0, 'data'=>$response->get_error_message(), 'id'=>$wpdb->insert_id];
         }
 
-
-        $status = wp_remote_retrieve_response_code($response);
 
         $res_body = wp_remote_retrieve_body($response);
         $res_decoded = json_decode($res_body, true);
 
         if(!$res_decoded['success']){
-            return ['status' => 0, 'data'=>$res_decoded['message']];
+            EduPress::logData($res_decoded['message']);
+            $insert_data['error'] = $res_decoded['message'];
+            $insert_data['status'] = 'ERROR';
+            $wpdb->insert($table, $insert_data);
+            $res = ['status' => 0, 'data'=>$res_decoded['message'], 'id'=>$wpdb->insert_id];
+            return $res;
         }
 
 
@@ -359,8 +375,8 @@ class Voice extends CustomPost
             $insert_data['msg_id'] = $res_decoded['broadcast']['id'];
             $insert_data['status'] = ucwords($res_decoded['broadcast']['status']);
             $wpdb->insert($table, $insert_data);
-            self::removeBalance($rate);
-            return['status' => 1, 'data'=>'Voice successfully submitted'];
+            self::removeBalance($rate, 0);
+            return['status' => 1, 'data'=>'Voice successfully submitted', 'id' => $wpdb->insert_id];
         }
 
     }

@@ -329,6 +329,21 @@ class Admin
             <div class="edupress-admin-settings-form-wrap form-<?php echo $form; ?>">
                 <form action="" method="post" class="<?php echo EduPress::getClassNames(array('edupress-admin-settings-form', 'vertical', 'form-'.$form), 'form'); ?>">
                     <?php foreach( $fields as $field ): ?>
+
+                        <?php if($field['type'] == 'hidden'):
+                            echo EduPress::generateFormElement( $field['type'] ?? '', $field['name'] ?? '', $field['settings'] ?? []);
+                            continue;
+                            endif;
+                            ?>
+                        <?php if($field['type'] == 'html'): ?>
+                            <div class="form-row <?php echo $field['name'] ?? ''; ?>">
+                            <div class="html-wrap">
+                                <?php echo $field['settings']['html'] ?? ''; ?>
+                            </div>
+                            </div>
+                        <?php continue; ?>
+                        <?php endif; ?>
+
                         <div class="form-row <?php echo $field['name'] ?? ''; ?>">
                             <div class="label-wrap"><label for="<?php echo $field['settings']['id'] ?? ''; ?>"><?php _t( $field['settings']['label'] ?? '' ); ?></label></div>
                             <div class="value-wrap">
@@ -951,6 +966,9 @@ class Admin
 
             case 'voice':
                 $disabled = !current_user_can('manage_options');
+                $domain = $_SERVER['HTTP_HOST'];
+                $domain = str_replace('www.', '', $domain);
+                $domain = str_replace('.','_',strtolower($domain));
 
                 if(current_user_can('manage_options')):
                     $fields['voice_api_token'] = array(
@@ -978,7 +996,7 @@ class Admin
                     'type' => 'text',
                     'name' => 'voice_caller_id',
                     'settings' => array(
-                        'value' => Admin::getSetting('voice_caller_id', '01979001001'),
+                        'value' => Admin::getSetting('voice_caller_id'),
                         'label' => __('Caller ID', 'edupress'),
                         'id' => 'voice_caller_id',
                         'disabled' => $disabled
@@ -988,7 +1006,7 @@ class Admin
                     'type' => 'text',
                     'name' => 'voice_entry_audio_id',
                     'settings' => array(
-                        'value' => Admin::getSetting('voice_entry_audio_id'),
+                        'value' => Admin::getSetting('voice_entry_audio_id', $domain .'_entry'),
                         'label' => __('Entry Audio Name / ID', 'edupress'),
                         'id' => 'voice_entry_audio_id',
                         'disabled' => $disabled
@@ -998,7 +1016,7 @@ class Admin
                     'type' => 'text',
                     'name' => 'voice_exit_audio_id',
                     'settings' => array(
-                        'value' => Admin::getSetting('voice_exit_audio_id'),
+                        'value' => Admin::getSetting('voice_exit_audio_id', $domain.'_exit'),
                         'label' => __('Exit Audio Name / ID', 'edupress'),
                         'id' => 'voice_exit_audio_id',
                         'disabled' => $disabled,
@@ -1215,28 +1233,63 @@ class Admin
                         'id' => 'generate_attendance_ids',
                         'class' => 'generate_attendance_ids',
                     )
+                );            
+                $fields['absence_cutoff_time'] = array(
+                    'type'  => 'time',
+                    'name'  => 'absence_cutoff_time',
+                    'settings' => array(
+                        'options' => array('active' => 'Yes', 'inactive' => 'No'),
+                        'value' => Admin::getSetting('absence_cutoff_time'),
+                        'label' => __('Absence SMS notification cutoff time', 'edupress'),
+                        'placeholder' => 'Select',
+                        'id' => 'absence_cutoff_time'
+                    )
+                );   
+                $fields['absence_heading'] = array(
+                    'type'  => 'html',
+                    'name'  => 'absence_heading',
+                    'settings' => array(
+                        'html' => __('<h4>Voice Call Settings</h4>', 'edupress'),
+                    )
                 );
-
+                $fields['attendance_voice'] = array(
+                    'type'  => 'select',
+                    'name'  => 'attendance_voice',
+                    'settings' => array(
+                        'options' => array('active' => 'Active', 'inactive' => 'Inactive'),
+                        'value' => Admin::getSetting('attendance_voice'),
+                        'label' => __('Attendance Voice Call', 'edupress'),  
+                        'placeholder' => 'Select',
+                        'id' => 'attendance_voice'
+                    )
+                );
+                $fields['attendance_absence_voice'] = array(
+                    'type'  => 'select',
+                    'name'  => 'attendance_absence_voice',
+                    'settings' => array(
+                        'options' => array('active' => 'Active', 'inactive' => 'Inactive'),
+                        'value' => Admin::getSetting('attendance_absence_voice'),
+                        'label' => __('Absence Voice Call', 'edupress'),  
+                        'placeholder' => 'Select',
+                        'id' => 'attendance_absence_voice'
+                    )
+                );
+                $fields['sms_heading'] = array(
+                    'type'  => 'html',
+                    'name'  => 'sms_heading',
+                    'settings' => array(
+                        'html' => __('<h4>SMS Settings</h4>', 'edupress'),
+                    )
+                );
                 $fields['absence_sms'] = array(
                     'type'  => 'select',
                     'name'  => 'absence_sms',
                     'settings' => array(
                         'options' => array('active' => 'Yes', 'inactive' => 'No'),
                         'value' => Admin::getSetting('absence_sms'),
-                        'label' => __('Absence SMS notification to guardian', 'edupress'),  
+                        'label' => __('Absence SMS', 'edupress'),  
                         'placeholder' => 'Select',
                         'id' => 'absence_sms'
-                    )
-                );
-                $fields['absence_sms_cutoff_time'] = array(
-                    'type'  => 'time',
-                    'name'  => 'absence_sms_cutoff_time',
-                    'settings' => array(
-                        'options' => array('active' => 'Yes', 'inactive' => 'No'),
-                        'value' => Admin::getSetting('absence_sms_cutoff_time'),
-                        'label' => __('Absence SMS notification cutoff time', 'edupress'),
-                        'placeholder' => 'Select',
-                        'id' => 'absence_sms_cutoff_time'
                     )
                 );
                 $fields['absence_sms_format'] = array(
@@ -1255,7 +1308,7 @@ class Admin
                     'settings' => array(
                         'options' => array('active' => 'Yes', 'inactive' => 'No'),
                         'value' => Admin::getSetting('attendance_sms'),
-                        'label' => __('SMS notification to guardian', 'edupress'),
+                        'label' => __('Attendance SMS to guardian', 'edupress'),
                         'placeholder' => 'Select',
                         'id' => 'attendance_sms'
                     )
@@ -1336,6 +1389,13 @@ class Admin
                         'label' => __('Admin SMS format', 'edupress'),
                         'placeholder' => $default_text,
                         'id' => 'attendance_sms_format_to_admin',
+                    )
+                );
+                $fields['other_setting_heading'] = array(
+                    'type' => 'html',
+                    'name' => 'other_setting_heading',
+                    'settings' => array(
+                        'html' => __('<h4>Other Settings</h4>', 'edupress')
                     )
                 );
 

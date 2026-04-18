@@ -44,6 +44,8 @@ class Subject extends Post
 
         $this->posts_per_page = -1;
 
+        if(Admin::getSetting('system_lang') == 'bn') $this->list_title = "বিষয়ের তালিকা <br> <span style='font-size:16px; color:#777;'>সিরিয়াল ঠিক করার জন্য বিষয় ড্রাগ ও ড্রপ করুন</span>";
+
         // Register subject
         add_action( 'init', [ $this, 'registerSubject' ] );
 

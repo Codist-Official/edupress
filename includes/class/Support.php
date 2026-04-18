@@ -72,6 +72,11 @@ class Support extends Post{
                 'link' => 'https://www.youtube.com/watch?v=cX2iaOZFXb4'
             ],
             [
+                'title' => 'How to prepare exam result',
+                'title_bn' => 'কিভাবে পরীক্ষার রেজাল্ট তৈরি করবেন',
+                'link' => 'https://www.youtube.com/watch?v=WDx2zfF_LwU'
+            ],
+            [
                 'title' => 'How to use accounting',
                 'title_bn' => 'একাউন্টিং কিভাবে ব্যবহার করতে হয়',
                 'link' => 'https://www.youtube.com/watch?v=Es957-OmAxg'
@@ -91,24 +96,32 @@ class Support extends Post{
     {
         $text = "Hello, I need support for my website " . site_url() . ". I'm facing following issues: ";
         $text = urlencode($text);
+        $lang = Admin::getSetting('system_lang');
+
         ob_start();
         ?>
         <ul class="support-list">
             <li>
-                <p><i class="fa-solid fa-phone"></i> To get support over phone, please call us at <a href="tel:+8801979001001"><strong>+8801979001001</strong></a></p>
+                <p><i class="fa-solid fa-phone"></i> 
+                <?php ($lang == 'en') ? _t('To get support over phone, please call us at ') : _t('ফোনে সাহায্য পেতে এই নাম্বারে কল করুন '); ?>
+                <a href="tel:+8801979001001"><strong>+8801979001001</strong></a></p>
             </li>
             <li>
-                <p><i class="fa-solid fa-envelope"></i> To get support over email, please send an email to <a href="mailto:support@edupressbd.com"><strong>support@edupressbd.com</strong></a></p>
+                <p><i class="fa-solid fa-envelope"></i> 
+                <?php ($lang == 'en') ? _t('To get support over email, please send an email to ') : _t('ইমেইলে সাহায্য পেতে ইমেইল করুন '); ?>
+                <a href="mailto:support@edupressbd.com"><strong>support@edupressbd.com</strong></a></p>
             </li>
             <li>
-                <p><i class="fa-brands fa-whatsapp"></i> To get support over whatsapp, please send a message to <a target="_blank" href="https://wa.me/+8801979001001?text=<?php echo $text; ?>"><strong>+8801979001001</strong></a></p>
+                <p><i class="fa-brands fa-whatsapp"></i> 
+                <?php ($lang == 'en') ? _t('To get support over whatsapp, please send a message to ') : _t('হোয়াটসএপে সাহায্য পেতে ম্যাসেজ পাঠান '); ?>
+
+                 <a target="_blank" href="https://wa.me/+8801979001001?text=<?php echo $text; ?>"><strong>+8801979001001</strong></a></p>
             </li>
         </ul>
         <div class="yt-playlist">
             <h4><?php _t('Video Tutorials', 'edupress'); ?></h4>
             <?php 
                 $videos = $this->getVideoList();
-                $lang = Admin::getSetting('system_lang');
                 if(!empty($videos)){
                     echo "<ul class='video-list'>";
                     foreach($videos as $video){

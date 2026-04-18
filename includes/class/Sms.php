@@ -417,13 +417,13 @@ class Sms extends CustomPost
                         <?php
                     }else { ?>
                         <div class="sms-form-item mobile-numbers">
-                            <label for="mobile_numbers"><?php _e( 'Mobile Numbers', 'edupress' ); ?></label>
+                            <label for="mobile_numbers"><?php _t( 'Mobile Numbers', 'edupress' ); ?></label>
                             <?php echo EduPress::generateFormElement( 'textarea', 'mobile_numbers', array( 'name' => 'mobile_numbers', 'id'=>'mobile_numbers', 'required' => true, 'placeholder' => '1 mobile number per line' ) ); ?>
                             <?php echo EduPress::generateFormElement( 'hidden', 'send_to', array( 'id'=>'send_to', 'value' => 'mobiles' ) ); ?>
                         </div>
                     <?php } ?>
                     <div class="sms-form-item">
-                        <label for="sms_text"><?php _e( 'SMS', 'edupress' ); ?></label>
+                        <label for="sms_text"><?php _t( 'SMS', 'edupress' ); ?></label>
                         <?php echo EduPress::generateFormElement( 'textarea', 'sms_text', array( 'name' => 'sms_text', 'id'=>'sms_text', 'required' => true, 'placeholder' => 'Compose your SMS here' ) ); ?>
                     </div>
                     <div class="sms-form-item">
@@ -518,9 +518,9 @@ class Sms extends CustomPost
             })
         </script>
         <h3><?php _t( 'Current balance', 'edupress' ); ?>: ৳<span class="sms-current-balance"><?php number_format(self::getBalance(), 2); ?></span></h3>
-        <button class="edupress-btn edupress-btn-primary edupress-ajax-link" data-before_send_callback="confirmBeforeSendCallback" data-ajax_action="resendTodayFailedSms">Resend Today's Failed SMS (<?php echo self::countTodayFailedSms(); ?>)</button>
-        <a class="edupress-btn edupress-btn-primary" href="<?php echo $fail_url; ?>"><?php _e('Filter Failed', 'edupressbd'); ?></a> | 
-        <a class="edupress-btn edupress-btn-primary" href="<?php echo $success_url; ?>"><?php _e('Filter Success', 'edupressbd'); ?></a>
+        <button class="edupress-btn edupress-btn-primary edupress-ajax-link" data-before_send_callback="confirmBeforeSendCallback" data-ajax_action="resendTodayFailedSms"> <?php _t('Resend Today\'s Failed SMS', 'edupress'); ?> (<?php echo self::countTodayFailedSms(); ?>)</button>
+        <a class="edupress-btn edupress-btn-primary" href="<?php echo $fail_url; ?>"><?php _t('Filter Failed', 'edupressbd'); ?></a> | 
+        <a class="edupress-btn edupress-btn-primary" href="<?php echo $success_url; ?>"><?php _t('Filter Success', 'edupressbd'); ?></a>
 
         <div class="edupress-table-wrap">
             <table class="edupress-table edupress-master-table tablesorter">

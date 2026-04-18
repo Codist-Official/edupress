@@ -440,7 +440,7 @@ class Calendar extends Post
             $my = $day->format('m-Y');
             $all_days[$my][] = $day->format('Y-m-d');
             $x = $day->format('Y-m');
-            $all_months_years[$x] = $day->format('F, Y');
+            $all_months_years[$x] = t($day->format('F'), 'edupress') . ', ' . td($day->format('Y'), 'edupress');
         }
 
         // Showing header
@@ -467,7 +467,7 @@ class Calendar extends Post
         <?php $default_hide_style = ''; ?>
         <?php if(User::currentUserCan('edit', 'calendar')) : $default_hide_style = " style='display:none;' "; ?>
             <div class="month-selector">
-                <label for="calendarMonthSelector"><?php _e( 'Select a Month', 'edupress' ); ?></label>
+                <label for="calendarMonthSelector"><?php _t( 'Select a Month', 'edupress' ); ?></label>
                 <?php
                     echo EduPress::generateFormElement( 'select', 'calendarMonthSelector',
                     array(
@@ -498,21 +498,21 @@ class Calendar extends Post
                         echo "
                             <li>
                                 <div class='header_weekly_title_wrap'>
-                                    <span style='float:left' class='header-calendar-day'>{$day->format('F')}</span>
-                                    <span style='float:right' class='header-calendar-month' for='monthly_day_selector_{$monthly_day_selector}'>{$week_day}</span>
+                                    <span style='float:left' class='header-calendar-day'>".t($day->format('F'), 'edupress')."</span>
+                                    <span style='float:right' class='header-calendar-month' for='monthly_day_selector_{$monthly_day_selector}'> " . t($week_day, 'edupress') ." </span>
                                 </div>
                                 <div class='header_weekly_selector_wrap'>
                                     <span title='Open' class='weekly_selector'>
                                         <input class='bulkStatusUpdate' id='{$month_week_day}_open' data-month='{$month}' data-dayname='{$week_day}' type='radio' name='weekly_selector_{$week_day}' value='o'>
-                                        <label for='{$month_week_day}_open'>Open</label>
+                                        <label for='{$month_week_day}_open'>".t('Open', 'edupress')."</label>
                                     </span>
                                     <span title='Close' class='weekly_selector'>
                                         <input class='bulkStatusUpdate' id='uid_{$month_week_day}_close' data-month='{$month}' data-dayname='{$week_day}' type='radio' name='weekly_selector_{$week_day}' value='c'>
-                                        <label for='uid_{$month_week_day}_close'>Close</label>
+                                        <label for='uid_{$month_week_day}_close'>".t('Closed', 'edupress')."</label>
                                     </span>
                                     <span title='Holiday' class='weekly_selector'>
                                         <input class='bulkStatusUpdate' id='uid_{$month_week_day}_holiday' data-month='{$month}' data-dayname='{$week_day}' type='radio' name='weekly_selector_{$week_day}' value='h'>
-                                        <label for='uid_{$month_week_day}_holiday'>Holiday</label>
+                                        <label for='uid_{$month_week_day}_holiday'>".t('Holiday', 'edupress')."</label>
                                     </span>
                                 </div>
                             </li>";
@@ -524,7 +524,7 @@ class Calendar extends Post
             }
 
             // Day wise details
-            $day_month = "<span class='month'>{$day->format('M')}</span><br><span class='day'>{$day->format('d')}</span>";
+            $day_month = "<span class='month'>".t($day->format('M'))."</span><br><span class='day'>".td($day->format('d'))."</span>";
             $day_name = $day->format('l');
 
             // This is for day alignment
@@ -565,13 +565,13 @@ class Calendar extends Post
             ?>
                 <li data-status="<?php echo $status; ?>" data-dayname="<?php echo $day->format('l'); ?>" data-date="<?php echo $date;?>" data-year="<?php echo $day->format('Y'); ?>" data-day="<?php echo $day->format('l');?>" data-month="<?php echo $day->format('F'); ?>" data-year="<?php echo $day->format('Y'); ?>">
                     <input type="hidden" name="date[]" value="<?php echo $date; ?>">
-                    <span class="fixed-calendar-day"><?php echo $day->format('l'); ?> </span>
+                    <span class="fixed-calendar-day"><?php _t($day->format('l')); ?> </span>
                     <?php echo $day_month; ?>
                     <?php if( $can_edit ) : ?>
                         <select name=day_status[] class='calendar-day-status' data-year="<?php echo $day->format('Y'); ?>" data-dayname="<?php echo $day->format('l'); ?>" data-month="<?php echo $day->format('m'); ?>" <?php echo $day->format('Y'); ?> data-date='<?php echo $date; ?>' id="<?php echo $uniqid; ?>">
-                            <option value='o' <?php echo $status == 'o' ? 'selected' : ''; ?>>Open</option>
-                            <option value='c' <?php echo $status == 'c' ? 'selected' : ''; ?>>Close</option>
-                            <option value='h' <?php echo $status == 'h' ? 'selected' : ''; ?>>Holiday</option>
+                            <option value='o' <?php echo $status == 'o' ? 'selected' : ''; ?>><?php _t('Open', 'edupress'); ?></option>
+                            <option value='c' <?php echo $status == 'c' ? 'selected' : ''; ?>><?php _t('Closed', 'edupress'); ?></option>
+                            <option value='h' <?php echo $status == 'h' ? 'selected' : ''; ?>><?php _t('Holiday', 'edupress'); ?></option>
                         </select>
                         <textarea placeholder="" style="height: 50px;" rows="1" name="note[]" <?php echo $disabled; ?>><?php echo $note; ?></textarea>
                     <?php else: ?>
@@ -731,14 +731,14 @@ class Calendar extends Post
         ob_start();
         ?>
         <div class="edupress-form-wrap">
-            <h2 style="text-align: center;"><?php _e( 'Academic Calendar', 'edupress' ); ?></h2>
+            <h2 style="text-align: center;"><?php _t( 'Academic Calendar', 'edupress' ); ?></h2>
             <form action="" class="<?php echo EduPress::getClassNames( array('publishCalendar'), 'form'); ?>">
                 <table class="edupress-table">
                 <?php
                 if(EduPress::isActive('branch')){
                     ?>
                     <tr>
-                        <th width="150"><?php _e('Branch', 'edupress'); ?></th>
+                        <th width="150"><?php _t('Branch', 'edupress'); ?></th>
                         <td><?php echo get_the_title($branch_id); ?></td>
                     </tr>
                     <?php
@@ -746,7 +746,7 @@ class Calendar extends Post
                 if(EduPress::isActive('shift')){
                     ?>
                     <tr>
-                        <th><?php _e('Shift', 'edupress'); ?></th>
+                        <th><?php _t('Shift', 'edupress'); ?></th>
                         <td><?php echo get_the_title($shift_id); ?></td>
                     </tr>
                     <?php
@@ -754,7 +754,7 @@ class Calendar extends Post
                 if(EduPress::isActive('class') && $class_id){
                     ?>
                     <tr>
-                        <th><?php _e('Class', 'edupress'); ?></th>
+                        <th><?php _t('Class', 'edupress'); ?></th>
                         <td><?php echo get_the_title($class_id); ?></td>
                     </tr>
                     <?php
@@ -762,19 +762,19 @@ class Calendar extends Post
                 if(EduPress::isActive('section') && $section_id > 0){
                     ?>
                     <tr>
-                        <th><?php _e('Section', 'edupress'); ?></th>
+                        <th><?php _t('Section', 'edupress'); ?></th>
                         <td><?php echo get_the_title($section_id); ?></td>
                     </tr>
                     <?php
                 }
                 ?>
                     <tr>
-                        <th><?php _e('Dates', 'edupress'); ?></th>
+                        <th><?php _t('Dates', 'edupress'); ?></th>
                         <td><?php echo date('d/m/Y', strtotime($start_date)) . ' - ' . date('d/m/Y', strtotime($end_date) );?> </td>
                     </tr>
                 </table>
                 <div class="legends-wrap">
-                    Legends: <span class="legend_open">Open</span>  <span class="legend_close">Closed</span>  <span class="legend_holiday">Holiday</span> 
+                    <?php _t('Legends', 'edupress'); ?>: <span class="legend_open"><?php _t('Open', 'edupress'); ?></span>  <span class="legend_close"><?php _t('Closed', 'edupress') ?></span>  <span class="legend_holiday"><?php _t('Holiday', 'edupress'); ?></span> 
                 </div>
                 <?php echo self::getCalendar( $start_date, $end_date, $data['data'] ?? [] ); ?>
                 <div class="form-row cal-save-btn" style="display:none;">

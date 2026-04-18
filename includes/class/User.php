@@ -429,7 +429,7 @@ class User
             'read_attendance',
             'publish_attendance',
             'delete_attendance',
-
+            'read_support'
         );
 
         add_role(
@@ -678,6 +678,8 @@ class User
             'alumni'  => __('Alumni', 'edupress'),
             'parent' => __('Parent', 'edupress'),
         );
+
+        if (current_user_can('manage_options')) $roles['administrator'] = __('Administrator', 'edupress');
 
         $custom_roles = self::getCustomRoles();
         if(!empty($custom_roles)){
@@ -1135,7 +1137,7 @@ class User
                 'name'  => 'start_date',
                 'type'  => 'date',
                 'settings'=>array(
-                    'label' => 'Academic Start Date',
+                    'label' => t('Academic Start Date', 'edupress'),
                     'value' => isset($settings['start_date']) && !empty($settings['start_date']) ? date('Y-m-d', strtotime($settings['start_date'])) : date('Y-m-d', strtotime($this->getUser()->user_registered)),
                 )
             );
@@ -1151,7 +1153,7 @@ class User
                 'name'  => 'end_date',
                 'type'  => 'date',
                 'settings'=>array(
-                    'label' => 'Academic End Date',
+                    'label' => t('Academic End Date', 'edupress'),
                     'value' => $end_date,
                 )
             );
@@ -1165,7 +1167,7 @@ class User
             'type' => 'file',
             'name'  => 'dp',
             'settings'=> array(
-                'label' => 'Profile photo',
+                'label' => t('Profile photo', 'edupress'),
                 'data' => array(
                     'data-target-name' => 'avatar_id',
                     'data-target-class' => 'user-photo-wrap'
@@ -1189,19 +1191,47 @@ class User
                     'type' => 'text',
                     'name'  => $k,
                     'settings' => array(
-                        'label' => $v,
+                        'label' => t($v, 'edupress'),
                         'value' => $this->getMeta( $k ),
                     )
                 );
             }
         }
+
+        $fields['blood_group'] = array(
+            'type' => 'select',
+            'name' => 'blood_group',
+            'settings' => array(
+                'options' => array( 
+                    'A+'=>t('A+','edupress'), 
+                    'A-'=>t('A-','edupress'), 
+                    'B+'=>t('B+','edupress'), 
+                    'B-'=>t('B-','edupress'), 
+                    'O+'=>t('O+','edupress'), 
+                    'O-'=>t('O-','edupress'), 
+                    'AB+'=>t('AB+','edupress'), 
+                    'AB-'=>t('AB-','edupress'), 
+                ),
+                'value' => $this->getMeta('blood_group'),
+                'label'=> t('Blood Group', 'edupress'),
+                'placeholder' => __('Select','edupress')
+            )
+        );
+        $fields['guardian'] = array(
+            'type' => 'text',
+            'name' => 'guardian',
+            'settings' => array(
+                'value' => $this->getMeta('guardian'),
+                'label'=> t('Guardian', 'edupress'),
+            )
+        );
         $fields['status'] = array(
             'type' => 'select',
             'name' => 'status',
             'settings' => array(
                 'options' => array('Active'=>'Active','Inactive'=>'Inactive'),
                 'value' => $this->getMeta('status'),
-                'label'=> 'Status'
+                'label'=> t('Status', 'edupress')
             )
         );
         return apply_filters( 'edupress_user_edit_fields', $fields );
@@ -1391,7 +1421,7 @@ class User
         $pages = ceil( $qry->get_total() / $args['number'] );
 
 
-        if ( empty($results) ) return 'No users found!';
+        if ( empty($results) ) return t('No users found', 'edupress');
 
         $shift_active = EduPress::isActive('shift');
         $class_active = EduPress::isActive('class');
@@ -1406,7 +1436,7 @@ class User
             </div>
             <div class="ep-flex-4 ep-mb-flex-12">
                 <?php if(EduPress::isActive('attendance')) : ?>
-                    <button class="ep-mt-sm edupress-btn generate_attendance_ids no-print" type="button"><?php _e('Sync User Attendance IDs', 'edupress'); ?></button>
+                    <button class="ep-mt-sm edupress-btn generate_attendance_ids no-print" type="button"><?php _t('Sync User Attendance IDs', 'edupress'); ?></button>
                 <?php endif; ?>
             </div>
         </div>

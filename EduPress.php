@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.7.9
+Version: 1.8.0
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -153,6 +153,16 @@ class EduPress
             return $show;
         });
 
+        // Add custom 3-minute cron schedule in WordPress
+        add_filter('cron_schedules', [$this, 'addCustomCronSchedules']);
+
+
+        // Schedule event if not already scheduled
+        add_action('init', [$this, 'scheduleEvents']);
+
+        // custom Hook 
+        add_action('edupress_sync_logs_hook', [$this, 'customCronHook'] );
+
     }
 
 
@@ -192,6 +202,32 @@ class EduPress
         }
 
     }
+
+    public function addCustomCronSchedules($schedules) 
+    {
+        $schedules['every_2_minutes'] = array(
+            'interval' => 120, // 2 minutes in seconds
+            'display'  => __('Every 2 Minutes')
+        );
+        $schedules['every_3_minutes'] = array(
+            'interval' => 180, // 3 minutes in seconds
+            'display'  => __('Every 3 Minutes')
+        );
+        return $schedules;
+    }
+
+    public function scheduleEvents () 
+    {
+        if (!wp_next_scheduled('edupress_sync_logs_hook')) {
+            wp_schedule_event(time(), 'every_3_minutes', 'edupress_sync_logs_hook');
+        }
+    }
+
+    public function customCronHook() {
+        $url = site_url('?syncAttendanceLogs');
+        file_get_contents($url);
+    }
+    
 
     /**
      * Create custom tables for SMS

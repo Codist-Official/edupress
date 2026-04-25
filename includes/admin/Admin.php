@@ -1435,7 +1435,7 @@ class Admin
                             'step' => 1,
                         ),
                         'after' => 'Default is 30 days',
-                        'value' => Admin::getSetting('attendance_store_log', 30),
+                        'value' => Admin::getSetting('attendance_store_log', 365),
                     )
                 );
 

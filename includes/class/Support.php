@@ -1,7 +1,7 @@
 <?php 
 namespace EduPress;
 
-defined('ABSPATH') or exit;
+defined('ABSPATH') or die();
 
 class Support extends Post{
 

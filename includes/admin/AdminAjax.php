@@ -170,6 +170,10 @@ class AdminAjax
             case 'notice':
                 $post = new Notice($post_id);
                 break;
+        
+            case 'exam_routine':
+                $post = new ExamRoutine($post_id);
+                break;
 
             case 'grade_table':
                 $post = new GradeTable($post_id);
@@ -327,6 +331,10 @@ class AdminAjax
                 );
                 break;
 
+            case 'exam_routine':
+                $post = new ExamRoutine($post_id);
+                break;
+
             default:
                 break;
 
@@ -429,6 +437,10 @@ class AdminAjax
 
             case 'notice':
                 $post = new Notice();
+                break;
+
+            case 'exam_routine':
+                $post = new ExamRoutine();
                 break;
 
             default:
@@ -1730,6 +1742,11 @@ class AdminAjax
         return ['status'=>1,'data'=>'Updated'];
     }
 
+    public function downloadAdmitCard()
+    {
+        $html = ExamRoutine::getAdmitCardHTML($_REQUEST);
+        return ['status' => 1, 'data' => $html, 'orientation' => $_REQUEST['orientation']];
+    }
 
 
 }

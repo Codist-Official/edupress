@@ -85,6 +85,7 @@ class Post
 
             $this->id = $id->ID;
             $this->setPost( $id );
+
         }
 
         if( $this->post ) $this->setMetadata( get_metadata( 'post', $this->id ) );
@@ -94,7 +95,7 @@ class Post
     /**
      * @return string
      */
-    public function getPostType(): string
+    public function getPostType()
     {
         return $this->post_type;
     }
@@ -105,7 +106,7 @@ class Post
      * @since 1.0
      * @access public
      */
-    public function setPostType(string $post_type): void
+    public function setPostType(string $post_type)
     {
         $this->post_type = $post_type;
     }
@@ -792,7 +793,7 @@ class Post
         $qry = $this->getPosts( $this->getListQuery() );
 
         if( !$qry->have_posts() ){
-            $html = __( "No ". ucwords(str_replace('_', ' ', $this->post_type ) ) ." found!", 'edupress' );
+            $html = t( "No ". ucwords(str_replace('_', ' ', $this->post_type ) ) ." found!", 'edupress' );
             return apply_filters( "edupress_list_{$this->post_type}_html", $html );
         }
 
@@ -937,9 +938,7 @@ class Post
             </div>
         <?php endif; ?>
         <div class="clear"></div>
-        <?php
-        return ob_get_clean();
-
+        <?php return ob_get_clean();
     }
 
     /**

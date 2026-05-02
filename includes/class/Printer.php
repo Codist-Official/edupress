@@ -205,7 +205,7 @@ class Printer
             <section class="edupress-print-footer-wrap">
                 <p style="font-size:8px !important;line-height:8px !important;margin:0;padding:0;">
                     This document was generated on <?php echo date('h:i:s a, d/m/y', strtotime(current_time('mysql'))); ?>
-                    using <strong>EduPress School Management Software </strong> | +880 1979 001 001 | www.edupressbd.com
+                    by <strong>EduPress School Management Software </strong> | +880 1979 001 001 | www.edupressbd.com
                 </p>
             </section>
         <?php endif; ?>
@@ -245,9 +245,12 @@ class Printer
                 })
 
             })
-            function printContent( content = '', portrait= true ) {
+            function printContent( content = '', portrait= true, configs={showHeader:true, showFooter: true}) {
 
-                let landscapeMode = !portrait ? `<style type="text/css">@page {size: <?php echo Admin::getSetting('print_paper_size', 'A4'); ?> landscape !important;}</style>` : '';
+                let mode = portrait ? ' portrait ' : ' landscape ';
+                let landscapeMode = `<style type="text/css">@page {size: <?php echo Admin::getSetting('print_paper_size', 'A4'); ?> ${mode} !important;}</style>`;
+                let header = 1 == 1 ? `<div class='print-header'><?php echo self::getHeader(); ?></div>` : '';
+                let footer = 1 == 1 ? `<div class='print-footer' id='pageFooter'><?php echo self::getFooter(); ?></div>` : '';
 
                 // Custom content to be printed
                 let customContent = `
@@ -257,9 +260,9 @@ class Printer
                         ${landscapeMode}
                     </head>
                     <body>
-                        <div class='print-header'><?php echo self::getHeader(); ?></div>
+                        ${header}
                         <main class='print-content'>${content}</main>
-                        <div class='print-footer' id='pageFooter'><?php echo self::getFooter(); ?></div>
+                        ${footer}
                     </body>
                     </html>
                 `;

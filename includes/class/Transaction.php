@@ -1,7 +1,7 @@
 <?php
 namespace EduPress;
 
-defined('ABSPATH') || exit;
+defined('ABSPATH') || die();
 
 class Transaction extends CustomPost
 {

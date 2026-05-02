@@ -244,7 +244,7 @@ class Attendance extends CustomPost
                         $sms_text = $sms_id ? $wpdb->get_var("SELECT sms FROM {$wpdb->prefix}sms_logs WHERE id = {$sms_id} ") : '';
                         $role = $user->getRole();
                         $role_name = isset($roles[$role]) ? $roles[$role] : $role;
-                        $voice_status = !is_null($r->voice_id) ? $wpdb->get_var("SELECT status FROM {$wpdb->prefix}voice_logs WHERE id = {$r->voice_id}") : '';
+                        $voice_status = property_exists($r, 'invoice_id') && !is_null($r->voice_id) ? $wpdb->get_var("SELECT status FROM {$wpdb->prefix}voice_logs WHERE id = {$r->voice_id}") : '';
                     ?>
                     <tr data-role="<?php echo $user->getRole(); ?>" data-user_id="<?php echo $r->user_id; ?>">
                         <?php if( $branch_active ): ?><td><?php  echo !empty($branch_id) ? get_the_title( $branch_id ) : ''; ?></td><?php endif; ?>

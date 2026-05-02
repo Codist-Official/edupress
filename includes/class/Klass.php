@@ -1,7 +1,7 @@
 <?php
 namespace EduPress;
 
-defined( 'ABSPATH' || die () );
+defined( 'ABSPATH' )  || die ();
 
 class Klass extends Post
 {

@@ -21,7 +21,7 @@ if(!empty($data['person']['roll'])){
 if(!empty($data['person']['mobile'])){
     $metadata[] = "Mobile: " . $data['person']['mobile'];
 }
-
+ 
 $metadata_text = '';
 if(!empty($metadata)){
     $metadata_text = implode("<br>", $metadata);

@@ -115,6 +115,7 @@ class GradeTable extends Post
         <div class="form-row">
             <div class="label-wrap"> &nbsp; </div>
             <div class="value-wrap">
+                <div class="ep-info"><?php _t('Start from highest range to lowest like A+ be first'); ?></div>
                 <ul class="grade-table">
                     <?php
                         if( !empty( $grade_data) && is_array($grade_data['grade_point']) ){
@@ -126,8 +127,8 @@ class GradeTable extends Post
                                     <?php echo EduPress::generateFormElement( 'number', 'grade_point[]', array( 'value'=> $grade_data['grade_point'][$i], 'placeholder'=>t('Grade Point'), 'required'=> true, 'data' => array( 'step' => 'any',  'min' => 0, ) )); ?>
                                     <?php echo EduPress::generateFormElement( 'text', 'grade[]', array( 'value'=> $grade_data['grade'][$i], 'placeholder'=>'Grade', 'required'=> true, 'data' => array( 'step' => 'any' ) )); ?>
                                     <div class="action">
-                                        <a href="javascript:void(0)" class="copy-grade-table-row">+</a>
-                                        <a href="javascript:void(0)" class="remove-grade-table-row">-</a>
+                                        <a href="javascript:void(0)" class="copy-grade-table-row ep-tag-btn">+</a>
+                                        <a href="javascript:void(0)" class="remove-grade-table-row ep-tag-btn">-</a>
                                     </div>
                                 </li>
                                 <?php
@@ -140,8 +141,8 @@ class GradeTable extends Post
                                 <?php echo EduPress::generateFormElement( 'number', 'grade_point[]', array('placeholder'=>t('Grade Point'), 'required'=> true, 'data' => array( 'step' => 'any',  'min' => 0, ) )); ?>
                                 <?php echo EduPress::generateFormElement( 'text', 'grade[]', array('placeholder'=>t('Grade'), 'required'=> true, 'data' => array( 'step' => 'any' ) )); ?>
                                 <div class="action">
-                                    <a href="javascript:void(0)" class="copy-grade-table-row">+</a>
-                                    <a href="javascript:void(0)" class="remove-grade-table-row">-</a>
+                                    <a href="javascript:void(0)" class="copy-grade-table-row ep-tag-btn">+</a>
+                                    <a href="javascript:void(0)" class="remove-grade-table-row ep-tag-btn">-</a>
                                 </div>
                             </li>
                             <?php

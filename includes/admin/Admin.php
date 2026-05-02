@@ -425,6 +425,8 @@ class Admin
 
         $setting = isset($option_value[$key]) && !empty($option_value[$key]) ? $option_value[$key] : $default;
 
+        if(!is_array($setting)) $setting = stripslashes(htmlspecialchars($setting));
+
         return apply_filters( 'edupress_admin_settings_'. $key, $setting );
 
     }
@@ -525,6 +527,18 @@ class Admin
         switch (strtolower(trim($form))){
 
             case 'features':
+                $sub_default = EduPress::isActive('exam') ? 'full' : 'attendance';
+                $sub_data = EduPress::getSubscriptionData();
+                $fields['subscription'] = array(
+                    'type' => 'select',
+                    'name' => 'subscription',
+                    'settings' => array(
+                        'options' => ['attendance' => t('Digital Attendance', 'edupress'), 'full' => t('School Management Software')],
+                        'label' => 'Subscription',
+                        'id' => 'subscription',
+                        'value' => Admin::getSetting('subscription', $sub_data['type'])
+                    )
+                );
                 $fields['branch_active'] = array(
                     'type'  => 'select',
                     'name'  => 'branch_active',
@@ -590,6 +604,15 @@ class Admin
                         'label' => __('Exam', 'edupress')
                     )
                 );
+                $fields['exam_routine_active'] = array(
+                    'type'  => 'select',
+                    'name'  => 'exam_routine_active',
+                    'settings' => array(
+                        'options' => $active_options,
+                        'value' => Admin::getSetting('exam_routine_active'),
+                        'label' => t('Exam Routine', 'edupress')
+                    )
+                );
                 $fields['transaction_active'] = array(
                     'type'  => 'select',
                     'name'  => 'transaction_active',
@@ -653,11 +676,19 @@ class Admin
                         'label' => __('Global Print Button', 'edupress')
                     )
                 );
-
-                // only admin can set this features 
-                if(!current_user_can('manage_options')){
-                    unset($fields['exam_active'], $fields['transaction_active'], $fields['term_active'], $fields['subject_active'], $fields['notice_active']);
+                
+                if(!current_user_can('manage_options')) $fields['subscription']['settings']['disabled'] = true;
+                
+                $sub_data = EduPress::getSubscriptionData();
+                
+                if ($sub_data['type'] != 'full'){
+                    // Full System Featuares 
+                    $full_features = ['exam_active', 'transaction_active', 'term_active', 'subject_active', 'notice_active', 'exam_routine_active'];
+                    foreach($full_features as $k){
+                        $fields[$k]['settings']['options'] = ['inactive'=>'Inactive'];
+                    }
                 }
+
                 break;
                 
             case 'institute':
@@ -689,7 +720,7 @@ class Admin
                     'name'  => 'institute_name',
                     'settings' => array(
                         'value' => Admin::getSetting('institute_name'),
-                        'label' => __('Institute Name', 'edupress')
+                        'label' => __('Institute\'s Name', 'edupress')
                     )
                 );
 
@@ -706,7 +737,6 @@ class Admin
                         'label' => __('Logo', 'edupress'),
                         'after' => "<div class='institute_logo_container'>".wp_get_attachment_image(Admin::getSetting('institute_logo_id'), 'full')."</div>",
                     ),
-
                 );
 
                 $fields['institute_logo_id'] = array(
@@ -759,6 +789,40 @@ class Admin
                     'settings' => array(
                         'value' => Admin::getSetting('institute_email'),
                         'label' => __('Email', 'edupress')  
+                    )
+                );
+
+
+                $fields['principal_signature_id'] = array(
+                    'type'  => 'file',
+                    'name'  => 'principal_signature_id',
+                    'settings' => array(
+                        'class' => 'wp_ajax_upload',
+                        'data'  => array(
+                            'data-target-name' => 'principal_signature',
+                            'data-target-class' => 'principal_signature_container',
+                            'accept' => 'image/*',
+                        ),
+                        'label' => t('Principal\'s Signature', 'edupress'),
+                        'after' => "<div class='principal_signature_container'>".wp_get_attachment_image(Admin::getSetting('principal_signature'), 'full')."</div>",
+                    ),
+                );
+
+                $fields['principal_signature'] = array(
+                    'type'  => 'hidden',
+                    'name'  => 'principal_signature',
+                    'settings' => array(
+                        'value' => Admin::getSetting('principal_signature'),
+                        'class' => 'principal_signature'
+                    )
+                );
+
+                $fields['principal_designation'] = array(
+                    'type'  => 'text',
+                    'name'  => 'principal_designation',
+                    'settings' => array(
+                        'value' => Admin::getSetting('principal_designation'),
+                        'label' => t('Principal\'s Designation', 'edupress')
                     )
                 );
                 break;
@@ -1548,6 +1612,17 @@ class Admin
                         );
                     }
                 }
+
+                $notes = "* Admit card must be presented at entry.\n* Candidates must report 15 minutes prior to commencement. \n* Mobile phones and electronic devices are prohibited. \n* Instructions of the invigilator must be followed. \n* Any misconduct will result in disqualification. \n";
+                $fields['admit_card_notes'] = array(
+                    'type'  => 'textarea',
+                    'name'  => 'admit_card_notes',
+                    'settings' => array(
+                        'value' => Admin::getSetting('admit_card_notes', $notes),
+                        'label' => t('Admit Card Notes', 'edupress'),
+                        'required' => false,
+                    )
+                );
                 break;
 
             case 'print':

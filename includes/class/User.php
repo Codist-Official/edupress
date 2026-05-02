@@ -279,9 +279,10 @@ class User
             'student',
             'Student'
         );
-        $student = get_role('student');
-        $student->add_cap('read_result');
-        $student->add_cap( 'read_attendance');
+        $student = get_role('student' );
+        $student->add_cap('read_result' );
+        $student->add_cap( 'read_attendance' );
+        $student->add_cap( 'read_exam_routine' );
 
         // Alumni
         add_role(
@@ -298,7 +299,8 @@ class User
         );
         $parent = get_role('parent');
         $parent->add_cap('read_result');
-        $student->add_cap( 'read_attendance');
+        $student->add_cap( 'read_attendance' );
+        $student->add_cap( 'read_exam_routine' );
 
         // Teacher
         add_role(
@@ -323,6 +325,11 @@ class User
         $teacher->add_cap('publish_result');
         $teacher->add_cap('edit_result');
         $teacher->add_cap('delete_result');
+
+        $teacher->add_cap('read_exam_routine');
+        $teacher->add_cap('publish_exam_routine');
+        $teacher->add_cap('edit_exam_routine');
+        $teacher->add_cap('delete_exam_routine');
 
         $teacher->add_cap('read_user' );
         $teacher->add_cap('read_sms' );
@@ -366,6 +373,12 @@ class User
 
         $accountant->add_cap( 'read_attendance');
         $accountant->add_cap( 'publish_attendance');
+
+        $accountant->add_cap('read_exam_routine');
+        $accountant->add_cap('publish_exam_routine');
+        $accountant->add_cap('edit_exam_routine');
+        $accountant->add_cap('delete_exam_routine');
+
 
 
         // Manager
@@ -429,7 +442,11 @@ class User
             'read_attendance',
             'publish_attendance',
             'delete_attendance',
-            'read_support'
+            'read_support',
+            'read_exam_routine',
+            'publish_exam_routine',
+            'edit_exam_routine',
+            'delete_exam_routine',
         );
 
         add_role(
@@ -2167,25 +2184,29 @@ class User
         if(!empty($conds['branch_id']) && $conds['branch_id'] > 0){
             $args['meta_query'][] = array(
                 'key' => 'branch_id',
-                'value' => intval($conds['branch_id'])
+                'value' => intval($conds['branch_id']),
+                'compare' => 'NUMERIC',
             );
         }
         if(!empty($conds['shift_id']) && $conds['shift_id'] > 0){
             $args['meta_query'][] = array(
                 'key' => 'shift_id',
-                'value' => intval($conds['shift_id'])
+                'value' => intval($conds['shift_id']),
+                'compare' => 'NUMERIC',
             );
         }
         if(!empty($conds['class_id']) && $conds['class_id'] > 0){
             $args['meta_query'][] = array(
                 'key' => 'class_id',
-                'value' => intval($conds['class_id'])
+                'value' => intval($conds['class_id']),
+                'compare' => 'NUMERIC',
             );
         }
         if(!empty($conds['section_id']) && $conds['section_id'] > 0){
             $args['meta_query'][] = array(
                 'key' => 'section_id',
-                'value' => intval($conds['section_id'])
+                'value' => intval($conds['section_id']),
+                'compare' => 'NUMERIC',
             );
         }
 
@@ -2196,7 +2217,7 @@ class User
             $args['meta_type'] = 'NUMERIC';
         }
 
-        if( isset($conds['role']) && !empty($conds['role']) ) $args['role__in'] = esc_attr($conds['role']);
+        if( isset($conds['role']) && !empty($conds['role']) ) $args['role__in'] = !is_array($conds['role']) ? [esc_attr($conds['role'])] : $conds['role'] ;
 
         if( isset($args['meta_query']) && count($args['meta_query']) > 1) $args['meta_query']['relation'] = 'AND';
 

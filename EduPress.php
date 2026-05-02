@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.8.0
+Version: 1.8.1
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -156,12 +156,11 @@ class EduPress
         // Add custom 3-minute cron schedule in WordPress
         add_filter('cron_schedules', [$this, 'addCustomCronSchedules']);
 
+        // // Schedule event if not already scheduled
+        // add_action('init', [$this, 'scheduleEvents']);
 
-        // Schedule event if not already scheduled
-        add_action('init', [$this, 'scheduleEvents']);
-
-        // custom Hook 
-        add_action('edupress_sync_logs_hook', [$this, 'customCronHook'] );
+        // // custom Hook 
+        // add_action('edupress_sync_logs_hook', [$this, 'customCronHook'] );
 
     }
 
@@ -1309,6 +1308,10 @@ class EduPress
                 'title' => 'Exam Term',
                 'icon' => 'fa-solid fa-calendar-day',
             ),
+            'exam_routine' => array(
+                'title' => 'Exam Routine',
+                'icon' => 'fa-solid fa-calendar-day',
+            ),
             'exam' => array(
                 'title' => 'Exam',
                 'icon' => 'fa-solid fa-calendar-day',
@@ -1694,6 +1697,21 @@ class EduPress
         </ul>
         <?php
         return ob_get_clean();
+    }
+
+
+    /**
+     * Get Subscription type 
+     * 
+     * @return array 
+     * 
+     * @since 1.8.0
+     */
+    public static function getSubscriptionData()
+    {
+        $default_sub = self::isActive('exam') ? 'full' : 'attednance';
+        $subscription = Admin::getSetting('subscription', $default_sub);
+        return ['type' => $subscription];
     }
 
 

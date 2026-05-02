@@ -165,23 +165,23 @@ class Result extends Post
         ob_start();
         ?>
 
-        <h2 style="text-align: center"><?php echo $can_user_edit  ? 'Update Result' : 'Academic Result'; ?></h2>
+        <h2 style="text-align: center"><?php echo $can_user_edit  ? t('Update Result') : t('Academic Result'); ?></h2>
 
         <div class="exam-result-head">
             <?php if( Admin::getSetting('branch_active') == 'active' ): ?>
-                Branch: <?php echo get_the_title($this->getMetadata()['branch_id'][0]); ?> <br>
+                <?php _t('Branch:'); ?> <?php echo get_the_title($this->getMetadata()['branch_id'][0]); ?> <br>
             <?php endif; ?>
             <?php if( Admin::getSetting('shift_active') == 'active' ): ?>
-                Shift: <?php echo get_the_title($this->getMetadata()['shift_id'][0]); ?> <br>
+                <?php _t('Shift:'); ?> <?php echo get_the_title($this->getMetadata()['shift_id'][0]); ?> <br>
             <?php endif; ?>
             <?php if( Admin::getSetting('class_active') == 'active' ): ?>
-                Class: <?php echo get_the_title($this->getMetadata()['class_id'][0]); ?> <br>
+                <?php _t('Class:'); ?> <?php echo get_the_title($this->getMetadata()['class_id'][0]); ?> <br>
             <?php endif; ?>
             <?php if( Admin::getSetting('section_active') == 'active' ): ?>
-                Section: <?php echo get_the_title($this->getMetadata()['section_id'][0]); ?><br>
+                <?php _t('Section:'); ?> <?php echo get_the_title($this->getMetadata()['section_id'][0]); ?><br>
             <?php endif; ?>
-            <?php _e( 'Subject', 'edupress' ); ?> : <strong> <?php echo get_the_title($this->getMetadata()['subject_id'][0]); ?></strong><br>
-            <?php _e( 'Exam date', 'edupress' ); ?>: <?php echo date( 'd/m/Y', strtotime($this->getMetadata()['exam_date'][0])); ?><br><br>
+            <?php _t( 'Subject', 'edupress' ); ?> : <strong> <?php echo get_the_title($this->getMetadata()['subject_id'][0]); ?></strong><br>
+            <?php _t( 'Exam date', 'edupress' ); ?>: <?php echo date( 'd/m/Y', strtotime($this->getMetadata()['exam_date'][0])); ?><br><br>
         </div>
 
         <style>
@@ -203,22 +203,22 @@ class Result extends Post
                         </tr>
                         <?php endif; ?>
                         <tr>
-                            <th>Roll</th>
-                            <th>Name</th>
-                            <th>Status</th>
+                            <th><?php _t('Roll'); ?></th>
+                            <th><?php _t('Name'); ?></th>
+                            <th><?php _t('Status'); ?></th>
                             <?php
                             if( !empty($heads) ){
                                 foreach($heads as $h){
                                     ?>
                                     <th>
-                                        <?php _e( $h, 'edupress' ); ?>
+                                        <?php _t( $h, 'edupress' ); ?>
                                         <?php echo EduPress::generateFormElement( 'number', $h .'_exam_mark', array( 'value' => $exam_marks[$h], 'required' => true, 'data' => array('title'=>$h. ' Exam Mark', 'data-mark-head'=>$h, 'step'=>'any', 'min' => 0), 'readonly' => !$can_user_edit, 'class' => "{$viewer_class}", )) ?>
                                     </th>
                                     <?php
                                 }
                             }
                             ?>
-                            <th>Total<br><span class="edupress-value-container"><?php echo array_sum($exam_marks); ?></span></th>
+                            <th><?php _t('Total'); ?><br><span class="edupress-value-container"><?php echo array_sum($exam_marks); ?></span></th>
                         </tr>
                     </thead>
                     <?php
@@ -442,7 +442,6 @@ class Result extends Post
                 $sub_id_a = (int) $exam_id_sub_id_mapping[$a->ID];
                 $sub_id_b = (int) $exam_id_sub_id_mapping[$b->ID];
 
-
                 $pos_a = array_search($sub_id_a, $subject_ordered);
                 $pos_b = array_search($sub_id_b, $subject_ordered);
 
@@ -450,6 +449,7 @@ class Result extends Post
             });
 
         } else {
+
             $subject_ordered = [];
             while($qry->have_posts()):
                 $qry->the_post();
@@ -463,7 +463,7 @@ class Result extends Post
 
         $students = User::getAll($_REQUEST);
 
-        if(empty($students)) return __('No students found!', 'edupress');
+        if(empty($students)) return t('No students found!', 'edupress');
 
         $branch_active = EduPress::isActive('branch');
         $branch_title = get_the_title($branch_id);
@@ -744,10 +744,6 @@ class Result extends Post
                         $connected_subjects_data[$student_id]['results'][$subject_id]['marks'] = $combined_data;
                         $connected_subjects_data[$student_id]['results'][$subject_id]['is_connected'] = $is_connected;
                         $connected_subjects_data[$student_id]['results'][$subject_id]['connected_subject_id'] = $connected_subject_id;
-                        // Reducing data
-//                        $connected_subjects_data[$student_id]['results'][$subject_id]['subject_title'] = $subject_marks['subject_title'];
-//                        $connected_subjects_data[$student_id]['results'][$subject_id]['combined_title'] = $subject_marks['combined_title'];
-//                        $connected_subjects_data[$student_id]['results'][$subject_id]['exam_date'] = $subject_marks['exam_date'];
 
                         // Skipping if unregistered
                         if($unregistered) continue;
@@ -864,8 +860,8 @@ class Result extends Post
                             <th>Total</th>
                             <th>Merit<br>Pos.</th>
                         <?php else : ?>
-                            <th>CGPA <br>(W/O Op.)</th>
-                            <th>CGPA <br>(W Op.)</th>
+                            <th>GPA <br>(W/O Op.)</th>
+                            <th>GPA <br>(W Op.)</th>
                             <th>Grade</th>
                         <?php endif; ?>
                         <th class="no-print">Action</th>
@@ -998,7 +994,8 @@ class Result extends Post
                                             if($result_sms_mark_details) $sms_data[$student_id]['sms'] .= rtrim($temp_sms_details, ', ');
                                             echo "<li><span class='exam-mark-title'><strong>Total</strong></span><span class='exam-mark-value'><strong>$total</strong></span></li>";
                                             $print_html = rtrim( trim($print_html), '+' );
-                                            $print_html .= "=$total";
+                                            // Sum up only if double or more heads found
+                                            if(str_contains($print_html, '+')) $print_html .= "=$total";
 
                                             // Showing grade and grade data
                                             if( $ranking_method != 'marks' ){
@@ -1103,8 +1100,8 @@ class Result extends Post
 
                         <!-- SMS -->
                             <?php
-                                $sms_data[$student_id]['sms'] .= "\nGGPA W/O Op: {$cgpa_without_op}";
-                                $sms_data[$student_id]['sms'] .= "\nGGPA W/ Op: {$cgpa_with_op} \n";
+                                $sms_data[$student_id]['sms'] .= "\nGPA W/O Op: {$cgpa_without_op}";
+                                $sms_data[$student_id]['sms'] .= "\nGPA W/ Op: {$cgpa_with_op} \n";
                                 $sms_data[$student_id]['sms'] .= "\nGrade: {$grade} \n";
                             ?>
 
@@ -1339,13 +1336,13 @@ class Result extends Post
         $columns = trim(Admin::getSetting('result_signature_box_columns'));
         if(!empty($columns)){
             $columns = explode("\r\n", $columns);
-            $columns = array_unique($columns);
+            $columns = array_unique(array_filter($columns));
         }
         ob_start();
         $box_height = Admin::getSetting('result_signature_box_height', 0.5);
         ?>
         <div class="edupress-table-wrap no-view" style="margin-top: 20px;">
-            <table class="edupress-table">
+            <table class="edupress-table sign-table">
                 <?php if(!empty($title)) : ?>
                 <tr>
                     <th colspan="<?php echo is_array($columns) ? count($columns) : 1; ?>" style="text-align: center"><?php echo $title; ?></th>
@@ -1355,8 +1352,12 @@ class Result extends Post
                 <?php if(!empty($columns)): ?>
                     <tr>
                         <?php foreach($columns as $column): ?>
-                            <th style="text-align: left; text-decoration: underline;">
-                                <?php echo $column; ?>
+                            <th style="text-align: left; vertical-align: top !important;">
+                                <?php 
+                                    $column_data = explode('|', $column);
+                                ?>
+                                <span style='text-decoration:underline;'><?php echo $column_data[0]; ?></span><br>
+                                <?php if($column_data[1]) echo apply_filters('the_content', $column_data[1]); ?>
                                 <div style="height: <?php echo $box_height; ?>in; "> </div>
                             </th>
                         <?php endforeach; ?>

@@ -196,15 +196,20 @@ jQuery(document).ready(function(){
     })
 
      // Adding portion to show filter wrap 
-     if($j('.edupress-filter-list-wrap').length > 0){
-        let txt = edupress.lang == 'bn' ? '+ ফিল্টার অপশন দেখুন' : '+ Show Filter Options';
-        let html = `<a href='javascript:void(0)' class='filter-toggle ep-search-toggle-btn no-print' data-active='0'>${txt}</a>`;
-        $j('.edupress-filter-list-wrap').before(html);
+     let filterSelector = $j('.edupress-filter-list-wrap');
+     if(filterSelector.length > 0){
+        if(filterSelector.data('active') == 1) {
+            filterSelector.show();
+        } else {
+            let txt = edupress.lang == 'bn' ? '+ ফিল্টার অপশন দেখুন' : '+ Show Filter Options';
+            let html = `<a href='javascript:void(0)' class='filter-toggle ep-search-toggle-btn no-print' data-active='0'>${txt}</a>`;
+            $j('.edupress-filter-list-wrap').before(html);
+        }
+        
     }
 
     // Filter Toggle
     $j(document).on('click', '.filter-toggle',function(e){
-        console.log($j(this).attr('data-active'));
         if($j(this).attr('data-active') == 0){
             let txt = edupress.lang == 'bn' ? '+ ফিল্টার অপশন লুকান' : '+ Hide Filter Options';
             $j(this).text(txt).attr('data-active', 1);
@@ -329,7 +334,6 @@ jQuery(document).ready(function(){
         // Adding new options
         if(edupress.class_active == 1) {
             for( i in edupress.classes ){
-                // if( parseInt(edupress.classes[i]['shift_id']) !== shiftId ) continue;
                 let classId = parseInt(getUrlParameter('class_id'));
                 let selected = classId === parseInt(edupress.classes[i]['id']) ? " selected='selected' " : "";
                 $j(":input[name='class_id']").append(`<option value='${edupress.classes[i]['id']}' ${selected}>${edupress.classes[i]['title']}</option>`);
@@ -357,18 +361,22 @@ jQuery(document).ready(function(){
         }
     }
 
+
     // Updating shift if active
-    $j(document).on('change',':input[name=branch_id]',function (){
-        updateShiftOptions(parseInt($j(this).val()));
+    $j(document).on('change',":input[name='branch_id']", function(){
+        let bid = parseInt($j(this).val());
+        if(edupress.shift_active == '1') updateShiftOptions(bid);
+        else if(edupress.class_active == '1') updateClassOptions(bid);
+        else if(edupress.section_active == '1') updateSectionOptions(bid);
     })
 
     // Update class if shift is changed
-    $j(document).on('change', ":input[name=shift_id]", function(){
+    $j(document).on('change', ":input[name='shift_id']", function(){
         updateClassOptions(parseInt($j(this).val()));
     })
 
     // Update sections if class is changed
-    $j(document).on('change', ":input[name=class_id]", function(){
+    $j(document).on('change', ":input[name='class_id']", function(){
         updateSectionOptions(parseInt($j(this).val()));
     })
 
@@ -389,6 +397,7 @@ jQuery(document).ready(function(){
     if(paramClassId > 0){
         updateSectionOptions(paramClassId);
     }
+
 
     // Updating branch if branch is 1 only when dom content loaded done 
     let curBranchId = $j(":input[name='branch_id']").val();
@@ -1508,6 +1517,26 @@ jQuery(document).ready(function(){
         })
     })
 
+    // clone exam routine 
+    $j(document).on('click', '.exam_routine_btn', function(e){
+        preventDefault(e);
+        let action = $j(this).data('action');
+        if ( action == 'copy' ){
+            let copy = $j(this).closest('.exam-routine-row').clone();
+            copy.find(":input").val('');
+            $j(this).parents('.exam-routine-row').after(copy);
+        } else {
+            let count = $j('.exam-routine-row').length;
+            if(count == 1){
+                alert("This row cannot be deleted");
+                return;
+            }
+            $j(this).parents('.exam-routine-row').slideUp(300, function(){
+                $j(this).remove();
+            });
+        }
+    })
+
 
 })
 ///// jQuery Ends //////
@@ -1870,4 +1899,14 @@ window.langSwitchCallback = function(data, ele){
 
 window.reload = function(){
     window.location.reload();
+}
+
+window.showAjaxContent = function(data, ele){
+    $j('.showAjaxContent').html(data.data);
+}
+
+window.printAdmitCard = function(data, ele){
+    let mode = data.orientation == 'portrait';
+    let configs = {showHeader:false, showFooter:false};
+    printContent(data.data, mode, configs);
 }

@@ -433,6 +433,10 @@ class Frontend
                 $post = new PrintMaterial();
                 break;
 
+            case 'exam_routine':
+                $post = new ExamRoutine();
+                break;
+
             default:
                 break;
         }

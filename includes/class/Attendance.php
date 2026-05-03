@@ -364,7 +364,7 @@ class Attendance extends CustomPost
                     <tr>
                         <th style="text-align: left;"><?php _e('Branch', 'edupress'); ?></th>
                         <th style="text-align: left;">
-                            <?php _e('Roll / ID', 'edupress'); ?>
+                            <?php _t('Roll / ID', 'edupress'); ?>
                             <br>
                             <span class="no-print">
                                 <input type="checkbox" class="edupress-bulk-select-all" id="select_all">
@@ -512,15 +512,15 @@ class Attendance extends CustomPost
         ?>
         <div id="single-day-count" data-day="<?php echo $date; ?>">
             <div class="day-count-item">
-                <div id='single_day_total_users' class='value'><?php _td($stats['total']); ?></div>
+                <div id='single_day_total_users' class='value'><?php _td($stats['total'] ?? 0); ?></div>
                 <div class="label"><?php _t('Total', 'edupress'); ?></div>
             </div> 
             <div class="day-count-item">
-                <div id='single_day_total_present' class='value'><?php _td($stats['present']) ; ?></div>
+                <div id='single_day_total_present' class='value'><?php _td($stats['present'] ?? 0) ; ?></div>
                 <div class="label"><?php _t('Present', 'edupress'); ?></div>
             </div> 
             <div class="day-count-item">
-                <div id='single_day_total_absent' class='value'><?php _td($stats['absent']); ?></div>
+                <div id='single_day_total_absent' class='value'><?php _td($stats['absent'] ?? 0); ?></div>
                 <div class="label"><?php _t('Absent', 'edupress'); ?></div>
             </div> 
         </div>
@@ -550,53 +550,66 @@ class Attendance extends CustomPost
         $section_id = sanitize_text_field($_REQUEST['section_id'] ?? '');
         $name = sanitize_text_field($_REQUEST['first_name'] ?? '');
         $roll = sanitize_text_field($_REQUEST['roll'] ?? '');
-        $role = sanitize_text_field($_REQUEST['role'] ?? '');
+        $role = strtolower(trim(sanitize_text_field($_REQUEST['role'] ?? '')));
 
         if(!empty($branch_id)){
-            $qry .= " LEFT JOIN {$wpdb->usermeta} t2 ON t1.user_id = t2.user_id ";
+            $qry .= " JOIN {$wpdb->usermeta} t2 ON t1.user_id = t2.user_id ";
+            $qry .= " AND t2.meta_key = 'branch_id' AND t2.meta_value = '{$branch_id}' ";
+
         }
         if(!empty($shift_id)){
-            $qry .= " LEFT JOIN {$wpdb->usermeta} t3 ON t1.user_id = t3.user_id ";
+            $qry .= " JOIN {$wpdb->usermeta} t3 ON t1.user_id = t3.user_id ";
+            $qry .= " AND t3.meta_key = 'shift_id' AND t3.meta_value = '{$shift_id}' ";
+
         }
         if(!empty($class_id)){
-            $qry .= " LEFT JOIN {$wpdb->usermeta} t4 ON t1.user_id = t4.user_id ";
+            $qry .= " JOIN {$wpdb->usermeta} t4 ON t1.user_id = t4.user_id ";
+            $qry .= " AND t4.meta_key = 'class_id' AND t4.meta_value = '{$class_id}' ";
+
         }
         if(!empty($section_id)){
-            $qry .= " LEFT JOIN {$wpdb->usermeta} t5 ON t1.user_id = t5.user_id ";
+            $qry .= " JOIN {$wpdb->usermeta} t5 ON t1.user_id = t5.user_id ";
+            $qry .= " AND t5.meta_key = 'section_id' AND t5.meta_value = '{$section_id}' ";
+
         }
         if(!empty($name)){
-            $qry .= " LEFT JOIN {$wpdb->usermeta} t6 ON t1.user_id = t6.user_id ";
+            $qry .= " JOIN {$wpdb->usermeta} t6 ON t1.user_id = t6.user_id ";
+            $qry .= " AND t6.meta_key = 'first_name' AND t6.meta_value LIKE '%{$name}%' ";
+
         }
         if(!empty($roll)){
-            $qry .= " LEFT JOIN {$wpdb->usermeta} t7 ON t1.user_id = t7.user_id ";
+            $qry .= " JOIN {$wpdb->usermeta} t7 ON t1.user_id = t7.user_id ";
+            $qry .= " AND t7.meta_key = 'roll' AND t7.meta_value = '{$roll}' ";
+
         }
         if(!empty($role)){
-            $qry .= " LEFT JOIN {$wpdb->usermeta} t8 ON t1.user_id = t8.user_id ";
+            $qry .= " JOIN {$wpdb->usermeta} t8 ON t1.user_id = t8.user_id ";
+            $qry .= " AND t8.meta_key = '{$wpdb->prefix}capabilities' AND t8.meta_value LIKE '%{$role}%' ";
         }
 
         $qry .= " WHERE 1 = 1 ";
 
 
         if(!empty($branch_id)){
-            $qry .= " AND t2.meta_key = 'branch_id' AND t2.meta_value = '{$branch_id}' ";
+            // $qry .= " AND t2.meta_key = 'branch_id' AND t2.meta_value = '{$branch_id}' ";
         }
         if(!empty($shift_id)){
-            $qry .= " AND t3.meta_key = 'shift_id' AND t3.meta_value = '{$shift_id}' ";
+            // $qry .= " AND t3.meta_key = 'shift_id' AND t3.meta_value = '{$shift_id}' ";
         }
         if(!empty($class_id)){
-            $qry .= " AND t4.meta_key = 'class_id' AND t4.meta_value = '{$class_id}' ";
+            // $qry .= " AND t4.meta_key = 'class_id' AND t4.meta_value = '{$class_id}' ";
         }
         if(!empty($section_id)){
-            $qry .= " AND t5.meta_key = 'section_id' AND t5.meta_value = '{$section_id}' ";
+            // $qry .= " AND t5.meta_key = 'section_id' AND t5.meta_value = '{$section_id}' ";
         }
         if(!empty($name)){
-            $qry .= " AND t6.meta_key = 'first_name' AND t6.meta_value LIKE '%{$name}%' ";
+            // $qry .= " AND t6.meta_key = 'first_name' AND t6.meta_value LIKE '%{$name}%' ";
         }
         if(!empty($roll)){
-            $qry .= " AND t7.meta_key = 'roll' AND t7.meta_value = '{$roll}' ";
+            // $qry .= " AND t7.meta_key = 'roll' AND t7.meta_value = '{$roll}' ";
         }
         if(!empty($role)){
-            $qry .= " AND t8.meta_key = 'wp_capabilities' AND t8.meta_value LIKE '%{$role}%' ";
+            // $qry .= " AND t8.meta_key = '{$wpdb->prefix}capabilities' AND t8.meta_value LIKE '%\"{$role}\"%' ";
         }
 
         if(!empty($start_date)){
@@ -607,7 +620,7 @@ class Attendance extends CustomPost
             $qry .= " AND DATE(t1.report_time) <= '{$end_date}' ";
         }
 
-        $qry .= " ORDER BY ID DESC ";
+        $qry .= " ORDER BY t1.ID DESC ";
 
         $paged = max( get_query_var( 'paged' ), 1 );
         $page = max( get_query_var( 'page' ), 1 );
@@ -1140,9 +1153,9 @@ class Attendance extends CustomPost
             'type' => 'select',
             'name' => 'report_type',
             'settings' => array(
-                'label' => 'Report Type',
+                'label' => t('Report Type'),
                 'id'=>'report_type',
-                'options' => array('logs' => 'Logs', 'detailed' => 'Detailed', 'summary' => 'Summary' ),
+                'options' => array('logs' => t('Logs'), 'detailed' => t('Detailed'), 'summary' => t('Summary') ),
                 'required' => true,
                 'value' => sanitize_text_field($_REQUEST['report_type'] ?? 'logs'),
             )
@@ -1151,7 +1164,7 @@ class Attendance extends CustomPost
             'type' => 'select',
             'name' => 'branch_id',
             'settings' => array(
-                'label' => 'Branch',
+                'label' => t('Branch'),
                 'id'=>'branch_id',
                 'options' => $branch_options,
                 'placeholder' => 'Select',
@@ -1163,9 +1176,9 @@ class Attendance extends CustomPost
             'type' => 'select',
             'name' => 'role',
             'settings' => array(
-                'label' => 'Role',
+                'label' => t('Role'),
                 'id'=>'role',
-                'options' => array_combine(User::getRoles(),User::getRoles()),
+                'options' => User::getRoles(),
                 'value' => sanitize_text_field($_REQUEST['role'] ?? ''),
                 'placeholder' => 'Select',
             )
@@ -1175,7 +1188,7 @@ class Attendance extends CustomPost
                 'type' => 'select',
                 'name' => 'shift_id',
                 'settings' => array(
-                    'label' => 'Shift',
+                    'label' => t('Shift'),
                     'id'=>'shift_id',
                     'placeholder' => 'Select',
                 )
@@ -1186,7 +1199,7 @@ class Attendance extends CustomPost
                 'type' => 'select',
                 'name' => 'class_id',
                 'settings' => array(
-                    'label' => 'Class',
+                    'label' => t('Class'),
                     'id'=>'class_id',
                     'placeholder' => 'Select',
                 )
@@ -1197,7 +1210,7 @@ class Attendance extends CustomPost
                 'type' => 'select',
                 'name' => 'section_id',
                 'settings' => array(
-                    'label' => 'Section',
+                    'label' => t('Section'),
                     'id'=>'section_id',
                     'placeholder' => 'Select',
                 )
@@ -1208,17 +1221,17 @@ class Attendance extends CustomPost
             'type' => 'text',
             'name' => 'first_name',
             'settings' => array(
-                'label' => 'Name',
+                'label' => t('Name'),
                 'id'=>'name',
                 'placeholder' => 'Name',
                 'value' => sanitize_text_field($_REQUEST['first_name'] ?? ''),
             )
         );
         $fields['roll'] = array(
-            'type' => 'number',
+            'type' => 'text',
             'name' => 'roll',
             'settings' => array(
-                'label' => 'Roll / Student ID',
+                'label' => t('Roll / Student ID'),
                 'id'=>'roll',
                 'placeholder' => 'Roll / Student ID',
                 'value' => sanitize_text_field($_REQUEST['roll'] ?? ''),
@@ -1228,7 +1241,7 @@ class Attendance extends CustomPost
             'type' => 'date',
             'name' => 'start_date',
             'settings' => array(
-                'label' => 'Start Date',
+                'label' => t('Start Date'),
                 'id'=>'start_date',
                 'placeholder' => 'Start Date',
                 'value' => sanitize_text_field($_REQUEST['start_date'] ?? current_time('Y-m-d')),
@@ -1238,7 +1251,7 @@ class Attendance extends CustomPost
             'type' => 'date',
             'name' => 'end_date',
             'settings' => array(
-                'label' => 'End Date',
+                'label' => t('End Date'),
                 'id'=>'end_date',
                 'placeholder' => 'End Date',
                 'value' => sanitize_text_field($_REQUEST['end_date'] ?? current_time('Y-m-d')),
@@ -1248,7 +1261,7 @@ class Attendance extends CustomPost
             'type' => 'select',
             'name' => 'posts_per_page',
             'settings' => array(
-                'label' => 'Items Per Page',
+                'label' => t('Items Per Page'),
                 'id'=>'posts_per_page',
                 'options' => array( 25 => 25, 50 => 50, 100 => 100, -1 => 'All' ),
                 'value' => sanitize_text_field($_REQUEST['posts_per_page'] ?? 25),

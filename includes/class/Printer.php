@@ -249,8 +249,8 @@ class Printer
 
                 let mode = portrait ? ' portrait ' : ' landscape ';
                 let landscapeMode = `<style type="text/css">@page {size: <?php echo Admin::getSetting('print_paper_size', 'A4'); ?> ${mode} !important;}</style>`;
-                let header = 1 == 1 ? `<div class='print-header'><?php echo self::getHeader(); ?></div>` : '';
-                let footer = 1 == 1 ? `<div class='print-footer' id='pageFooter'><?php echo self::getFooter(); ?></div>` : '';
+                let header = configs.showHeader ? `<div class='print-header'><?php echo self::getHeader(); ?></div>` : '';
+                let footer = configs.showFooter ? `<div class='print-footer' id='pageFooter'><?php echo self::getFooter(); ?></div>` : '';
 
                 // Custom content to be printed
                 let customContent = `

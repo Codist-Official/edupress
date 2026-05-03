@@ -446,9 +446,8 @@ class ExamRoutine extends Post
 
         // Getting routine first 
         $meta_args = [];
-
-
         $user_args = [];
+
         if(EduPress::isActive('branch') && isset($args['branch_id'])) {
             $meta_args['branch_id'] = $args['branch_id'];
             $user_args['branch_id'] = $args['branch_id'];
@@ -466,8 +465,10 @@ class ExamRoutine extends Post
             $user_args['section_id'] = $args['section_id'];
         }
 
+        $meta_args['term_id'] = $args['term_id'];
+
         $meta_query = [];
-        foreach($post_args as $k=>$v){
+        foreach($meta_args as $k=>$v){
             if(empty($v)) continue; 
             $meta_query[] = [
                 'key' => $k,
@@ -475,17 +476,17 @@ class ExamRoutine extends Post
                 'compare' => '='
             ];
         }
+        if(count($meta_query) > 1) $meta_query['relation'] = 'AND';
 
         $post_args = [
             'post_type' => 'exam_routine',
             'post_status' => 'publish',
         ];
-        if(!empty($meta_query)) $post_args['meta_query'] = $meta_args;
+        if(!empty($meta_query)) $post_args['meta_query'] = $meta_query;
 
         $posts = get_posts($post_args);
         if(empty($posts)) return t('No routine found');
 
-        if(count($meta_query) > 1) $meta_query['relation'] = 'AND';
 
         $routine = reset($posts);
         $exams = maybe_unserialize(get_post_meta($routine->ID, 'exams', true));
@@ -504,8 +505,6 @@ class ExamRoutine extends Post
         $name = Admin::getSetting('institute_name');
         $address = Admin::getSetting('institute_address');
         $term = get_the_title($_REQUEST['term_id']);
-
-
         
         ob_start();
         ?>
@@ -555,7 +554,7 @@ class ExamRoutine extends Post
                 grid-template-columns: repeat(3,1fr);
                 gap: 10px;
                 font-size: 15px;
-                margin-top: 20px;
+                margin-top: 10px;
                 line-height: 1;
             }
             .student-data-label{
@@ -591,7 +590,7 @@ class ExamRoutine extends Post
                 border: 1px solid #000;
                 font-size: 12px;
                 line-height: 1;
-                padding: 3px;
+                padding: 2px;
             }
             .admit-notes{
                 margin-top: 10px;
@@ -620,14 +619,17 @@ class ExamRoutine extends Post
                 width: 100%;
             }
             .sign-block img{
+                width: 100%;
                 max-width: 75px;
+                height: auto;
                 display: inline-block;
                 float: none;
                 margin-bottom: 2px;
+
             }
             .edupress-credit{
                 padding: 3px;
-                font-size: 12px;
+                font-size: 11px;
                 text-align: center; 
                 line-height: 1.2;
                 margin: 20px 20px 0;
@@ -729,7 +731,7 @@ class ExamRoutine extends Post
                     <div class="ep-flex-3 sign-block">
                         <?php 
                             $principal_signature_id = Admin::getSetting('principal_signature');
-                            if($principal_signature_id) echo wp_get_attachment_image($principal_signature_id, 'thumbnail', null, ['loading'=>'eager','decoding'=>'sync']);
+                            if($principal_signature_id) echo wp_get_attachment_image($principal_signature_id, 'large', null, ['loading'=>'eager','decoding'=>'sync']);
                             $desig = Admin::getSetting('principal_designation');
                         ?>
                         <div class="signer-desig"><?php _t($desig); ?></div>

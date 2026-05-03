@@ -81,8 +81,19 @@ class Support extends Post{
                 'title_bn' => 'একাউন্টিং কিভাবে ব্যবহার করতে হয়',
                 'link' => 'https://www.youtube.com/watch?v=Es957-OmAxg'
             ],
+            [
+                'title' => 'How to prepare attendance report',
+                'title_bn' => 'কিভাবে হাজিরা রিপোর্ট তৈরি করতে হয়',
+                'link' => 'https://www.youtube.com/watch?v=fZ_WLJUNXuY'
+            ],
+            [
+                'title' => 'How to search users',
+                'title_bn' => 'কিভাবে ইউজার / শিক্ষার্থী / শিক্ষক খুঁজে বের করতে হয়',
+                'link' => 'https://www.youtube.com/watch?v=_dLQfLaNw8U'
+            ],
         ];
     }
+
 
     /**
      * List html

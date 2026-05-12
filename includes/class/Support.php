@@ -59,7 +59,7 @@ class Support extends Post{
             [
                 'title' => 'How to set up Helix device, add users to device',
                 'title_bn' => 'হেলিক্স ডিভাইস কিভাবে সেটআপ করতে হয়, কিভাবে ইউজার এড করতে হয় ইত্যাদি',
-                'link' => 'https://www.youtube.com/watch?v=atGUaG56yWM'
+                'link' => 'https://www.youtube.com/watch?v=i8WTWkwLdwA'
             ],
             [
                 'title' => 'How to add class & section',

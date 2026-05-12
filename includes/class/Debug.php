@@ -1,5 +1,7 @@
 <?php
+
 namespace EduPress;
+@ini_set('display_errors', 1);
 
 defined( 'ABSPATH' ) || die();
 
@@ -57,16 +59,23 @@ class Debug
         // $mobile = '01913919597';
         // var_dump( Voice::send($mobile, $id) );
 
+        // $domains = EduPress::getAllDomains(true);
+        // foreach($domains as $domain){
+        //     echo $domain . "<br>";
+        // }
         // return;
+        
         ob_start(); 
-        // Attendance::sendAbsenceAttendanceSMS();
-        // return ob_get_clean();
         ?> 
         <html>
-            <head></head>
+            <head>
+                <link rel="preconnect" href="https://fonts.googleapis.com">
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+            </head>
             <body class="print-card">
                 <style>
-
                     body.print-card{
                         width: 290px; /* 54.61mm; */
                         height: 458px; /* 86.36mm; */
@@ -108,83 +117,144 @@ class Debug
                         line-height: 1;
                         z-index: 9999;
                     }
-                    .card-row{
-                        display: inline-block;
-                        width: 100%;
-                    }
                     .pagebreak{
                         page-break-after: always;
                     }
-
-                    .student-card-title{
-                        margin: 0 auto;
-                        background-color: #273a72;
-                        color: white; 
-                        padding: 5px 15px;
-                        line-height: 1;
-                        border-radius: 20px;
+                    .id-thumb-wrap{
                         text-align: center;
-                        font-size: 14px;
-                        display: inline-block;
+                        margin-top: 125px;
                     }
-                    .stud-photo{
-                        height: 100px;
-                        width: auto;
-                        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-                        border-radius: 10px;
-                        overflow: hidden;
+                    .id-thumb{
+                        border-radius: 100%;
+                        width: 125px;
+                        height: auto;
+                        text-align: center;
+                        margin: 0 auto;
+                        border: 3px solid #fff;
+                    }
+                    .details-wrap{
+                        width: 175px;
+                        margin-top: 10px;
+                    }
+                    .details-wrap{
+                        font-family: 'Poppins', sans-serif;
+                        color: #fff;
+                        font-weight: bold;
+                    }
+                    .name{
+                        font-size: 20px;
+                        font-weight: bold; 
+                        color: #fff;
+                        line-height: 1;
+                        margin-bottom: 5px;
+                    }
+                    span.key{
+                        color: #ffde59;
+                        font-size: 14px;
+                        line-height: 1.2;
+                    }
+                    span.value{
+                        color: white;
+                        font-size: 14px;
+                        line-height: 1.2;
+                    }
+                    .mobile{
+                        margin-top: 7px;
+                        padding: 5px 7px;
+                        background-color: #fff;
+                        border-radius: 50px;
+                        display: inline-block;
+                        color: #409346;
+                        line-height: 1
+                        height: 20px;
+                        vertical-align: middle;
+                    }
+                    .transparent-bg{
+                        opacity: 0;
                     }
                 </style>
                 <?php 
-                    $users = User::getAll(['role'=>'student', 'number'=>5]);
+                    $users = User::getAll(['role'=>'student', 'number'=>2000, 'orderby'=>'ID','order'=>'DESC']);
+                    if(empty($users)){
+                        echo "<div class='no-users'>No users found to print</div>";
+                        return ob_get_clean();
+                    }
                     foreach($users as $user):
                         $section_id = get_user_meta($user->ID,'section_id', true);
-                        if(in_array($section_id, [43,46,47])) continue;
+                        
                         $metadata = get_metadata('user', $user->ID);
-                        $name = isset($metadata['first_name']) ? $metadata['first_name'][0] : '';
                         $data = [];
-                        $data['roll'] = ['name' => "ID", 'value' =>  $metadata['roll'][0] ?? '' ];
-                        $data['guardian'] = ['name' => "Guardian", 'value' =>  $metadata['guardian_name'][0] ?? '' ];
-                        $data['mobile'] = ['name' => 'Mobile', 'value'=> $metadata['mobile'][0] ?? ''];
-                        $data['blood_group'] = ['name' => 'Blood Group', 'value' => $metadata['blood_group'][0] ?? ''];
+                        $class_id = $metadata['class_id'][0] ?? '';
+                        $class = get_the_title($class_id);
+                        $section_id = $metadata['section_id'][0] ?? '';
+                        $section = get_the_title($section_id);
+                        $section_title = "Section";
+                        $attendance_id = (int) $metadata['attendance_id'][0] ?? '';
+
+                        $skip_ids = [4952, 4968, 5951, 5148];
+                        if(in_array($attendance_id, $skip_ids)) continue;
+
+                        $name = isset($metadata['first_name']) ? $metadata['first_name'][0] : '';
+                        $name_ids = [5143, 5946];
+                        if(!in_array($attendance_id, $name_ids)) $name = ucwords(strtolower($name));
+
+
+
+                        // check if a eitehr play, kg, nursery, nine
+                        $preprimary = ['play', 'kg', 'nursery'];
+                        foreach($preprimary as $pp){
+                            if(str_contains(strtolower($class), $pp)){
+                                $section_title = "Shift";
+                                break;
+                            }
+                        }
+                        if(str_contains(strtolower($class), 'nine')){
+                            $section_title = "Group";
+                        }
+
+                        $roll = $metadata['roll'][0] ?? '';
+                        $mobile = $metadata['mobile'][0] ?? '';
+                        $mobile = str_replace('+88', '', $mobile);
+                        $mobile = str_replace(' ', '', $mobile);
+                        $mobile = str_replace('-', '', $mobile);
+
+                        $data['attendance'] = ['name' => "ID No", 'value' => $attendance_id ?? ''];
+                        $data['class'] = ['name' => "Class", 'value' =>  $class_id ? $class : '' ];
+                        $data['section'] = ['name' => $section_title, 'value' => $section ? $section : '' ];
+                        $data['roll'] = ['name' => "Roll", 'value' =>  $roll ? $roll : '' ];
                         $avatar_id = get_user_meta($user->ID, 'avatar_id', true);
                         // $photo = $avatar_id ? wp_get_attachment_image_url($avatar_id, 'full') : '';
                         // $photo_url = $photo;
                     ?>
                     <div class="id-card-holder">
-                        <img src="<?php echo EDUPRESS_IMG_URL; ?>id-cards/fcghs.png" style="position: absolute; left: 0; top: 0; z-index: 1; width: 100%; height: 100%;">
+                        <img src="<?php echo EDUPRESS_IMG_URL; ?>id-cards/radiance-front-bg.png" style="position: absolute; left: 0; top: 0; z-index: 1; width: 100%; height: 100%;">
                         <div class="id-card-inner">
-                            <div class="card-row logo" style="display: flex; align-items: strech; margin: 0px 0 15px 0; gap: 5px; ">
-                                <div class="logo-wrap" style="flex: 1; line-height: 0; align-items: center; justify-content: center; display: flex; "><img src="<?php echo EDUPRESS_IMG_URL; ?>id-cards/fcghs-logo.jpeg" class="top-logo" style=" width: 50px;"></div>
-                                <div class="name-wrap" style="flex: 3; display: flex; align-items: center; background-color: #273a72; ;  font-size: 13px; color: #fff; font-weight:bold; padding: 10px; ">FOREST COLONY GIRLS' HIGH SCHOOL</div>
+                            <div class="id-thumb-wrap">
+                            <?php 
+                                if($avatar_id > 0) : 
+                                    echo wp_get_attachment_image($avatar_id, 'thumbnail', null, ['class' => 'id-thumb']);
+                                else:
+                                    $img_url = EDUPRESS_IMG_URL . 'id-cards/white-bg.png';
+                                    echo "<img src='{$img_url}' class='id-thumb transparent-bg'>";
+                                endif; 
+                                ?>
                             </div>
-                            <div class="card-row card-title" style="text-align: center;">
-                                <div class="dp-wrap" style="margin-bottom: 5px;">
-                                    <?php echo wp_get_attachment_image($avatar_id, 'full', null, ['class'=>'stud-photo']); ?>
-                                </div>
-                            </div>
-                            <div class="card-row" style="text-align:center; margin-top: 10px;">
-                                <div class="student-card-title" style="margin-bottom: 10px;">Student ID Card</div>
-                            </div>
-
-                            <div class="card-row data-details" style="padding: 0 10px;">
-                                <div class="card-value student-name" style="text-align: center; font-size: 15px; text-transform: uppercase; line-height: 1.25;font-weight:bold; color: #d41c15;"><?php echo strtoupper($name); ?></div>
-                                <div style="font-size: 14px; line-height: 1.2; margin-top: 10px; min-height: 65px;">
-                                    <?php 
-                                        foreach($data as $k=>$v){
-                                            if(empty($v['value'])) continue; 
-                                            echo "<span class='label'>{$v['name']}</span>: <strong>{$v['value']}</strong><br>"; 
-                                        }
-                                    ?>
-                                </div>
-                            </div>
-                            <div class="card-row" style="margin-top: 15px; text-align: center; ">
-                                <img src="<?php echo EDUPRESS_IMG_URL; ?>id-cards/fcghs-hm.jpeg" style="height: 25px; width: auto;" ><br>
-                                <span class="hm-sign" style="display: inline-block; font-size: 10px; font-weight: bold; border-top: 1px dashed #000;">Headmaster's Signature</span>
-                            </div>
-                            <div class="card-row" style="font-size:10px; text-align: center; line-height: 1; font-weight: 300; margin-top: 10px; color: #8ec532">
-                                <?php $attendance_id = get_user_meta($user->ID, 'attendance_id', true); ?>
-                                The card is generated by EduPress School Management Software [<?php echo $attendance_id; ?>]
+                            <div class="details-wrap">
+                                <div class="name"><?php echo $name; ?></div>
+                                <?php 
+                                    foreach($data as $k=>$v){
+                                        if(empty($v['value'])) continue;
+                                        echo "<div>
+                                            <span class='key'>{$v['name']}</span><span class='value'>: {$v['value']}</span>
+                                        </div>";
+                                    }
+                                ?>
+                                <?php if($mobile): ?>
+                                    <div class="mobile">
+                                        <img src="<?php echo EDUPRESS_IMG_URL; ?>id-cards/mobile-icon.png" style="width: 15px; height: 15px; vertical-align: middle;">
+                                        <?php echo $mobile; ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>

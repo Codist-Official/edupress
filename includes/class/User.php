@@ -2215,9 +2215,16 @@ class User
             $args['order'] = $conds['order'] ?? 'ASC';
             $args['meta_key'] = 'roll';
             $args['meta_type'] = 'NUMERIC';
+        } else {
+            $args['orderby'] = $conds['orderby'] ?? 'ID';
+            $args['order'] = $conds['order'] ?? 'DESC';
         }
 
         if( isset($conds['role']) && !empty($conds['role']) ) $args['role__in'] = !is_array($conds['role']) ? [esc_attr($conds['role'])] : $conds['role'] ;
+
+        if(isset($conds['number'])) $args['number'] = $conds['number'];
+
+        if(isset($conds['include'])) $args['include'] = $conds['include'];
 
         if( isset($args['meta_query']) && count($args['meta_query']) > 1) $args['meta_query']['relation'] = 'AND';
 

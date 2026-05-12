@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.8.2
+Version: 1.8.3
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -1002,6 +1002,33 @@ class EduPress
     }
 
     /**
+     * Get all domains and subdomains using wordpress
+     *
+     * @return array
+     *
+     * @since 1.0
+     * @access public
+     * @static
+     */
+    public static function getAllDomains($update=false)
+    {
+        $key = 'edupress_all_domains';
+        $data = maybe_unserialize(get_option($key));
+        $date = current_time('Y-m-d');
+        if( $update || empty($data) || $data['date'] < $date ){
+            $url = 'http://api.edupressbd.com/wp-json/edupress_sync/v1/websites';
+            $response = wp_remote_get($url);
+            if( is_wp_error($response) ) return [];
+            $data = [];
+            $data['domains'] = json_decode($response['body'], true);
+            $data['date'] = $date;  
+            update_option($key, $data);
+            return $data['domains'];
+        }
+        return $data['domains'];
+    }
+
+    /**
      * Print Footer html
      *
      * @return void
@@ -1117,6 +1144,26 @@ class EduPress
             edupress.classes = <?php echo json_encode($classes); ?>;
             edupress.sections = <?php echo json_encode($sections); ?>;
             edupress.default_branch_id = <?php $default_branch = count($branches) === 1 ? reset($branches) : 0; echo $default_branch['id'] ?? 0; ?>;
+        </script>
+
+
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-PTXRTVB20R"></script>
+
+        <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag(){
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-PTXRTVB20R', {
+            linker: {
+                domains: <?php echo json_encode(EduPress::getAllDomains()); ?>
+            }
+        });
         </script>
 
         <?php

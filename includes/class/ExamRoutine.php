@@ -697,7 +697,7 @@ class ExamRoutine extends Post
                             foreach($exams as $exam){
                                 $subject = get_the_title($exam['subject']);
                                 $dt = new \DateTime($exam['date']);
-                                echo "<td>{$dt->format('d M, Y')}</td> <td>{$subject}</td> ";
+                                echo "<td>{$dt->format('h:i A')}<br>{$dt->format('d, M Y')}</td> <td>{$subject}</td> ";
                                 $count++;
                                 if($count % 2 == 0) echo "</tr><tr>";
                             }

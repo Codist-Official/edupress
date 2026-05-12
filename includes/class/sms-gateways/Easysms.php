@@ -39,8 +39,8 @@ class Easysms
     public function __construct()
     {
 
-        // $this->base_url = 'http://api.easysmsbd.com/api/';
-        $this->base_url = 'http://bulksmsbd.net/api/';
+        $this->base_url = 'http://api.easysmsbd.com/api/';
+        // $this->base_url = 'http://bulksmsbd.net/api/';
         $this->username = Admin::getSetting('sms_username' );
         $this->password = Admin::getSetting('sms_password' );
         $this->api_key = Admin::getSetting('sms_api_key' );

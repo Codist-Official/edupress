@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.8.3
+Version: 1.8.4
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -1729,7 +1729,7 @@ class EduPress
      */
     public static function languageSwitcherHTML()
     {
-        if(!current_user_can('manage_setting')) return;
+        if(!current_user_can('manage_setting') && !current_user_can('manage_options')) return;
         $current_lang = Admin::getSetting('system_lang');
         $langs = array('en'=>'EN', 'bn'=>'বা');
         ob_start();

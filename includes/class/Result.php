@@ -115,7 +115,7 @@ class Result extends Post
             );
         }
 
-        $shift_id = (int) $this->getMetadata()['shift_id'][0];
+        $shift_id = isset($this->getMetadata()['shift_id'][0]) ? (int) $this->getMetadata()['shift_id'][0] : 0;
         if( Admin::getSetting( 'shift_active') == 'active' && !empty($shift_id) ){
             $args['meta_query'][] = array(
                 'key'   => 'shift_id',
@@ -169,16 +169,16 @@ class Result extends Post
 
         <div class="exam-result-head">
             <?php if( Admin::getSetting('branch_active') == 'active' ): ?>
-                <?php _t('Branch:'); ?> <?php echo get_the_title($this->getMetadata()['branch_id'][0]); ?> <br>
+                <?php _t('Branch'); ?>: <?php echo get_the_title($this->getMetadata()['branch_id'][0]); ?> <br>
             <?php endif; ?>
             <?php if( Admin::getSetting('shift_active') == 'active' ): ?>
-                <?php _t('Shift:'); ?> <?php echo get_the_title($this->getMetadata()['shift_id'][0]); ?> <br>
+                <?php _t('Shift'); ?>: <?php echo get_the_title($this->getMetadata()['shift_id'][0]); ?> <br>
             <?php endif; ?>
             <?php if( Admin::getSetting('class_active') == 'active' ): ?>
-                <?php _t('Class:'); ?> <?php echo get_the_title($this->getMetadata()['class_id'][0]); ?> <br>
+                <?php _t('Class'); ?>: <?php echo get_the_title($this->getMetadata()['class_id'][0]); ?> <br>
             <?php endif; ?>
             <?php if( Admin::getSetting('section_active') == 'active' ): ?>
-                <?php _t('Section:'); ?> <?php echo get_the_title($this->getMetadata()['section_id'][0]); ?><br>
+                <?php _t('Section'); ?>: <?php echo get_the_title($this->getMetadata()['section_id'][0]); ?><br>
             <?php endif; ?>
             <?php _t( 'Subject', 'edupress' ); ?> : <strong> <?php echo get_the_title($this->getMetadata()['subject_id'][0]); ?></strong><br>
             <?php _t( 'Exam date', 'edupress' ); ?>: <?php echo date( 'd/m/Y', strtotime($this->getMetadata()['exam_date'][0])); ?><br><br>
@@ -198,7 +198,7 @@ class Result extends Post
                         <?php if( User::currentUserCan('edit', 'exam' ) ) : ?>
                         <tr>
                             <th colspan="<?php echo is_array($heads) ? count($heads) + 4 : 0; ?>" align="right" style="text-align: right;">
-                                <?php echo EduPress::generateFormElement( 'submit', '', array('value'=>'Save Results')); ?>
+                                <?php echo EduPress::generateFormElement( 'submit', '', array('value'=>t('Save Results'))); ?>
                             </th>
                         </tr>
                         <?php endif; ?>
@@ -232,7 +232,7 @@ class Result extends Post
                                     <?php echo EduPress::generateFormElement( 'hidden', 'user_id[]', array( 'value' => $user->id ) ) ; ?>
                                 </td>
                                 <td><?php echo User::showProfileOnClick( $user->id, $user->getMeta( 'first_name' ) ); ?></td>
-                                <td><?php echo EduPress::generateFormElement( 'select', "unregistered[]", array( 'options' => array('Registered', 'Unregistered'), 'value' => $unregistered, 'class'=>"edupress-result-unregistered-status {$viewer_class}", 'disabled' => !$can_user_edit ) ); ?></td>
+                                <td><?php echo EduPress::generateFormElement( 'select', "unregistered[]", array( 'options' => array(t('Registered'), t('Unregistered')), 'value' => $unregistered, 'class'=>"edupress-result-unregistered-status {$viewer_class}", 'disabled' => !$can_user_edit ) ); ?></td>
                                 <?php
                                 if( !empty($heads) ){
                                     $total_mark = 0;
@@ -246,7 +246,7 @@ class Result extends Post
                                         ?>
                                         <td class="<?php echo $col_class; ?>">
                                             <?php echo EduPress::generateFormElement( 'number', "{$h}[]", array( 'value' => $mark, 'readonly' => $absent, 'disabled' => !$can_user_edit, 'data' => array( 'step' => 'any', 'min' => 0, 'max'=> $exam_marks[$h], 'style' => 'margin-bottom:5px !important;', ),  'class' => $viewer_class, ) ); ?>
-                                            <?php echo EduPress::generateFormElement( 'select', "{$h}_absent[]", array( 'options' => array('Present', 'Absent'), 'value' => $absent, 'class'=>"{$viewer_class} edupress-result-absent-status", 'disabled' => !$can_user_edit  ) ); ?>
+                                            <?php echo EduPress::generateFormElement( 'select', "{$h}_absent[]", array( 'options' => array(t('Present'), t('Absent')), 'value' => $absent, 'class'=>"{$viewer_class} edupress-result-absent-status", 'disabled' => !$can_user_edit  ) ); ?>
                                         </td>
                                         <?php
                                     }
@@ -266,7 +266,7 @@ class Result extends Post
                     <tfoot>
                         <tr>
                             <td colspan="<?php echo is_array($heads) ? count($heads) + 4 : 0; ?>">
-                                <?php echo EduPress::generateFormElement( 'submit', '', array('value'=>'Save Results')); ?>
+                                <?php echo EduPress::generateFormElement( 'submit', '', array('value'=>t('Save Results'))); ?>
                                 <?php echo EduPress::generateFormElement( 'hidden', 'action', array('value'=>'edupress_admin_ajax')); ?>
                                 <?php echo EduPress::generateFormElement( 'hidden', 'ajax_action', array('value'=>'saveExamResult')); ?>
                                 <?php echo EduPress::generateFormElement( 'hidden', 'heads', array('value'=> is_array($heads) ? implode(',', $heads) : [], )); ?>
@@ -279,9 +279,7 @@ class Result extends Post
                 </table>
             </div>
         </form>
-        <?php
-        return ob_get_clean();
-
+        <?php return ob_get_clean();
     }
 
     /**
@@ -798,22 +796,21 @@ class Result extends Post
         ?>
         <div class="edupress-table-wrap">
             <table class="edupress-table edupress-master-table tablesorter">
-
                 <thead>
                     <tr>
                         <th class="">
                             <?php if(User::currentUserCan('send', 'sms') ): ; ?>
                                 <input type="checkbox" class="edupress-bulk-select-all no-print" id="select_all">
-                                <label for="select_all"><?php _e('Roll', 'edupress'); ?></label>
-                                <br><br>
+                                <label for="select_all"><?php _t('Roll'); ?></label>
+                                <br>
                                 <a title="Select Results to Print" href="javascript:void(0)" class="result-bulk-print no-print" data-term-id="<?php echo $term_id; ?>" data-start-date="<?php echo $start_date; ?>" data-end-date="<?php echo $end_date; ?>" data-rank-method="<?php echo $ranking_method; ?>"><?php echo EduPress::getIcon('print'); ?></a>
                                 <a title="Send emails to all selected users" href="javascript:void(0)" class="result-bulk-email-send no-print"><?php echo EduPress::getIcon('email'); ?></a>
                                 <a title="Send SMS to all selected users" href="javascript:void(0)" class="result-bulk-sms-send no-print"><?php echo EduPress::getIcon('sms'); ?></a>
                             <?php else: ?>
-                                <?php _e('Roll', 'edupress' ); ?>
+                                <?php _t('Roll'); ?>
                             <?php endif; ?>
                         </th>
-                        <th>Name</th>
+                        <th><?php _t('Name'); ?></th>
                         <?php
                         $found_subjects = $qry->found_posts;
                         if($qry->have_posts()):
@@ -844,9 +841,9 @@ class Result extends Post
                                         echo "<ul class='exam-mark-details'>";
                                         if(!empty($exam_marks_head_wise_data[$subject_id])){
                                             foreach($exam_marks_head_wise_data[$subject_id] as $k=>$v){
-                                                echo "<li><span class='exam-mark-title'>$k: </span><span class='exam-mark-value'>$v</span></li>";
+                                                echo "<li><span class='exam-mark-title'>$k: </span><span class='exam-mark-value'>".td($v)."</span></li>";
                                             }
-                                            echo "<li><span class='exam-mark-title'><strong>Total: </strong></span><span class='exam-mark-value'><strong>".array_sum($exam_marks_head_wise_data[$subject_id])."</strong></span></li>";
+                                            echo "<li><span class='exam-mark-title'><strong>".t('Total').": </strong></span><span class='exam-mark-value'><strong>".td(array_sum($exam_marks_head_wise_data[$subject_id]))."</strong></span></li>";
                                         }
                                         echo "</ul>";
                                     ?>
@@ -857,14 +854,14 @@ class Result extends Post
                         ?>
                         
                         <?php if( $ranking_method == 'marks' ): ?>
-                            <th>Total</th>
-                            <th>Merit<br>Pos.</th>
+                            <th><?php _t('Total'); ?></th>
+                            <th><?php _t('Merit <br>Pos.'); ?></th>
                         <?php else : ?>
-                            <th>GPA <br>(W/O Op.)</th>
-                            <th>GPA <br>(W Op.)</th>
-                            <th>Grade</th>
+                            <th><?php _t('GPA W/O Op.'); ?></th>
+                            <th><?php _t('GPA W Op.'); ?></th>
+                            <th><?php _t('Grade'); ?></th>
                         <?php endif; ?>
-                        <th class="no-print">Action</th>
+                        <th class="no-print"><?php _t('Action'); ?></th>
                     </tr>
                 </thead>
 
@@ -895,7 +892,7 @@ class Result extends Post
                             <?php if(User::currentUserCan('send', 'sms') ) : ?>
                             <input type="checkbox" class="edupress-bulk-select-item no-print" name="student_id[]" id="user_<?php echo $student_id;?>" value="<?php echo $student_id; ?>">
                             <?php endif; ?>
-                            <label for="user_<?php echo $student_id; ?>"><?php echo $user->getMeta('roll'); ?></label>
+                            <label for="user_<?php echo $student_id; ?>"><?php echo td($user->getMeta('roll')); ?></label>
                         </td>
 
                         <!-- student name -->
@@ -920,13 +917,10 @@ class Result extends Post
                                     $is_optional = $student_optional_subject_id == $connected_subject_id ? 1 : 0;
                                 }
 
-
                                 $heads = $students_data[$student_id]['results'][$subject_id]['marks'] ?? [];
                                 $is_failed = 0;
                                 if( !is_null($heads) ){
-
                                     $is_failed = array_sum(array_column($heads, 'failed'));
-
                                 }
 
 
@@ -939,7 +933,6 @@ class Result extends Post
                                     $student_shown_subjects_for_combined_subjects[] = (int) $connected_subject_id;
 
                                     if( $is_optional ) $is_failed = false;
-
                                 }
 
                                 // Checking if subject is registered or not
@@ -987,19 +980,18 @@ class Result extends Post
                                                 $indv_obtained = is_array($v)  && isset($v['obtained']) ? $v['obtained'] : 0;
                                                 $indv_failed = isset($v['failed']) && $v['failed'] ? 1 : 0;
                                                 $extra_class = $indv_failed ? ' highlight-failed ' : '';
-                                                echo "<li class='$extra_class'><span class='exam-mark-title'>$k</span><span class='exam-mark-value'>". $indv_obtained ."</span></li>";
+                                                echo "<li class='$extra_class'><span class='exam-mark-title'>$k</span><span class='exam-mark-value'>". td($indv_obtained) ."</span></li>";
                                                 $temp_sms_details .= "$k: $indv_obtained, ";
-                                                $print_html .= floatval($indv_obtained) . "+";
+                                                $print_html .= td(floatval($indv_obtained)) . "+";
                                             }
                                             if($result_sms_mark_details) $sms_data[$student_id]['sms'] .= rtrim($temp_sms_details, ', ');
-                                            echo "<li><span class='exam-mark-title'><strong>Total</strong></span><span class='exam-mark-value'><strong>$total</strong></span></li>";
+                                            echo "<li><span class='exam-mark-title'><strong>".t('Total')."</strong></span><span class='exam-mark-value'><strong>".td($total)."</strong></span></li>";
                                             $print_html = rtrim( trim($print_html), '+' );
                                             // Sum up only if double or more heads found
                                             if(str_contains($print_html, '+')) $print_html .= "=$total";
 
                                             // Showing grade and grade data
                                             if( $ranking_method != 'marks' ){
-
                                                 echo "<li><span class='exam-mark-title'><strong>GP</strong></span><span class='exam-mark-value'><strong>{$grade_data['point']}</strong></span></li>";
                                                 echo "<li><span class='exam-mark-title'><strong>Grade</strong></span><span class='exam-mark-value'><strong>{$grade_data['grade']}</strong></span></li>";
 
@@ -1009,7 +1001,6 @@ class Result extends Post
                                                 if($is_optional){
                                                     echo "O. S.";
                                                 }
-
                                             }
 
                                         echo "</ul>";
@@ -1026,7 +1017,7 @@ class Result extends Post
                         <?php if( $ranking_method == 'marks' ) : ?>
 
                         <!-- total marks -->
-                            <td><?php echo $students_data[$student_id]['total_obtained_marks']; ?></td>
+                            <td><?php echo td($students_data[$student_id]['total_obtained_marks']); ?></td>
 
                         <!-- Merit Position -->
                             <td><?php $merit_pos = $students_data[$student_id]['merit'] ?? 0; echo EduPress::numberToOrdinal($merit_pos); ?></td>
@@ -1356,8 +1347,8 @@ class Result extends Post
                                 <?php 
                                     $column_data = explode('|', $column);
                                 ?>
-                                <span style='text-decoration:underline;'><?php echo $column_data[0]; ?></span><br>
-                                <?php if($column_data[1]) echo apply_filters('the_content', $column_data[1]); ?>
+                                <span style='text-decoration:underline;'><?php echo $column_data[0] ?? ''; ?></span><br>
+                                <?php if(isset($column_data[1])) echo apply_filters('the_content', $column_data[1]); ?>
                                 <div style="height: <?php echo $box_height; ?>in; "> </div>
                             </th>
                         <?php endforeach; ?>

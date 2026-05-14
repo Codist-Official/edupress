@@ -302,46 +302,46 @@ class Printer
 
         ob_start();
         ?>
-        <section class="head"><h2 class="master-title">Academic Progress Report</h2></section>
+        <section class="head"><h2 class="master-title"><?php _t('Academic Progress Report'); ?></h2></section>
         <section class="student-details">
             <div class="details-wrap">
-                <h3 class="master-subtitle">Student Details</h3>
+                <h3 class="master-subtitle"><?php _t('Student Details'); ?></h3>
                 <div class="edupress-table-wrap">
                     <table class="edupress-table">
                         <tr>
-                            <th style="width: 100px;"><?php _e( 'Student\'s Name', 'edupress' ); ?></th>
+                            <th style="width: 100px;"><?php _t( 'Name' ); ?></th>
                             <td><?php echo get_user_meta( $user_id, 'first_name', true ) ?? ''; ?></td>
                         </tr>
                         <tr>
-                            <th><?php _e( 'Roll', 'edupress' ); ?></th>
-                            <td><?php echo get_user_meta( $user_id, 'roll', true ); ?></td>
+                            <th><?php _t( 'Roll' ); ?></th>
+                            <td><?php echo td(get_user_meta( $user_id, 'roll', true )); ?></td>
                         </tr>
                         <?php if( EduPress::isActive('branch') ): ?>
                             <tr>
-                                <th><?php _e( 'Branch', 'edupress' ); ?></th>
+                                <th><?php _t( 'Branch' ); ?></th>
                                 <td><?php echo get_the_title(get_user_meta($user_id, 'branch_id', true )); ?></td>
                             </tr>
                         <?php endif; ?>
                         <?php if( EduPress::isActive('shift') ): ?>
                             <tr>
-                                <th><?php _e( 'Shift', 'edupress' ); ?></th>
+                                <th><?php _t( 'Shift' ); ?></th>
                                 <td><?php echo get_the_title(get_user_meta($user_id, 'shift_id', true )); ?></td>
                             </tr>
                         <?php endif; ?>
                         <?php if( EduPress::isActive('class') ): ?>
                             <tr>
-                                <th><?php _e( 'Class', 'edupress' ); ?></th>
+                                <th><?php _t( 'Class' ); ?></th>
                                 <td><?php echo get_the_title(get_user_meta($user_id, 'class_id', true )); ?></td>
                             </tr>
                         <?php endif; ?>
                         <?php if( EduPress::isActive('section') ): ?>
                             <tr>
-                                <th><?php _e( 'Section', 'edupress' ); ?></th>
+                                <th><?php _t( 'Section' ); ?></th>
                                 <td><?php echo get_the_title(get_user_meta($user_id, 'section_id', true )); ?></td>
                             </tr>
                         <?php endif; ?>
                         <tr>
-                            <th><?php _e( 'Exam Term', 'edupress' ); ?></th>
+                            <th><?php _t( 'Exam Term' ); ?></th>
                             <td><?php echo get_the_title($term_id); ?></td>
                         </tr>
                     </table>
@@ -350,7 +350,7 @@ class Printer
 
             <?php if(Admin::getSetting('attendance_active') == 'active' ): ?>
             <div class="attendance-wrap">
-                <h3 class="master-subtitle"><?php _e('Attendance Report', 'edupress'); ?></h3>
+                <h3 class="master-subtitle"><?php _t('Attendance Report'); ?></h3>
                 <div class="edupress-table-wrap">
                     <table class="edupress-table">
                         <?php
@@ -367,28 +367,28 @@ class Printer
                             $cal_data = $user->getAttendanceReport( $start_date, $end_date );
                         ?>
                         <tr>
-                            <th><?php _e('Dates', 'edupress'); ?></th>
-                            <td><?php echo date('d/m/y', strtotime($cal_data['start_date'])) . ' - ' . date('d/m/y', strtotime($cal_data['end_date'])); ?></td>
-                            <th><?php _e('Total Days', 'edupress'); ?></th>
-                            <td><?php echo $cal_data['total_days']; ?></td>
+                            <th><?php _t('Dates'); ?></th>
+                            <td><?php echo td(date('d/m/y', strtotime($cal_data['start_date']))) . ' - ' . td(date('d/m/y', strtotime($cal_data['end_date']))); ?></td>
+                            <th><?php _t('Total Days'); ?></th>
+                            <td><?php echo td($cal_data['total_days']); ?></td>
                         </tr>
                         <tr>
-                            <th><?php _e('Open', 'edupress'); ?></th>
-                            <td><?php echo $cal_data['open']; ?></td>
-                            <th><?php _e('Close', 'edupress'); ?></th>
-                            <td><?php echo $cal_data['close']; ?></td>
+                            <th><?php _t('Open'); ?></th>
+                            <td><?php echo td($cal_data['open'] ?? ''); ?></td>
+                            <th><?php _t('Close'); ?></th>
+                            <td><?php echo td($cal_data['close'] ?? ''); ?></td>
                         </tr>
                         <tr>
-                            <th><?php _e('Present', 'edupress'); ?></th>
-                            <td><?php echo $cal_data['present']; ?></td>
-                            <th><?php _e('Absent', 'edupress'); ?></th>
-                            <td><?php echo $cal_data['absent']; ?></td>
+                            <th><?php _t('Present'); ?></th>
+                            <td><?php echo td($cal_data['present']); ?></td>
+                            <th><?php _t('Absent'); ?></th>
+                            <td><?php echo td($cal_data['absent']); ?></td>
                         </tr>
                         <tr>
-                            <th><?php _e('Presence %', 'edupress'); ?></th>
-                            <td><?php echo number_format($cal_data['present_percentage'], 2); ?>%</td>
-                            <th><?php _e('Absence %', 'edupress'); ?></th>
-                            <td><?php echo number_format(100 - $cal_data['present_percentage'], 2); ?>%</td>
+                            <th><?php _t('Presence %'); ?></th>
+                            <td><?php echo td(number_format($cal_data['present_percentage'], 2)); ?>%</td>
+                            <th><?php _t('Absence %'); ?></th>
+                            <td><?php echo td(number_format(100 - $cal_data['present_percentage'], 2)); ?>%</td>
                         </tr>
                     </table>
                 </div>
@@ -419,38 +419,38 @@ class Printer
                 }
             </style>
                 <div class="edupress-table-wrap">
-                    <h3 class="master-subtitle">Mark Details</h3>
+                    <h3 class="master-subtitle"><?php _t('Mark Details'); ?></h3>
                     <table class="edupress-table ind-result">
                         <thead>
                             <tr>
-                            <th style="text-align:left;" rowspan="2"><?php _e('Subject', 'edupress'); ?></th>
+                            <th style="text-align:left;" rowspan="2"><?php _t('Subject'); ?></th>
                             <?php if($format == 'marks') : ?>
-                                <th rowspan="2"><?php _e('Date<br>of Exam', 'edupress'); ?></th>
+                                <th rowspan="2"><?php _t('Date<br>of Exam'); ?></th>
                             <?php endif; ?>
-                            <th rowspan="2"><?php _e('Exam<br>Mark', 'edupress'); ?></th>
-                            <th style="text-align: center" colspan="<?php echo count($all_marks_heads);?>"><?php _e('Obtained Marks', 'edupress'); ?></th>
-                            <th rowspan="2"><?php _e('Obtained<br>Total', 'edupress'); ?></th>
+                            <th rowspan="2"><?php _t('Exam<br>Mark'); ?></th>
+                            <th style="text-align: center" colspan="<?php echo count($all_marks_heads);?>"><?php _t('Obtained Marks'); ?></th>
+                            <th rowspan="2"><?php _t('Obtained<br>Total'); ?></th>
                             <?php if($format == 'marks'){ ?>
-                                <th rowspan="2"><?php _e('Highest<br>Total', 'edupress'); ?></th>
-                                <th rowspan="2">Total </th>
-                                <th rowspan="2">Merit<br>Pos.</th>
+                                <th rowspan="2"><?php _t('Highest<br>Total'); ?></th>
+                                <th rowspan="2"><?php _t('Total'); ?></th>
+                                <th rowspan="2"><?php _t('Merit<br>Pos.'); ?></th>
                             <?php } else { ?>
-                                <th rowspan="2">Letter<br>Grade </th>
-                                <th rowspan="2">Grade<br>Point </th>
+                                <th rowspan="2"><?php _t('Letter<br>Grade'); ?></th>
+                                <th rowspan="2"><?php _t('Grade<br>Point'); ?></th>
                                 <?php if(!empty($optional_subject_data)): ?>
-                                    <th rowspan="2" style="text-align:center;">CGPA <br>Without Optional</th>
-                                    <th rowspan="2" style="text-align:center;">CGPA <br>With Optional</th>
+                                    <th rowspan="2" style="text-align:center;"><?php _t('CGPA <br>Without Optional'); ?></th>
+                                    <th rowspan="2" style="text-align:center;"><?php _t('CGPA <br>With Optional'); ?></th>
                                 <?php else: ?>
-                                    <th rowspan="2" style="text-align:center;">CGPA</th>
+                                    <th rowspan="2" style="text-align:center;"><?php _t('CGPA'); ?></th>
                                 <?php endif; ?>
-                                <th rowspan="2" style="text-align:center;">Grade</th>
+                                <th rowspan="2" style="text-align:center;"><?php _t('Grade'); ?></th>
                             <?php } ?>
                         </tr>
                         <tr>
                             <!-- Head wise marks -->
                             <?php foreach($all_marks_heads as $k=>$v){
                                 ?>
-                                <th><?php _e( $v, 'edupress' ); ?></th>
+                                <th><?php _t($v); ?></th>
                                 <?php
                             }?>
                         </tr>
@@ -485,35 +485,35 @@ class Printer
                                 </td>
 
                                 <?php if($format == 'marks'): ?>
-                                    <td><?php echo date('d/m/y', strtotime($result['exam_date'] ?? 0)); ?></td>
+                                    <td><?php echo td(date('d/m/y', strtotime($result['exam_date'] ?? 0))); ?></td>
                                 <?php endif; ?>
 
-                                <td><?php echo $result['exam_marks']; ?></td>
+                                <td><?php echo td($result['exam_marks']); ?></td>
 
                                 <!-- Head wise marks -->
                                 <?php foreach($all_marks_heads as $k=>$v){
                                     ?>
                                     <td>
-                                        <?php echo $result['marks'][$v]['obtained'] ?? '-'; ?>
-                                        <?php echo isset($result['marks'][$v]['exam_marks']) ? "({$result['marks'][$v]['exam_marks']})" : ''; ?>
-                                        <?php echo isset($result['marks'][$v]['absent']) && $result['marks'][$v]['absent'] == 1 ? "(A)" : ''; ?>
-                                        <?php echo isset($result['marks'][$v]['failed']) && $result['marks'][$v]['failed'] == 1 ? "(F)" : ''; ?>
+                                        <?php echo td($result['marks'][$v]['obtained'] ?? '-'); ?>
+                                        <?php echo isset($result['marks'][$v]['exam_marks']) ? td("({$result['marks'][$v]['exam_marks']})") : ''; ?>
+                                        <?php echo isset($result['marks'][$v]['absent']) && $result['marks'][$v]['absent'] == 1 ? td("(A)") : ''; ?>
+                                        <?php echo isset($result['marks'][$v]['failed']) && $result['marks'][$v]['failed'] == 1 ? td("(F)") : ''; ?>
                                     </td>
                                     <?php
                                 }?>
 
-                                <td><?php echo $result['obtained']; ?></td>
+                                <td><?php echo td($result['obtained']); ?></td>
 
                                 <!-- marks based -->
                                 <?php $rowspan = count($user_data['results']); ?>
                                 <?php if($format == 'marks'){ ?>
 
-                                    <td><?php echo $result['highest']; ?></td>
+                                    <td><?php echo td($result['highest']); ?></td>
 
                                     <!-- other details -->
                                     <?php if( $i == 0 ){ ?>
-                                        <td rowspan="<?php echo $rowspan; ?>"><strong><?php echo $user_data['total_obtained_marks']; ?></strong></td>
-                                        <td rowspan="<?php echo $rowspan; ?>"><strong><?php echo Result::ordinal($user_data['merit']); ?></strong></td>
+                                        <td rowspan="<?php echo $rowspan; ?>"><strong><?php echo td($user_data['total_obtained_marks']); ?></strong></td>
+                                        <td rowspan="<?php echo $rowspan; ?>"><strong><?php echo t(Result::ordinal($user_data['merit'])); ?></strong></td>
                                     <?php } ?>
 
                                 <!-- CGPA based -->
@@ -562,8 +562,8 @@ class Printer
                         </tr>
                       <?php endif; ?>
                   </table>
-                  <p class="legends" style="margin: 5px 0 0 0;"> <strong>Obtained Total:</strong> <?php echo array_sum(array_column($user_data['results'], 'obtained')); ?> </p>
-                  <p class="legends" style="margin: 5px 0 0 0;"> Legends: <strong>(A)</strong> - Absent, <strong>(F)</strong> - Failed, <strong>N/A</strong> - Not Applicable </p>
+                  <p class="legends" style="margin: 5px 0 0 0;"> <strong><?php _t('Obtained Total'); ?>:</strong> <?php echo td(array_sum(array_column($user_data['results'], 'obtained'))); ?> </p>
+                  <p class="legends" style="margin: 5px 0 0 0;"> <?php _t('Legends'); ?>: <strong>(A)</strong> - <?php _t('Absent'); ?>, <strong>(F)</strong> - <?php _t('Failed'); ?>, <strong><?php _t('N/A'); ?></strong> - <?php _t('Not Applicable'); ?> </p>
                 </div>
 
         </section>

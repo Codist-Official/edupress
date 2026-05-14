@@ -1419,7 +1419,16 @@ class Attendance extends CustomPost
     public static function showUsersToAddManualAttendance($args)
     {
         $users = User::getAll( $args );
+        if(empty($users)) return '<div class="no-users">No users found</div>';
+        $users_sorted = [];
+        foreach($users as $user){
+            $roll = get_user_meta($user->ID, 'roll', true);
+            $users_sorted[$roll] = $user;
+        }
+        ksort($users_sorted);
+        $users = array_values($users_sorted);
         ob_start();
+        
         ?>
         <style>
             table tr th,

@@ -542,24 +542,19 @@ class Exam extends Post
         $urls = explode('?', $url);
         $url = $urls[0];
         $url .= "?panel=result&branch_id={$branch_id}&shift_id={$shift_id}&class_id={$class_id}&section_id={$section_id}&exam_id={$post_id}&subject_id={$subject_id}&ranking_method=marks&term_id={$term_id}";
+        
         $view_html = " <a title='View Result Analysis' href='{$url}'>".EduPress::getIcon('view')."</a>";
 
         // Skipping duplicate action link
         if ( str_contains( $html, 'Edit Result') || str_contains( $html, 'View Result') ) return $html . $view_html;
 
-
         if( User::currentUserCan( 'edit', $this->post_type ) ){
-
-            $html .= " <a data-ajax_action='getPostEditForm' data-post_type='result' data-before_send_callback='' data-success_callback='resultSuccessCallback' data-error_callback='' href='javascript:void(0)' class='edpupress-show-result-update-form edupress-ajax-link' data-post_id='{$post_id}' data-id='{$post_id}'>".__( 'Edit Result', 'edupress' ). "</a>";
-
+            $html .= " <a data-ajax_action='getPostEditForm' data-post_type='result' data-before_send_callback='' data-success_callback='resultSuccessCallback' data-error_callback='' href='javascript:void(0)' class='edpupress-show-result-update-form edupress-ajax-link' data-post_id='{$post_id}' data-id='{$post_id}'>". __('Edit Result'). "</a>";
         } else {
-
-            $html .= " <a data-ajax_action='getPostEditForm' data-post_type='result' data-before_send_callback='' data-success_callback='resultSuccessCallback' data-error_callback='' href='javascript:void(0)' class='edpupress-show-result-update-form edupress-ajax-link' data-post_id='{$post_id}' data-id='{$post_id}'>".__( 'View Result', 'edupress' ). "</a>";
-
+            $html .= " <a data-ajax_action='getPostEditForm' data-post_type='result' data-before_send_callback='' data-success_callback='resultSuccessCallback' data-error_callback='' href='javascript:void(0)' class='edpupress-show-result-update-form edupress-ajax-link' data-post_id='{$post_id}' data-id='{$post_id}'>". __( 'View Result', 'edupress' ). "</a>";
         }
 
-        return $html;
-        
+        return $html;        
     }
 
     /**

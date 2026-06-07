@@ -1034,10 +1034,10 @@ class AdminAjax
 
         foreach($students as $id){
 
+            $res .= Printer::getHeader();
             $res .= Printer::printIndividualResult( $id , $_REQUEST['data'][$id], $extra_data );
             if($last !== $id) {
                 $res .= "<div class='page-break'></div>";
-                $res .= Printer::getHeader();
             }
 
         }

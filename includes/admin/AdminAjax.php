@@ -204,7 +204,7 @@ class AdminAjax
 
         unset($_REQUEST['ajax_action']);
 
-        if($post_type == 'transaction') return $status;
+        // if($post_type == 'transaction') return $status;
 
         return array(
             'status'    => $status,
@@ -1037,6 +1037,7 @@ class AdminAjax
             $res .= Printer::printIndividualResult( $id , $_REQUEST['data'][$id], $extra_data );
             if($last !== $id) {
                 $res .= "<div class='page-break'></div>";
+                $res .= Printer::getHeader();
             }
 
         }

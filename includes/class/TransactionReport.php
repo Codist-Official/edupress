@@ -491,51 +491,66 @@ class TransactionReport extends Post
             <!-- Duration Report -->
             <?php if( $report_type === 'duration' ): ?>
                 <?php 
-                    global $wpdb;
-                    $qry = "SELECT *, SUM(amount) AS total_amount, SUM(discount) AS total_discount FROM {$wpdb->prefix}transaction WHERE 1 = 1 ";
-                    $qry .= " AND is_inflow = 1 ";
-                    if(!empty($start_date)) $qry .= " AND DATE(t_time) >= '{$start_date}' ";
-                    if(!empty($end_date)) $qry .= " AND DATE(t_time) <= '{$end_date}' ";
-                    $qry .= " AND status = 'completed' ";
-                    $qry .= "GROUP BY is_inflow, DATE(t_time) ORDER BY t_time DESC ";
 
-                    $results = $wpdb->get_results($qry);
-                    if(empty($results)) return __('No transactions found!', 'edupress');
-                    $data = [] ;
-                    foreach($results as $r){
-                        $date = date('Y-m-d', strtotime($r->t_time));
-                        $type = $r->is_inflow ? 'inflow' : 'outflow';
-                        $data[$date] = array(
-                            'amount' => $r->total_amount,
-                            'discount' => $r->total_discount,
-                        );
+                    // we need to sum amount for inflow and outflow for each date 
+                    // in following query, inflow and outflow are in same table, so we need to sum amount for inflow and outflow for each date 
+                    
+                    global $wpdb;
+                    $qry1 = "SELECT DATE(t_time) AS date, SUM(amount) AS inflow, SUM(discount) AS discount FROM {$wpdb->prefix}transaction WHERE 1 = 1 ";
+                    $qry1 .= " AND is_inflow = 1 ";
+                    if(!empty($start_date)) $qry1 .= " AND DATE(t_time) >= '{$start_date}' ";
+                    if(!empty($end_date)) $qry1 .= " AND DATE(t_time) <= '{$end_date}' 
+                    GROUP BY DATE(t_time) ORDER BY DATE(t_time) DESC";
+                    $qry2 = "SELECT DATE(t_time) AS date, SUM(amount) AS outflow FROM {$wpdb->prefix}transaction WHERE 1 = 1 ";
+                    $qry2 .= " AND is_inflow = 0 ";
+                    if(!empty($start_date)) $qry2 .= " AND DATE(t_time) >= '{$start_date}' ";
+                    if(!empty($end_date)) $qry2 .= " AND DATE(t_time) <= '{$end_date}' ";
+                    $qry2 .= " GROUP BY DATE(t_time) ORDER BY DATE(t_time) DESC";
+                    $results1 = $wpdb->get_results($qry1, ARRAY_A);
+                    $results2 = $wpdb->get_results($qry2, ARRAY_A);
+                    $data = [];
+                    foreach($results1 as $r){
+                        $data[$r['date']]['inflow'] = $r['inflow'] ?? 0;
+                        $data[$r['date']]['discount'] = $r['discount'] ?? 0;
+                        $data[$r['date']]['branch_id'] = $r['branch_id'] ?? 0;
+                    }
+                    foreach($results2 as $r){
+                        $data[$r['date']]['outflow'] = $r['outflow'] ?? 0;
                     }
                 ?>
-
+                <h2 class="master-title text-center"><?php _t('Inflow and Outflow Report', 'edupress'); ?></h2>
                 <div class="duration-report-wrap">
                     <div class="edupress-table-wrap">
-                        <table class="edupress-table tablesorter">
+                        <table class="edupress-table edupress-master-table tablesorter">
                             <thead>
                                 <tr>
-                                    <th style="text-align: left;">Date</th>
-                                    <th style="text-align: center">Inflow</th>
-                                    <th style="text-align: center">Discount</th>
+                                    <th style="text-align: left;"><?php _t('Date', 'edupress'); ?></th>
+                                    <th style="text-align: center"><?php _t('Inflow', 'edupress'); ?></th>
+                                    <th style="text-align: center"><?php _t('Discount', 'edupress'); ?></th>
+                                    <th style="text-align: center"><?php _t('Outflow', 'edupress'); ?></th>
+                                    <th style="text-align: center"><?php _t('Net Amount', 'edupress'); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach($data as $k=>$v){ ?>
+                                <?php foreach($data as $k=>$v){ 
+                                    $url = site_url('/?branch_id='.$v['branch_id'].'&t_type=inflow&t_time='.$k.'&t_user=&paged=0&t_user_id=0&panel=transaction');
+                                    ?>
                                     <tr>
-                                        <td><?php echo date('d M, y', strtotime($k)); ?></td>
-                                        <td style="text-align: center;"><?php echo isset( $v['amount']) ? number_format( $v['amount'], 0) : 0; ?></td>
-                                        <td style="text-align: center;"><?php echo $v['discount'] ?? 0; ?></td>
+                                        <td><a target="_blank" href="<?php echo $url; ?>"><?php echo date('d M, y', strtotime($k)); ?></a></td>
+                                        <td style="text-align: center;"><?php echo isset( $v['inflow']) ? number_format( $v['inflow'], 0) : 0; ?></td>
+                                        <td style="text-align: center;"><?php echo isset( $v['discount']) ? number_format( $v['discount'], 0) : 0; ?></td>
+                                        <td style="text-align: center;"><?php echo isset( $v['outflow']) ? number_format( $v['outflow'], 0) : 0; ?></td>
+                                        <td style="text-align: center;"><?php echo number_format( $v['inflow'] - $v['outflow'], 0 ); ?></td>
                                     </tr>
                                 <?php } ?>
                             </tbody>
                             <tfoot>
                                 <tr>
                                     <td> </td>
-                                    <td style="text-align: center;"><?php echo number_format(  array_sum( array_column( $data, 'amount') ), 0 );  ?></td>
-                                    <td style="text-align: center;"><?php echo array_sum( array_column( $data, 'discount') );  ?></td>
+                                    <td style="text-align: center;"><?php echo number_format(  array_sum( array_column( $data, 'inflow') ), 0 );  ?></td>
+                                    <td style="text-align: center;"><?php echo number_format(  array_sum( array_column( $data, 'discount') ), 0 );  ?></td>
+                                    <td style="text-align: center;"><?php echo number_format(  array_sum( array_column( $data, 'outflow') ), 0 );  ?></td>
+                                    <td style="text-align: center;"><?php echo number_format(  array_sum( array_column( $data, 'inflow') ) - array_sum( array_column( $data, 'outflow') ), 0 );  ?></td>
                                 </tr>
                             </tfoot>
                         </table>

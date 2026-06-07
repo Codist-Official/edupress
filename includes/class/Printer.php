@@ -55,6 +55,7 @@ class Printer
         $font_family_escaped = str_replace(' ', '+', $font_family);
         $font_size = Admin::getSetting('print_font_size');
         $line_height = Admin::getSetting('print_line_height');
+        $title_font_size = Admin::getSetting('print_title_font_size');
 
         $header_height = Admin::getSetting('print_header_height', 1.5);
         $logo_height = Admin::getSetting('print_logo_height', 0.5);
@@ -102,9 +103,13 @@ class Printer
                 height: <?php echo $logo_height; ?>in;
                 width: auto;
             }
+            .header-title{
+                font-size: <?php echo $title_font_size; ?>px !important;
+                line-height: 1.25em !important;
+            }
             .print-qr-code{
                 display: inline-block;
-                position: fixed;
+                position: absolute;
                 text-align: center;
                 <?php
                     $top_margin = (float) Admin::getSetting('print_qr_code_top_margin', 0.01);
@@ -513,7 +518,7 @@ class Printer
                                     <!-- other details -->
                                     <?php if( $i == 0 ){ ?>
                                         <td rowspan="<?php echo $rowspan; ?>"><strong><?php echo td($user_data['total_obtained_marks']); ?></strong></td>
-                                        <td rowspan="<?php echo $rowspan; ?>"><strong><?php echo t(Result::ordinal($user_data['merit'])); ?></strong></td>
+                                        <td rowspan="<?php echo $rowspan; ?>"><strong><?php echo t(Result::ordinal($user_data['merit'] ?? 0)); ?></strong></td>
                                     <?php } ?>
 
                                 <!-- CGPA based -->
@@ -569,6 +574,14 @@ class Printer
         </section>
 
         <?php echo Result::getEndorsementBox(); ?>
+
+        <!-- if note not empty --> 
+        <?php if(Admin::getSetting('result_note') != ''): ?>
+            <div class="result-note" style="width: 100%; max-width: calc(100% - 20px); margin: 20px auto 0 auto;">
+                <span style="font-weight: bold;"><?php _t('Note', 'edupress'); ?></span>
+                <?php echo nl2br(Admin::getSetting('result_note')); ?> 
+            </div>
+        <?php endif; ?>
 
         <?php if($format !== 'marks' ) : ?>
             <!-- Grade table data -->

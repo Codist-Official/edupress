@@ -1104,7 +1104,7 @@ jQuery(document).ready(function(){
                 clog(res);
                 $j('.edupress-bulk-select-all').click();
                 hideEduPressLoading();
-                printContent(res.data);
+                printContent(res.data, true, {showHeader: false} );
             }
         })
     })

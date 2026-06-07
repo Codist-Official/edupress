@@ -36,6 +36,7 @@ class Util
             .principalSignature{
                 width: 100%;
                 max-width: <?php echo $params['width'];?>px;
+                height: auto;
             }
         </style>
         <?php 

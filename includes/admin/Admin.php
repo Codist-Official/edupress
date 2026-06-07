@@ -856,7 +856,7 @@ class Admin
                     'name'  => 'result_title_font_size',
                     'settings' => array(
                         'value' => Admin::getSetting('result_title_font_size', 20),
-                        'label' => __('Title Font Size', 'edupress'),
+                        'label' => t('Title Font Size', 'edupress'),
                         'options' => range(0,100),
                     )
                 );
@@ -865,7 +865,7 @@ class Admin
                     'name'  => 'result_signature_box',
                     'settings' => array(
                         'value' => Admin::getSetting('result_signature_box', 'inactive'),
-                        'label' => __('Signature Box', 'edupress'),
+                        'label' => t('Signature Box', 'edupress'),
                         'options' => array('inactive' => 'Inactive', 'active' => 'Active'),
                     )
                 );
@@ -874,7 +874,7 @@ class Admin
                     'name'  => 'result_signature_box_title',
                     'settings' => array(
                         'value' => Admin::getSetting('result_signature_box_title', ''),
-                        'label' => __('Signature Box Title', 'edupress'),
+                        'label' => t('Signature Box Title', 'edupress'),
                         'after' => 'Keep it blank to hide box title',
                     )
                 );
@@ -883,7 +883,7 @@ class Admin
                     'name'  => 'result_signature_box_columns',
                     'settings' => array(
                         'value' => Admin::getSetting('result_signature_box_columns', ''),
-                        'label' => __('Signature Box Columns', 'edupress'),
+                        'label' => t('Signature Box Columns', 'edupress'),
                         'after' => 'Each line treated as a column',
                     )
                 );
@@ -892,12 +892,55 @@ class Admin
                     'name'  => 'result_signature_box_height',
                     'settings' => array(
                         'value' => Admin::getSetting('result_signature_box_height', '0.5'),
-                        'label' => __('Signature Box Height (in)', 'edupress'),
+                        'label' => t('Signature Box Height (in)', 'edupress'),
                         'data' => array(
                             'min' => 0,
                             'max' => 5,
                             'step' => 'any',
                         )
+                    )
+                );
+                $fields['result_signature_box_title_position'] = array(
+                    'type'  => 'select',
+                    'name'  => 'result_signature_box_title_position',
+                    'settings' => array(
+                        'value' => Admin::getSetting('result_signature_box_title_position', 'top'),
+                        'label' => __('Signature Box Title Position', 'edupress'),
+                        'options' => array('top' => 'Top', 'bottom' => 'Bottom'),
+                    )
+                );
+                //border
+                $fields['result_signature_box_border'] = array(
+                    'type'  => 'select',
+                    'name'  => 'result_signature_box_border',
+                    'settings' => array(
+                        'value' => Admin::getSetting('result_signature_box_border', 'inactive'),
+                        'label' => t('Signature Box Border', 'edupress'),
+                        'options' => range(0,10),
+                    )
+                );
+                // margin-top
+                $fields['result_signature_box_margin_top'] = array(
+                    'type'  => 'number',
+                    'name'  => 'result_signature_box_margin_top',
+                    'settings' => array(
+                        'value' => Admin::getSetting('result_signature_box_margin_top', 20),
+                        'label' => t('Signature Box Margin Top', 'edupress'),
+                        'data' => array(
+                            'min' => 0,
+                            'max' => 1000,
+                            'step' => 1,
+                        )
+                    )
+                );
+                // note 
+                $fields['result_note'] = array(
+                    'type'  => 'textarea',
+                    'name'  => 'result_note',
+                    'settings' => array(
+                        'value' => Admin::getSetting('result_note', ''),
+                        'label' => t('Result Note', 'edupress'),
+                        'after' => 'This note will be displayed at the bottom of the result page',
                     )
                 );
                 break;
@@ -1828,6 +1871,16 @@ class Admin
                     'settings' => array(
                         'value' => Admin::getSetting('print_font_size', 12),
                         'label' => __('Font Size', 'edupress'),
+                        'options' => range(0,100)
+                    )
+                );
+
+                $fields['print_title_font_size'] = array(
+                    'type'  => 'select',
+                    'name'  => 'print_title_font_size',
+                    'settings' => array(
+                        'value' => Admin::getSetting('print_title_font_size', 20),
+                        'label' => t('Title Font Size', 'edupress'),
                         'options' => range(0,100)
                     )
                 );

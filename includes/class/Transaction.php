@@ -461,7 +461,7 @@ class Transaction extends CustomPost
 
         $results = $wpdb->get_results( $this->getListQuery() );
 
-        if(empty($results)) return __( 'No transactions found', 'edupress' );
+        if(empty($results)) return t( 'No transactions found', 'edupress' );
 
         ob_start();
         ?>
@@ -472,6 +472,13 @@ class Transaction extends CustomPost
                 font-size: 12px !important;
                 color: #555 !important;
                 text-align: left !important;
+            }
+           
+            body .edupress-table-wrap table tr[data-inflow="0"], body .edupress-table-wrap table tr[data-inflow="0"] td{
+                background-color: #fff3cd !important; // light yellow 
+            }
+            body .edupress-table-wrap table tr td table.transaction-details tr th, body .edupress-table-wrap table tr td table.transaction-details tr td{
+                background-color: #fff !important; // light yellow 
             }
         </style>
         <div class="edupress-table-wrap edupress-master-table">
@@ -503,7 +510,7 @@ class Transaction extends CustomPost
                         $logs = !empty($r->update_log) ? json_decode( $r->update_log, true ) : [];
                         $logs_data = is_array($logs) ? array_combine( array_column($logs, 'time'), array_column($logs, 'user_id') ) : [];
                         ?>
-                        <tr>
+                        <tr data-inflow="<?php echo $r->is_inflow; ?>">
                             <td><?php echo $branch_title ; ?></td>
                             <td><?php echo $r->is_inflow  ? 'Inflow' : 'Outflow'; ?></td>
                             <td><?php echo $r->amount; ; ?></td>
@@ -594,6 +601,8 @@ class Transaction extends CustomPost
 
         $user_id = intval($_REQUEST['t_user_id'] ?? '');
         $branch_id = intval($_REQUEST['branch_id'] ?? '');
+        $t_type = sanitize_text_field($_REQUEST['t_type'] ?? '');
+        $is_inflow = $t_type == 'inflow' ? 1 : 0;
         $date = sanitize_text_field($_REQUEST['t_time'] ?? '');
         $date_formatted = date('Y-m-d', strtotime($date));
 
@@ -602,7 +611,7 @@ class Transaction extends CustomPost
         if( !empty($user_id) ) $qry .= " AND user_id = {$user_id} ";
         if( !empty($branch_id) ) $qry .= " AND branch_id = {$branch_id} ";
         if( !empty($date) ) $qry .= " AND DATE(t_time) = '{$date_formatted}' ";
-
+        if( !empty($t_type) ) $qry .= " AND is_inflow = {$is_inflow} ";
         $qry .= " ORDER BY id DESC ";
         $qry .= " LIMIT {$this->posts_per_page} ";
         
@@ -631,16 +640,29 @@ class Transaction extends CustomPost
             'name'      => 'branch_id',
             'settings'  => array(
                 'options' => $branch->getPosts( [], true ),
-                'label' => 'Branch',
-                'placeholder' => 'Select a branch',
+                'label' => t('Branch'),
+                'placeholder' => t('Select a branch'),
                 'value' => intval($_REQUEST['branch_id'] ?? 0)
+            )
+        );
+        $fields['t_type'] = array(
+            'type'      => 'select',
+            'name'      => 't_type',
+            'settings'  => array(
+                'options' => array(
+                    'inflow' => t('Inflow'),
+                    'outflow' => t('Outflow'),
+                ),
+                'label' => t('Type'),
+                'placeholder' => t('Select a type'),
+                'value' => sanitize_text_field($_REQUEST['t_type'] ?? ''),
             )
         );
         $fields['t_time'] = array(
             'type'      => 'date',
             'name'      => 't_time',
             'settings'  => array(
-                'label' => 'Date',
+                'label' => t('Date'),
                 'value' => esc_attr($_REQUEST['t_time'] ?? ''),
             )
         );
@@ -648,8 +670,8 @@ class Transaction extends CustomPost
             'type'      => 'text',
             'name'      => 't_user',
             'settings'  => array(
-                'label' => 'User',
-                'placeholder' => 'Type a name...',
+                'label' => t('User'),
+                'placeholder' => t('Type a name...'),
                 'class'=>'t_user',
                 'value' => sanitize_text_field($_REQUEST['t_user'] ?? '')
             )
@@ -952,116 +974,162 @@ class Transaction extends CustomPost
         <html>
             <head>
             <title>POS Receipt</title>
-                <style>                    
-                    @media all{
-                        body {
-                        width: 58mm;
-                        font-family: monospace;
-                        font-size: 12px;
+            <style>                    
+                /* ==========================================================================
+                1. PRINT DEVICE CONFIGURATION (Fixes Auto-Cutting & Blank Spaces)
+                ========================================================================== */
+                @media print {
+                    @page {
                         margin: 0;
-                        padding: 0;
-                    }
-                    .receipt {
-                        padding: 10px;
-                    }
-                    .center {
-                        text-align: center;
-                    }
-                    .bold {
-                        font-weight: bold;
-                    }
-                    .line {
-                        border-top: 1px dashed #000;
-                        margin: 5px 0;
-                    }
-                    .transaction-pos-print{
-                        width: 100%;
-                        height: 100%;
-                        background-color: #fff;
-                    }
-                    .title{
-                        font-size: 14px;
-                        line-height: 1;
-                    }
-                    .subtitle{
-                        font-size: 12px;
-                        line-height: 1;
-                    }
-                    .meta-data{
-                        font-size:10px;
-                        line-height: 1;
-                    }
-                    .body-text{
-                        font-size:10px;
-                        line-height: 1;
-                    }
-                    .institute-details{
-                        margin: 5px 0;
-                        padding: 5px 0;
-                        border: 1px dashed #000;
-                        border-left: none;
-                        border-right: none;
-                    }
-                    .uppercase{
-                        text-transform: uppercase;
-                    }
-                    .capitalize{
-                        text-transform: capitalize;
-                    }
-                    .mt-10{
-                        margin-top: 10px;
-                    }
-                    .mb-10{
-                        margin-bottom: 10px;
-                    }
-                    .mt-20{
-                        margin-top: 20px;
-                    }
-                    ul.payment-items{
-                        margin: 0;
-                        padding: 0;
-                        list-style:none;
-                        width: 100%;
-                        height: auto;
-                        display: inline-block;
-                    }
-                    ul.payment-items li{
-                        list-style: none;
-                        margin-bottom: 5px;
-                        width: 100%;
-                        height: auto;
-                        display: inline-block;
-                        border-bottom: 1px dashed #000;
-                    }
-                    ul.payment-items li div{
-                        float: left;
-                        font-size: 9px;
-                        line-height: 1;
-                        padding: 3px;
-                        box-sizing: border-box;
-                    }
-                    ul.payment-items li .name{
-                        width: 40%;
-                    }
-                    ul.payment-items li .amount{
-                        width: 25%;
-                    }
-                    ul.payment-items li .month{
-                        width: 20%;
-                    }
-                    ul.payment-items li .due{
-                        width: 15%;
-                    }
-                    .pos-print-body{
-                        width: 100%;
-                        height: auto;
-                        display: inline-block;
-                    }
-                    .disclaimer-text{
-                        font-size: 8px;
+                        size: 80mm auto; /* Configures Chrome for an 80mm continuous thermal roll */
                     }
                 }
-                </style>
+
+                /* ==========================================================================
+                2. MAIN RECEIPT STYLES
+                ========================================================================== */
+                body {
+                    width: 80mm; /* Matches your 80mm physical paper roll width */
+                    font-size: 12px;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #fff;
+                }
+
+                .pos-print-header,
+                .pos-print-body{
+                    display: block;
+                    padding: 4mm;
+                }
+                
+                .receipt {
+                    padding: 4mm;
+                    box-sizing: border-box;
+                }
+                
+                .transaction-pos-print {
+                    width: 100%;
+                    height: auto; /* CRITICAL: Prevents printer from forcing extra blank paper output */
+                    background-color: #fff;
+                    display: block;
+                }
+                
+                .pos-print-body {
+                    width: 100%;
+                    height: auto;
+                    display: block;
+                }
+
+                /* ==========================================================================
+                3. TYPOGRAPHY & TEXT UTILITIES
+                ========================================================================== */
+                .center {
+                    text-align: center;
+                }
+                
+                .bold {
+                    font-weight: bold;
+                }
+                
+                .title {
+                    font-size: 14px;
+                    line-height: 1.2;
+                }
+                
+                .subtitle {
+                    font-size: 12px;
+                    line-height: 1.2;
+                }
+                
+                .meta-data,
+                .body-text {
+                    font-size: 10px;
+                    line-height: 1.2;
+                }
+                
+                .disclaimer-text {
+                    font-size: 8px;
+                    line-height: 1.2;
+                }
+                
+                .uppercase {
+                    text-transform: uppercase;
+                }
+                
+                .capitalize {
+                    text-transform: capitalize;
+                }
+
+                /* ==========================================================================
+                4. LAYOUT SPACING & BORDERS
+                ========================================================================== */
+                .line {
+                    border-top: 1px dashed #000;
+                    margin: 5px 0;
+                }
+                
+                .institute-details {
+                    margin: 5px 0;
+                    padding: 5px 0;
+                    border-top: 1px dashed #000;
+                    border-bottom: 1px dashed #000;
+                }
+                
+                .mt-10 { margin-top: 10px; }
+                .mb-10 { margin-bottom: 10px; }
+                .mt-20 { margin-top: 20px; }
+
+                /* ==========================================================================
+                5. PAYMENT ITEMS TABLE (Flexbox Architecture - Multi-line Safe)
+                ========================================================================== */
+                ul.payment-items {
+                    margin: 0;
+                    padding: 0;
+                    list-style: none;
+                    width: 100%;
+                }
+                
+                ul.payment-items li {
+                    display: flex;             /* Replaces float layout completely */
+                    align-items: flex-start;    /* Keeps text top-aligned if it wraps */
+                    width: 100%;
+                    margin-bottom: 5px;
+                    border-bottom: 1px dashed #000;
+                    padding-bottom: 3px;
+                }
+                
+                ul.payment-items li div {
+                    font-size: 9px;
+                    line-height: 1.2;
+                    padding: 3px;
+                    box-sizing: border-box;
+                    word-break: break-word;    /* Ensures long text folds nicely without breaking column constraints */
+                }
+                
+                /* Rigid column width distributions */
+                ul.payment-items li .name {
+                    flex: 0 0 40%;
+                    width: 40%;
+                }
+                
+                ul.payment-items li .amount {
+                    flex: 0 0 25%;
+                    width: 25%;
+                    text-align: right;        /* Cleans up financial column viewing */
+                }
+                
+                ul.payment-items li .month {
+                    flex: 0 0 20%;
+                    width: 20%;
+                    text-align: center;
+                }
+                
+                ul.payment-items li .due {
+                    flex: 0 0 15%;
+                    width: 15%;
+                    text-align: right;
+                }
+            </style>
             </head>
             <body>
                     <div class="pos-print-header">

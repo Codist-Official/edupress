@@ -46,25 +46,6 @@ class Debug
      */
     public function debug()
     {
-    
-        // echo "<br><br><br><br><br><br><br><br>DEBUGINGGG";
-        // $voice = Voice::send('01913919597', 'edupressbd_com_entry_test----');
-        // var_dump($voice);
-        // return; 
-        // $users = count_users();
-        // var_dump($users);
-        // return;
-        // var_dump(Voice::getBalance());
-        // $id = Voice::getEntryVoiceId();
-        // $mobile = '01913919597';
-        // var_dump( Voice::send($mobile, $id) );
-
-        // $domains = EduPress::getAllDomains(true);
-        // foreach($domains as $domain){
-        //     echo $domain . "<br>";
-        // }
-        // return;
-        
         ob_start(); 
         ?> 
         <html>
@@ -72,7 +53,6 @@ class Debug
                 <link rel="preconnect" href="https://fonts.googleapis.com">
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
                 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-
             </head>
             <body class="print-card">
                 <style>

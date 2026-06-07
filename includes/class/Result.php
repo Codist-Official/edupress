@@ -292,11 +292,8 @@ class Result extends Post
      */
     public function edit( $data = [] )
     {
-
         if ( !$this->id ) return false;
-
         return update_post_meta( $this->id, 'results', $data );
-
     }
 
     /**
@@ -817,7 +814,8 @@ class Result extends Post
                             while($qry->have_posts()) :
                                 $qry->the_post();
                                 $subject_id = get_post_meta( $qry->post->ID, 'subject_id', true );
-                                $subject_title = $found_subjects > 5 ? get_post_meta( $subject_id, 'shortname', true ) : get_the_title( $subject_id);
+                                $subject_title = $found_subjects > 5 ? get_post_meta( $subject_id, 'shortname', true ) : '';
+                                if(empty($subject_title)) $subject_title = get_the_title( $subject_id);
                                 if( $ranking_method  !== 'marks' ){
                                     $combined_name = get_post_meta( $subject_id, 'combined_name', true );
                                     if(!empty($combined_name)) $subject_title = $combined_name;
@@ -1323,16 +1321,52 @@ class Result extends Post
      */
     public static function getEndorsementBox()
     {
+        $box_height = Admin::getSetting('result_signature_box_height', 0.5);
+        $title_position = Admin::getSetting('result_signature_box_title_position', 'top');
+        $border = Admin::getSetting('result_signature_box_border', 0);
         $title = trim(Admin::getSetting('result_signature_box_title'));
         $columns = trim(Admin::getSetting('result_signature_box_columns'));
+        $margin_top = Admin::getSetting('result_signature_box_margin_top', 0);
         if(!empty($columns)){
             $columns = explode("\r\n", $columns);
             $columns = array_unique(array_filter($columns));
         }
         ob_start();
-        $box_height = Admin::getSetting('result_signature_box_height', 0.5);
         ?>
-        <div class="edupress-table-wrap no-view" style="margin-top: 20px;">
+        <style>
+            .edupress-table.sign-table{
+                position: relative;
+                width: 100% !important;
+                box-sizing: border-box;
+                margin: 0 auto;
+                margin-top: <?php echo $margin_top; ?>px !important;
+            }
+
+            .edupress-table-wrap .sign-table tr td, 
+            .edupress-table-wrap .sign-table tr th {
+                padding: 3px 5px !important;
+                border-width: <?php echo $border; ?>px !important;
+                text-align: center !important;
+                vertical-align: <?php echo $title_position == 'top' ? 'top' : 'bottom'; ?> !important;
+            }
+
+            <?php if($title_position == 'top') : ?>
+                .column-title {
+                    margin-bottom: 5px;   
+                    border-bottom: 1px dashed #000 !important;
+                    padding-bottom: 5px;
+                }
+            <?php endif; ?>
+            <?php if($title_position == 'bottom') : ?>
+                .column-title {
+                    margin-top: 5px;
+                    border-top: 1px dashed #000 !important;
+                    padding-top: 5px;
+                }
+            <?php endif; ?>
+
+        </style>
+        <div class="edupress-table-wrap no-view">
             <table class="edupress-table sign-table">
                 <?php if(!empty($title)) : ?>
                 <tr>
@@ -1343,13 +1377,19 @@ class Result extends Post
                 <?php if(!empty($columns)): ?>
                     <tr>
                         <?php foreach($columns as $column): ?>
-                            <th style="text-align: left; vertical-align: top !important;">
+                            <th width="<?php echo 100 / count($columns); ?>%">
                                 <?php 
                                     $column_data = explode('|', $column);
                                 ?>
-                                <span style='text-decoration:underline;'><?php echo $column_data[0] ?? ''; ?></span><br>
-                                <?php if(isset($column_data[1])) echo apply_filters('the_content', $column_data[1]); ?>
-                                <div style="height: <?php echo $box_height; ?>in; "> </div>
+                                <?php if($title_position == 'top') : ?>
+                                    <div class="column-title"><?php echo $column_data[0] ?? ''; ?></div>
+                                <?php endif; ?>
+                                <?php if(isset($column_data[1])) : ?>
+                                    <div class="column-content"><?php echo apply_filters('the_content', $column_data[1]); ?></div>
+                                <?php endif; ?>
+                                <?php if($title_position == 'bottom') : ?>
+                                    <div class="column-title"><?php echo $column_data[0] ?? ''; ?></div>
+                                <?php endif; ?>
                             </th>
                         <?php endforeach; ?>
                     </tr>
@@ -1372,12 +1412,19 @@ class Result extends Post
      */
     public function getAfterListHtml()
     {
+        return '';
         ob_start();
         if(Admin::getSetting('result_signature_box') == 'active' ): ?>
-            <div>
+            <div style="position: relative;">
                 <div class="edupress-print-bottom-wrap">
                     <?php echo self::getEndorsementBox(); ?>
                 </div>
+            </div>
+        <?php endif;
+        if(Admin::getSetting('result_note') != ''): ?>
+            <div class="result-note">
+                <h3 class="master-subtitle"><?php _t('Note', 'edupress'); ?></h3>
+                <?php echo nl2br(Admin::getSetting('result_note')); ?> 
             </div>
         <?php endif;
         return ob_get_clean();

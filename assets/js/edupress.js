@@ -1537,6 +1537,48 @@ jQuery(document).ready(function(){
         }
     })
 
+    // Edupress Device Sync Buttons
+    $j(document).on('click', '.edupress-sync-device-btn', function(e){
+        preventDefault(e);
+        let action = $j(this).data('action');
+        let userId = $j(this).data('user_id');
+        let attendanceId = $j(this).data('attendance_id');
+        let cardNumber = '';
+        let ele = $j(this);
+        if(action == 'syncRfid'){
+            cardNumber = $j(this).closest('tr').find('.card_number').val();
+        } 
+        let data = {
+            action: 'edupress_admin_ajax',
+            ajax_action: action,
+            _wpnonce: edupress.wpnonce,
+            user_id: userId,
+            attendance_id: attendanceId,
+            card_number: cardNumber,
+        };
+        $j.ajax({
+            url: edupress.ajax_url,
+            data: data,
+            dataType: 'json',
+            method: 'POST',
+            beforeSend: function(){
+                clog(data);
+                if(!confirm('Are you sure to proceed?')) return false;
+                showEduPressLoading();
+            },
+            success: function(res){
+                clog(res);
+                hideEduPressLoading();
+                showEduPressStatus(res.status === 1 ? 'success' : 'error');
+                if(res.status === 1 && action === 'syncRfid' && res.card_number){
+                    ele.closest('tr').find('.card_number').val(res.card_number);
+                } else if(res.status === 1 && action === 'deleteCard' && res.response.data.UserID === attendanceId){
+                    $j(".card_number[data-attendance_id='" + attendanceId + "']").val('');
+                }
+            }
+        })
+    })
+
 
 })
 ///// jQuery Ends //////

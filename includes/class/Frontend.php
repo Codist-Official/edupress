@@ -75,12 +75,13 @@ class Frontend
     public function getPanel()
     {
 
+        $panel = sanitize_text_field($_REQUEST['panel'] ?? '' );
         ob_start();
         ?>
         <div class='edupress-frontend-panel-wrap'>
-            <div class="topbar-wrap"><?php echo $this->getTopBar(); ?></div>
-            <div class="sidebar-wrap"><?php echo $this->getSidebar(); ?></div>
-            <div class="content-wrap"><?php echo $this->getContent(); ?></div>
+            <div class="topbar-wrap" data-panel="<?php echo $panel; ?>"><?php echo $this->getTopBar(); ?></div>
+            <div class="sidebar-wrap" data-panel="<?php echo $panel; ?>"><?php echo $this->getSidebar(); ?></div>
+            <div class="content-wrap" data-panel="<?php echo $panel; ?>"><?php echo $this->getContent(); ?></div>
         </div>
         <?php
         return ob_get_clean();

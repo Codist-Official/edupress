@@ -1488,16 +1488,12 @@ class User
                         <th><?php _t( 'Mobile' ); ?></th>
                         <th><?php _t( 'Reg. Date' ); ?></th>
                         <?php if( self::currentUserCan( 'edit', $this->post_type ) ): ?>
-
                             <th class="no-print" style="text-align:center;"><?php _t( 'Action' ); ?></th>
-
+                            <th class="no-print" style="text-align:center;"><?php _t( 'Device Sync' ); ?></th>
                         <?php endif; ?>
+
                     </tr>
                 </thead>
-
-
-            
-
                 <?php 
                 $current_user_id = get_current_user_id();
                 foreach( $results as $user ) :
@@ -1507,9 +1503,7 @@ class User
                     <td class="no-print" width="100">
 
                         <?php
-                            // current user cannot delete himself
                             $disable_own = $this->id === $current_user_id ? " disabled='disabled' " :  '';
-
                             $user_visible_id = $this->id;
                             if(EduPress::isActive('attendance')){
                                 $user_visible_id = $this->getMeta('attendance_id');
@@ -1524,11 +1518,11 @@ class User
                     <td data-field="branch_id"><?php echo get_the_title( $this->getMeta('branch_id')); ?></td>
                     <td>
                         <?php 
-                        $roles = $this->getRoles();
-                        $current_role = $this->getRole();
-                        $role_name = $roles[$current_role] ?? '';
-                        echo ucwords($role_name); 
-                    ?>
+                            $roles = $this->getRoles();
+                            $current_role = $this->getRole();
+                            $role_name = $roles[$current_role] ?? '';
+                            echo ucwords($role_name); 
+                        ?>
                     </td>
                     <td data-field="name">
                         <?php $text = get_avatar($this->id, 20) . $this->getMeta('first_name');  ?>
@@ -1555,6 +1549,32 @@ class User
                             <?php if ( self::currentUserCan('delete', $this->post_type ) && $current_user_id !== $this->id ) : ?>
                                 <a href="javascript:void(0)" data-action="delete" class="edupress-modify-user" data-user-id="<?php echo $this->id; ?>"><?php echo EduPress::getIcon('delete'); ?></a>
                             <?php endif; ?>
+                        </td>
+
+                        <td data-field="device_sync" align="center" style="text-align: center;" class="no-print">
+                            <div class="item-wrap">
+                                <?php 
+                                    $rfid = $this->getMeta('card_number');
+                                    $attendance_id = $this->getMeta('attendance_id');
+                                    echo EduPress::generateFormElement('text', 'card_number', array('value' => $rfid, 'class' => 'card_number no-print', 'data' => ['data-user_id' => $this->id, 'data-attendance_id' => $attendance_id]));
+                                ?>
+                                <a href="javascript:void(0)" data-action="syncRfid" class="no-print edupress-sync-device-btn" data-attendance_id="<?php echo $attendance_id; ?>" data-user_id="<?php echo $this->id; ?>" data-card_number="<?php echo $rfid; ?>"><?php _t('Sync RFID', 'edupress'); ?></a>
+                            </div>
+                            <div class="item-wrap">
+                                <span class="item-title"><?php _t('Face', 'edupress'); ?></span>
+                                <a href="javascript:void(0)" data-action="enrollFace" class="no-print edupress-sync-device-btn" data-attendance_id="<?php echo $attendance_id; ?>" data-user_id="<?php echo $this->id; ?>" title="Enroll Face">+</a>
+                                <a href="javascript:void(0)" data-action="deleteFace" class="no-print edupress-sync-device-btn" data-attendance_id="<?php echo $attendance_id; ?>" data-user_id="<?php echo $this->id; ?>" title="Delete Face">-</a>
+                            </div>
+                            <div class="item-wrap">
+                                <span class="item-title"><?php _t('Finger', 'edupress'); ?></span>
+                                <a href="javascript:void(0)" data-action="enrollFinger" class="no-print edupress-sync-device-btn" data-attendance_id="<?php echo $attendance_id; ?>" data-user_id="<?php echo $this->id; ?>" title="Enroll Finger">+</a>
+                                <a href="javascript:void(0)" data-action="deleteFinger" class="no-print edupress-sync-device-btn" data-attendance_id="<?php echo $attendance_id; ?>" data-user_id="<?php echo $this->id; ?>" title="Delete Finger">-</a>
+                            </div>
+                            <div class="item-wrap">
+                                <span class="item-title"><?php _t('Card', 'edupress'); ?></span>
+                                <a href="javascript:void(0)" data-action="enrollCard" class="no-print edupress-sync-device-btn" data-attendance_id="<?php echo $attendance_id; ?>" data-user_id="<?php echo $this->id; ?>" title="Enroll Card">+</a>
+                                <a href="javascript:void(0)" data-action="deleteCard" class="no-print edupress-sync-device-btn" data-attendance_id="<?php echo $attendance_id; ?>" data-user_id="<?php echo $this->id; ?>" title="Delete Card">-</a>
+                            </div>
                         </td>
                     <?php endif; ?>
                 </tr>
@@ -3150,11 +3170,6 @@ class User
      */
     public function delete()
     {
-        // deleting user even if has transaction 
-        // if($this->hasTransaction()){
-        //     $this->updateMeta('status', 'inactive');
-        //     return false;
-        // }
         return wp_delete_user( $this->id );
     }
 

@@ -150,7 +150,6 @@ class Attendance extends CustomPost
                         <?php 
                         foreach($ids as $id){
                             $online = Admin::getSetting('device_' . $id . '_online', 0);
-                            // light green or light red
                             $online_color = $online == 1 ? '#90EE90' : '#FFB6C1';
                             $online_status = intval($online) == 1 ? 'Online' : 'Offline';
                             $branch_id = Admin::getSetting('attendance_device_'.$id.'_branch_id', 0);
@@ -1060,7 +1059,6 @@ class Attendance extends CustomPost
         }
         
         $args = array(
-            'method' => 'GET',
             'body' => $body,
         );
 

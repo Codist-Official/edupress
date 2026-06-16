@@ -1,58 +1,4 @@
-<?php
-
-namespace EduPress;
-@ini_set('display_errors', 1);
-
-defined( 'ABSPATH' ) || die();
-
-class Debug
-{
-
-    private static $_instance;
-
-    /**
-     * Initialize instance
-     *
-     * @return Debug
-     * @since 1.0
-     * @acccess public
-     * @static
-     */
-    public static function instance()
-    {
-
-        if( is_null( self::$_instance ) ) self::$_instance = new self();
-        return self::$_instance;
-
-    }
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-
-        add_shortcode('EduPress_Debug', [ $this, 'debug' ] );
-        add_shortcode('edupress_debug', [ $this, 'debug' ] );
-
-    }
-
-    /**
-     * Process debugging
-     *
-     * @return string
-     * @access public
-     * @since 1.0
-     */
-    public function debug()
-    {
-        ob_start();
-        echo "<br><br><br><br>";
-        $device = new Device();
-        echo "<pre>";
-        var_dump($device->pullRfidNumbers());
-        echo "</pre>";
-        return ob_get_clean();
+<?php 
         ob_start(); 
         ?> 
         <html>
@@ -98,6 +44,8 @@ class Debug
                         border: none;
                         padding: 5mm;
                         box-sizing: border-box;
+                        /* top: 85mm;
+                        left: 12mm; */
                         position: relative;
                         line-height: 1;
                         z-index: 9999;
@@ -107,44 +55,52 @@ class Debug
                     }
                     .id-thumb-wrap{
                         text-align: center;
-                        margin-top: 85px;
+                        margin-top: 125px;
                     }
                     .id-thumb{
-                        width: 110px;
+                        border-radius: 100%;
+                        width: 125px;
                         height: auto;
                         text-align: center;
                         margin: 0 auto;
-                        border: 3px solid #f6881f;
+                        border: 3px solid #fff;
                     }
                     .details-wrap{
-                        margin-left: 5px;
-                        width: 250px;
-                        margin-top: 60px;
+                        width: 175px;
+                        margin-top: 10px;
+                    }
+                    .details-wrap{
                         font-family: 'Poppins', sans-serif;
                         color: #fff;
-                        line-height: 1.2;
-                        vertical-align: middle;
+                        font-weight: bold;
                     }
-                    .details-wrap div{
-                        display: flex;
-                        margin-bottom: 1px;
+                    .name{
+                        font-size: 20px;
+                        font-weight: bold; 
+                        color: #fff;
+                        line-height: 1;
+                        margin-bottom: 5px;
                     }
                     span.key{
-                        color: #000;
+                        color: #ffde59;
                         font-size: 14px;
                         line-height: 1.2;
-                        width: 65px;
-                        display: inline-block;
                     }
                     span.value{
-                        color: #000;
+                        color: white;
                         font-size: 14px;
                         line-height: 1.2;
-                        width: calc(100% - 65px);
-                        display: inline-block;
                     }
-                    .key.blood_group{
-                        font-size: 10px !important;
+                    .mobile{
+                        margin-top: 7px;
+                        padding: 5px 7px;
+                        background-color: #fff;
+                        border-radius: 50px;
+                        display: inline-block;
+                        color: #409346;
+                        line-height: 1
+                        height: 20px;
+                        vertical-align: middle;
                     }
                     .transparent-bg{
                         opacity: 0;
@@ -168,11 +124,14 @@ class Debug
                         $section_title = "Section";
                         $attendance_id = (int) $metadata['attendance_id'][0] ?? '';
 
-                        $skip_ids = [];
+                        $skip_ids = [4952, 4968, 5951, 5148];
                         if(in_array($attendance_id, $skip_ids)) continue;
 
                         $name = isset($metadata['first_name']) ? $metadata['first_name'][0] : '';
-                        $name = ucwords(strtolower($name));
+                        $name_ids = [5143, 5946];
+                        if(!in_array($attendance_id, $name_ids)) $name = ucwords(strtolower($name));
+
+
 
                         // check if a eitehr play, kg, nursery, nine
                         $preprimary = ['play', 'kg', 'nursery'];
@@ -187,23 +146,21 @@ class Debug
                         }
 
                         $roll = $metadata['roll'][0] ?? '';
-                        $blood_group = $metadata['blood_group'][0] ?? '';
                         $mobile = $metadata['mobile'][0] ?? '';
                         $mobile = str_replace('+88', '', $mobile);
                         $mobile = str_replace(' ', '', $mobile);
                         $mobile = str_replace('-', '', $mobile);
 
-                        $data['name'] = ['name' => "Name", 'value' => $name ?? ''];
-                        $data['attendance'] = ['name' => "ID", 'value' => $attendance_id ?? ''];
+                        $data['attendance'] = ['name' => "ID No", 'value' => $attendance_id ?? ''];
                         $data['class'] = ['name' => "Class", 'value' =>  $class_id ? $class : '' ];
                         $data['section'] = ['name' => $section_title, 'value' => $section ? $section : '' ];
                         $data['roll'] = ['name' => "Roll", 'value' =>  $roll ? $roll : '' ];
-                        $data['mobile'] = ['name' => "Mobile", 'value' =>  $mobile ? $mobile : '' ];
-                        $data['blood_group'] = ['name' => "Blood Group", 'value' =>  $blood_group ? $blood_group : 'A+' ];
                         $avatar_id = get_user_meta($user->ID, 'avatar_id', true);
+                        // $photo = $avatar_id ? wp_get_attachment_image_url($avatar_id, 'full') : '';
+                        // $photo_url = $photo;
                     ?>
                     <div class="id-card-holder">
-                        <img src="<?php echo EDUPRESS_IMG_URL; ?>id-cards/biis-front.png" style="position: absolute; left: 0; top: 0; z-index: 1; width: 100%; height: 100%; background-size: cover;">
+                        <img src="<?php echo EDUPRESS_IMG_URL; ?>id-cards/radiance-front-bg.png" style="position: absolute; left: 0; top: 0; z-index: 1; width: 100%; height: 100%;">
                         <div class="id-card-inner">
                             <div class="id-thumb-wrap">
                             <?php 
@@ -216,16 +173,21 @@ class Debug
                                 ?>
                             </div>
                             <div class="details-wrap">
-                                <!-- <div class="name"><?php echo $name; ?></div> -->
+                                <div class="name"><?php echo $name; ?></div>
                                 <?php 
                                     foreach($data as $k=>$v){
                                         if(empty($v['value'])) continue;
                                         echo "<div>
-                                            <span class='key {$k}'>{$v['name']}</span><span class='value'>: {$v['value']}</span>
+                                            <span class='key'>{$v['name']}</span><span class='value'>: {$v['value']}</span>
                                         </div>";
                                     }
                                 ?>
-                                
+                                <?php if($mobile): ?>
+                                    <div class="mobile">
+                                        <img src="<?php echo EDUPRESS_IMG_URL; ?>id-cards/mobile-icon.png" style="width: 15px; height: 15px; vertical-align: middle;">
+                                        <?php echo $mobile; ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -235,9 +197,6 @@ class Debug
         </html>
         <?php 
         $html = ob_get_clean();
-        echo $html;
-        // return;
-
         $settings = [
             'page_width' => '54.61mm',
             'page_height' => '86.36mm',
@@ -259,10 +218,3 @@ class Debug
         echo "<br><br>";
         echo $data['pdf'];
         echo "<br><br>";
-
-
-    }
-
-}
-
-Debug::instance();

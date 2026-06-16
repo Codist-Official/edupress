@@ -394,15 +394,12 @@ class Result extends Post
 
         if(isset($args['meta_query']) && is_array($args['meta_query']) && count($args['meta_query']) > 1) $args['meta_query']['relation'] = 'AND';
 
-        $min_req_fields = 2;
-        if( Admin::getSetting('shift_active') ) $min_req_fields++;
-        if( Admin::getSetting('class_active') ) $min_req_fields++;
-        if( Admin::getSetting('section_active') ) $min_req_fields++;
+        // $min_req_fields = 2;
+        // if( Admin::getSetting('shift_active') ) $min_req_fields++;
+        // if( Admin::getSetting('class_active') ) $min_req_fields++;
+        // if( Admin::getSetting('section_active') ) $min_req_fields++;
 
-        if( !isset($args['meta_query']) || (is_array($args['meta_query']) && count($args['meta_query']) < $min_req_fields) ) return t( 'Please select all fields!', 'edupress' );
-
-
-
+        // if( !isset($args['meta_query']) || (is_array($args['meta_query']) && count($args['meta_query']) < $min_req_fields) ) return t( 'Please select all fields!', 'edupress' );
         $qry = new \WP_Query( $args );
 
         if(!$qry->have_posts()) return __('No exams found!', 'edupress' );
@@ -620,7 +617,9 @@ class Result extends Post
         foreach($students_data as $student_id => $v){
 
             if($student_id == 'exam_marks') continue;
-            if(!empty($v['failed_subjects']) || $v['total_obtained_marks'] == 0  ) continue;
+            // here we are checking if the student has failed any subject or has not obtained any marks
+            // schools want to show all students in the result, so skipping this check
+            // if(!empty($v['failed_subjects']) || $v['total_obtained_marks'] == 0  ) continue;
             $students_total_marks[$student_id] = $v['total_obtained_marks'];
 
         }
@@ -629,13 +628,10 @@ class Result extends Post
         $position = 0;
         $previous_marks = null;
         foreach($students_total_marks as $student_id=>$total){
-
             $total !== $previous_marks ? $position++ : $position;
             $students_data[$student_id]['merit'] = $position;
             $previous_marks = $total;
-
         }
-
 
         // Assigning highest mark to each subject of all students
         foreach($students_data as $student_id => $marks ){
@@ -791,8 +787,24 @@ class Result extends Post
 
         ob_start();
         ?>
+        <style>
+            body .edupress-table-wrap table a.showUserProfile,
+            body .edupress-table-wrap table label,
+            body .edupress-table-wrap table div.tablesorter-header-inner,
+            body .edupress-table-wrap table tr,
+            body .edupress-table-wrap table th,
+            body .edupress-table-wrap table td,
+            body .edupress-table-wrap table td a,
+            body .edupress-table-wrap table tr td *,
+            body .edupress-table-wrap table tr th *,
+            body .edupress-table-wrap table tr th label,
+            body .edupress-table-wrap table tr:nth-child(odd) td,
+            body .edupress-table-wrap table tr:nth-child(even) td{
+                font-size: 12px !important;
+            }
+        </style>
         <div class="edupress-table-wrap">
-            <table class="edupress-table edupress-master-table tablesorter">
+            <table class="edupress-table edupress-result-table edupress-master-table tablesorter">
                 <thead>
                     <tr>
                         <th class="">
@@ -1022,20 +1034,18 @@ class Result extends Post
 
                         <!-- SMS -->
                             <?php
-                            $student_total_obtained_marks = $students_data[$student_id]['total_obtained_marks'] ?? 0;
-                            $student_merit_pos = EduPress::numberToOrdinal($students_data[$student_id]['merit'] ?? 0);
-                            $exam_total = 0;
-                            foreach($exam_marks_head_wise_data as $subject){
-                                $exam_total += array_sum($subject);
-                            }
-                            if( !isset($students_data[$student_id]['total_exam_marks']) ) $students_data[$student_id]['total_exam_marks'] = 0;
-                            $students_data[$student_id]['total_exam_marks'] += $exam_total;
+                                $student_total_obtained_marks = $students_data[$student_id]['total_obtained_marks'] ?? 0;
+                                $student_merit_pos = EduPress::numberToOrdinal($students_data[$student_id]['merit'] ?? 0);
+                                $exam_total = 0;
+                                foreach($exam_marks_head_wise_data as $subject){
+                                    $exam_total += array_sum($subject);
+                                }
+                                if( !isset($students_data[$student_id]['total_exam_marks']) ) $students_data[$student_id]['total_exam_marks'] = 0;
+                                $students_data[$student_id]['total_exam_marks'] += $exam_total;
 
-                            $sms_data[$student_id]['sms'] .= "\n\nTotal: $student_total_obtained_marks/$exam_total";
-                            $sms_data[$student_id]['sms'] .= "\nMerit: $student_merit_pos\n";
+                                $sms_data[$student_id]['sms'] .= "\n\nTotal: $student_total_obtained_marks/$exam_total";
+                                $sms_data[$student_id]['sms'] .= "\nMerit: $student_merit_pos\n";
                             ?>
-
-
                         <?php else : ?>
 
                         <!-- Grade point without optional -->
@@ -1187,7 +1197,7 @@ class Result extends Post
                 'type' => 'select',
                 'name' => 'section_id',
                 'settings' => array(
-                    'required'=> true,
+                    'required'=> false,
                     'label' => 'Section',
                     'placeholder' => 'Select',
                     'value' => intval($_REQUEST['section_id'] ?? 0),

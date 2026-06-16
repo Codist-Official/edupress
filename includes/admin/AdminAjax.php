@@ -1749,6 +1749,83 @@ class AdminAjax
         return ['status' => 1, 'data' => $html, 'orientation' => $_REQUEST['orientation']];
     }
 
+    public function syncRfid()
+    {
+        $attendance_id = intval($_REQUEST['attendance_id']);
+        $user_id = intval($_REQUEST['user_id']);
+        $card_number = intval($_REQUEST['card_number']);
+
+        $device = new Device();
+
+        if(!$card_number){
+            // check if card number exists in device 
+            $card_number = $device->getUserRfid($attendance_id);            
+            if(!$card_number){
+                return ['status' => 0, 'data' => 'Card number not found in device', 'response' => $response];
+            } 
+            update_user_meta($user_id, 'card_number', $card_number);
+            $data = ['user_id' => $attendance_id, 'card_number' => $card_number];
+            $response = $device->addUser($data);
+            return $response['success'] ? ['status' => 1, 'data' => 'RFID synced successfully', 'card_number' => $card_number] : ['status' => 0, 'data' => 'Failed to sync RFID', 'response' => $response, 'card_number' => $card_number];
+        }
+
+        if($card_number){
+            update_user_meta($user_id, 'card_number', $card_number);
+            $data = ['user_id' => $attendance_id, 'card_number' => $card_number];
+            $response = $device->addUser($data);
+            return $response['success'] ? ['status' => 1, 'data' => 'RFID synced successfully'] : ['status' => 0, 'data' => 'Failed to sync RFID', 'response' => $response];
+        }
+    }
+
+    public function enrollFace()
+    {
+        $attendance_id = intval($_REQUEST['attendance_id']);
+        $user_id = intval($_REQUEST['user_id']);
+        $device = new Device();
+        $response = $device->remoteEnroll(['user_id' => $attendance_id, 'enroll_type' => 'face']);
+        return $response['success'] ? ['status' => 1, 'data' => 'Face enrollment started', 'response' => $response] : ['status' => 0, 'data' => 'Failed to enroll face', 'response' => $response];
+    }
+
+    public function enrollFinger()
+    {
+        $attendance_id = intval($_REQUEST['attendance_id']);
+        $user_id = intval($_REQUEST['user_id']);
+        $device = new Device();
+        $response = $device->remoteEnroll(['user_id' => $attendance_id, 'enroll_type' => 'finger']);
+        return $response['success'] ? ['status' => 1, 'data' => 'Finger enrollment started', 'response' => $response] : ['status' => 0, 'data' => 'Failed to enroll finger', 'response' => $response];
+    }
+
+    public function enrollCard()
+    {
+        $attendance_id = intval($_REQUEST['attendance_id']);
+        $user_id = intval($_REQUEST['user_id']);
+        $device = new Device();
+        $response = $device->remoteEnroll(['user_id' => $attendance_id, 'enroll_type' => 'card']);
+        return $response['success'] ? ['status' => 1, 'data' => 'Card enrollment started', 'response' => $response] : ['status' => 0, 'data' => 'Failed to enroll card', 'response' => $response];
+    }
+
+    public function deleteCard()
+    {
+        $attendance_id = intval($_REQUEST['attendance_id']);
+        $user_id = intval($_REQUEST['user_id']);
+        $device = new Device();
+        $response = $device->addUser(['user_id' => $attendance_id, 'card_number' => " "]);
+        if($response['success']){
+            update_user_meta($user_id, 'card_number', '');
+        }
+        return $response['success'] ? ['status' => 1, 'data' => 'Card deleted successfully', 'response' => $response] : ['status' => 0, 'data' => 'Failed to delete card', 'response' => $response];
+    }
+
+    public function deleteFace()
+    {
+        $attendance_id = intval($_REQUEST['attendance_id']);
+        $user_id = intval($_REQUEST['user_id']);
+        $device = new Device();
+        $response = $device->deleteFace(['user_id' => $attendance_id]);
+        return $response['success'] ? ['status' => 1, 'data' => 'Face deleted successfully', 'response' => $response] : ['status' => 0, 'data' => 'Failed to delete face', 'response' => $response];
+    }
+
+
 
 }
 

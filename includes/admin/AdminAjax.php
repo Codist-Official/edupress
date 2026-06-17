@@ -1825,6 +1825,15 @@ class AdminAjax
         return $response['success'] ? ['status' => 1, 'data' => 'Face deleted successfully', 'response' => $response] : ['status' => 0, 'data' => 'Failed to delete face', 'response' => $response];
     }
 
+    public function deleteFinger()
+    {
+        $attendance_id = intval($_REQUEST['attendance_id']);
+        $user_id = intval($_REQUEST['user_id']);
+        $device = new Device();
+        $response = $device->deleteFinger(['user_id' => $attendance_id]);
+        return $response['success'] ? ['status' => 1, 'data' => 'Finger deleted successfully', 'response' => $response] : ['status' => 0, 'data' => 'Failed to delete finger', 'response' => $response];
+    }
+
 
 
 }

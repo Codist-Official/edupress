@@ -400,6 +400,9 @@ class Result extends Post
         // if( Admin::getSetting('section_active') ) $min_req_fields++;
 
         // if( !isset($args['meta_query']) || (is_array($args['meta_query']) && count($args['meta_query']) < $min_req_fields) ) return t( 'Please select all fields!', 'edupress' );
+
+        if(!isset($_REQUEST['ranking_method'])) return t('Please select ranking method!', 'edupress');
+
         $qry = new \WP_Query( $args );
 
         if(!$qry->have_posts()) return __('No exams found!', 'edupress' );

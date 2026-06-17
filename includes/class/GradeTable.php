@@ -201,7 +201,7 @@ class GradeTable extends Post
         if($marks < 0) $marks = 0;
 
         $grade_data = maybe_unserialize( get_post_meta( $id, 'grade_data', true ) );
-        $rank_type =  floatval(reset($grade_data['range_start'])) > 0 ? 'DESC' : 'ASC';
+        $rank_type = isset($grade_data['range_start']) && !empty($grade_data['range_start']) ? (floatval(reset($grade_data['range_start'])) > 0 ? 'DESC' : 'ASC') : 'ASC';
 
         $data = [];
         for( $i = 0; $i < count($grade_data['range_start']); $i++ ){

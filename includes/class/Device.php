@@ -79,14 +79,17 @@ class Device
 
         // join url and data with ?
         $url = self::$base_api_url . '?' . http_build_query($data);
+        $response_data = [];
         foreach($devices as $device_id){
             $response = wp_remote_get($url . '&device_id=' . $device_id);
             if(is_wp_error($response)){
-                return ['success' => false, 'message' => $response->get_error_message()];
+                $response_data[$device_id]['success'] = false;
+                $response_data[$device_id]['message'] = $response->get_error_message();
+                continue;
             }
-            $response_data = json_decode($response['body'], true);
-            return $response_data;
+            $response_data[$device_id] = json_decode($response['body'], true);
         }
+        return $response_data;
     }
 
 
@@ -94,7 +97,12 @@ class Device
     {
         $data = ['user_id' => $user_id];
         $response = $this->getUser($data);
-        return $response['success'] ? (int) $response['data']['cardNumber'] : '';
+        foreach($response as $device_id => $device_response){
+            if($device_response['success']){
+                return (int) $device_response['data']['cardNumber'];
+            }
+        }   
+        return '';
     }
 
     public function deleteUser($data=[], $devices=[])
@@ -241,6 +249,32 @@ class Device
         if(empty($devices)) return ['success' => false, 'message' => 'No devices found'];
         
         $data['action'] = 'delete_face';
+        $data = self::validateApiParams($data);
+
+        // join url and data with ?
+        $url = self::$base_api_url . '?' . http_build_query($data);
+        $response_data = [];
+        foreach($devices as $device_id){
+            $response = wp_remote_get($url . '&device_id=' . $device_id);
+            if(is_wp_error($response)){
+                $response_data[$device_id]['success'] = false;
+                $response_data[$device_id]['message'] = $response->get_error_message();
+                continue;
+            }
+            $response_data[$device_id] = json_decode($response['body'], true);
+        }
+        return $response_data;
+    }
+
+
+    public function deleteFinger($data=[], $devices=[])
+    {
+        if(empty($devices)){
+            $devices = self::getDevices();
+        }
+        if(empty($devices)) return ['success' => false, 'message' => 'No devices found'];
+        
+        $data['action'] = 'delete_finger';
         $data = self::validateApiParams($data);
 
         // join url and data with ?

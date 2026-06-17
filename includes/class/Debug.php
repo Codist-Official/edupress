@@ -49,9 +49,10 @@ class Debug
         ob_start();
         echo "<br><br><br><br>";
         $device = new Device();
-        echo "<pre>";
-        var_dump($device->pullRfidNumbers());
-        echo "</pre>";
+        // echo "<pre>";
+        var_dump($device->getUserRfid(2244));
+        // echo "</pre>";
+        echo "<br><br><br><br>";
         return ob_get_clean();
         ob_start(); 
         ?> 

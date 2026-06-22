@@ -48,10 +48,19 @@ class Debug
     {
         ob_start();
         echo "<br><br><br><br>";
+        $all_users = User::getAll(['role'=>'student', 'number'=>2000, 'orderby'=>'ID','order'=>'DESC']);
         $device = new Device();
-        // echo "<pre>";
-        var_dump($device->getUserRfid(2244));
-        // echo "</pre>";
+        foreach($all_users as $user){
+            $attendance_id = (int) get_user_meta($user->ID,'attendance_id', true);
+            $card_number = (int) get_user_meta($user->ID,'card_number', true);
+            if($card_number > 0) continue;
+            $rfid = $device->getUserRfid($attendance_id);
+            if(is_numeric($rfid) && $rfid > 0){
+                update_user_meta($user->ID,'card_number', $rfid);
+                echo "User ID: {$user->ID} - Card Number: {$rfid} - Updated<br>";
+                continue; 
+            }
+        }
         echo "<br><br><br><br>";
         return ob_get_clean();
         ob_start(); 

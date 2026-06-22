@@ -1760,13 +1760,20 @@ class AdminAjax
         if(!$card_number){
             // check if card number exists in device 
             $card_number = $device->getUserRfid($attendance_id);            
-            if(!$card_number){
-                return ['status' => 0, 'data' => 'Card number not found in device', 'response' => $response];
+            if(is_array($card_number) || !$card_number){
+                return ['status' => 0, 'data' => 'Card number not found in device', 'response' => $card_number];
             } 
             update_user_meta($user_id, 'card_number', $card_number);
             $data = ['user_id' => $attendance_id, 'card_number' => $card_number];
             $response = $device->addUser($data);
-            return $response['success'] ? ['status' => 1, 'data' => 'RFID synced successfully', 'card_number' => $card_number] : ['status' => 0, 'data' => 'Failed to sync RFID', 'response' => $response, 'card_number' => $card_number];
+            $is_success = false;
+            foreach($response as $response){
+                if($response['success']){
+                    $is_success = true;
+                    break;
+                }
+            }
+            return $is_success ? ['status' => 1, 'data' => 'RFID synced successfully', 'card_number' => $card_number] : ['status' => 0, 'data' => 'Failed to sync RFID', 'response' => $response, 'card_number' => $card_number];
         }
 
         if($card_number){
@@ -1782,8 +1789,15 @@ class AdminAjax
         $attendance_id = intval($_REQUEST['attendance_id']);
         $user_id = intval($_REQUEST['user_id']);
         $device = new Device();
-        $response = $device->remoteEnroll(['user_id' => $attendance_id, 'enroll_type' => 'face']);
-        return $response['success'] ? ['status' => 1, 'data' => 'Face enrollment started', 'response' => $response] : ['status' => 0, 'data' => 'Failed to enroll face', 'response' => $response];
+        $responses = $device->remoteEnroll(['user_id' => $attendance_id, 'enroll_type' => 'face']);
+        $is_success = false;
+        foreach($responses as $response){
+            if($response['success']){
+                $is_success = true;
+                break;
+            }
+        }
+        return $is_success ? ['status' => 1, 'data' => 'Face enrollment started'] : ['status' => 0, 'data' => 'Failed to enroll face', 'response' => $responses];
     }
 
     public function enrollFinger()
@@ -1791,8 +1805,15 @@ class AdminAjax
         $attendance_id = intval($_REQUEST['attendance_id']);
         $user_id = intval($_REQUEST['user_id']);
         $device = new Device();
-        $response = $device->remoteEnroll(['user_id' => $attendance_id, 'enroll_type' => 'finger']);
-        return $response['success'] ? ['status' => 1, 'data' => 'Finger enrollment started', 'response' => $response] : ['status' => 0, 'data' => 'Failed to enroll finger', 'response' => $response];
+        $responses = $device->remoteEnroll(['user_id' => $attendance_id, 'enroll_type' => 'finger']);
+        $is_success = false;
+        foreach($responses as $response){
+            if($response['success']){
+                $is_success = true;
+                break;
+            }
+        }
+        return $is_success ? ['status' => 1, 'data' => 'Finger enrollment started'] : ['status' => 0, 'data' => 'Failed to enroll finger', 'response' => $responses];
     }
 
     public function enrollCard()
@@ -1800,8 +1821,15 @@ class AdminAjax
         $attendance_id = intval($_REQUEST['attendance_id']);
         $user_id = intval($_REQUEST['user_id']);
         $device = new Device();
-        $response = $device->remoteEnroll(['user_id' => $attendance_id, 'enroll_type' => 'card']);
-        return $response['success'] ? ['status' => 1, 'data' => 'Card enrollment started', 'response' => $response] : ['status' => 0, 'data' => 'Failed to enroll card', 'response' => $response];
+        $responses = $device->remoteEnroll(['user_id' => $attendance_id, 'enroll_type' => 'card']);
+        $is_success = false;
+        foreach($responses as $response){
+            if($response['success']){
+                $is_success = true;
+                break;
+            }
+        }
+        return $is_success ? ['status' => 1, 'data' => 'Card enrollment started'] : ['status' => 0, 'data' => 'Failed to enroll card', 'response' => $responses];
     }
 
     public function deleteCard()
@@ -1809,11 +1837,18 @@ class AdminAjax
         $attendance_id = intval($_REQUEST['attendance_id']);
         $user_id = intval($_REQUEST['user_id']);
         $device = new Device();
-        $response = $device->addUser(['user_id' => $attendance_id, 'card_number' => " "]);
-        if($response['success']){
+        $responses = $device->addUser(['user_id' => $attendance_id, 'card_number' => " "]);
+        $is_success = false;
+        foreach($responses as $response){
+            if($response['success']){
+                $is_success = true;
+                break;
+            }
+        }
+        if($is_success){
             update_user_meta($user_id, 'card_number', '');
         }
-        return $response['success'] ? ['status' => 1, 'data' => 'Card deleted successfully', 'response' => $response] : ['status' => 0, 'data' => 'Failed to delete card', 'response' => $response];
+        return $is_success ? ['status' => 1, 'data' => 'Card deleted successfully', 'response' => $response] : ['status' => 0, 'data' => 'Failed to delete card', 'response' => $response];
     }
 
     public function deleteFace()
@@ -1821,8 +1856,15 @@ class AdminAjax
         $attendance_id = intval($_REQUEST['attendance_id']);
         $user_id = intval($_REQUEST['user_id']);
         $device = new Device();
-        $response = $device->deleteFace(['user_id' => $attendance_id]);
-        return $response['success'] ? ['status' => 1, 'data' => 'Face deleted successfully', 'response' => $response] : ['status' => 0, 'data' => 'Failed to delete face', 'response' => $response];
+        $responses = $device->deleteFace(['user_id' => $attendance_id]);
+        $is_success = false;
+        foreach($responses as $response){
+            if($response['success']){
+                $is_success = true;
+                break;
+            }
+        }
+        return $is_success ? ['status' => 1, 'data' => 'Face deleted successfully'] : ['status' => 0, 'data' => 'Failed to delete face', 'response' => $responses];
     }
 
     public function deleteFinger()
@@ -1830,8 +1872,15 @@ class AdminAjax
         $attendance_id = intval($_REQUEST['attendance_id']);
         $user_id = intval($_REQUEST['user_id']);
         $device = new Device();
-        $response = $device->deleteFinger(['user_id' => $attendance_id]);
-        return $response['success'] ? ['status' => 1, 'data' => 'Finger deleted successfully', 'response' => $response] : ['status' => 0, 'data' => 'Failed to delete finger', 'response' => $response];
+        $responses = $device->deleteFinger(['user_id' => $attendance_id]);
+        $is_success = false;
+        foreach($responses as $response){
+            if($response['success']){
+                $is_success = true;
+                break;
+            }
+        }
+        return $is_success ? ['status' => 1, 'data' => 'Finger deleted successfully'] : ['status' => 0, 'data' => 'Failed to delete finger', 'response' => $responses];
     }
 
 

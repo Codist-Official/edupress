@@ -431,6 +431,7 @@ class Result extends Post
             // Getting values as per sorted order
             $subject_ordered = array_values($sub_order);
             $subject_ordered = array_map('intval', $subject_ordered);
+            $subject_ordered = array_unique($subject_ordered);
 
             // Sorting qry posts as per subject order
             usort($qry->posts, function($a, $b) use ($subject_ordered, $exam_id_sub_id_mapping){
@@ -450,6 +451,8 @@ class Result extends Post
                 $qry->the_post();
                 $subject_ordered[] = get_post_meta( $qry->post->ID, 'subject_id', true );
             endwhile;
+            $subject_ordered = array_map('intval', $subject_ordered);
+            $subject_ordered = array_unique($subject_ordered);
         }
 
         $_REQUEST['role'] = 'student';
@@ -791,8 +794,9 @@ class Result extends Post
         ob_start();
         ?>
         <style>
+            body .edupress-frontend-panel-wrap .content-wrap label,
             body .edupress-table-wrap table a.showUserProfile,
-            body .edupress-table-wrap table label,
+            body .edupress-table-wrap table tr td label,
             body .edupress-table-wrap table div.tablesorter-header-inner,
             body .edupress-table-wrap table tr,
             body .edupress-table-wrap table th,
@@ -825,10 +829,13 @@ class Result extends Post
                         <th><?php _t('Name'); ?></th>
                         <?php
                         $found_subjects = $qry->found_posts;
+                        $subjects_already_shown = [];
                         if($qry->have_posts()):
                             while($qry->have_posts()) :
                                 $qry->the_post();
                                 $subject_id = get_post_meta( $qry->post->ID, 'subject_id', true );
+                                if( in_array( $subject_id, $subjects_already_shown ) ) continue;
+                                $subjects_already_shown[] = $subject_id;
                                 $subject_title = $found_subjects > 5 ? get_post_meta( $subject_id, 'shortname', true ) : '';
                                 if(empty($subject_title)) $subject_title = get_the_title( $subject_id);
                                 if( $ranking_method  !== 'marks' ){
@@ -918,12 +925,18 @@ class Result extends Post
                             // checking if optional subject
                             $student_optional_subject_id = $students_data[$student_id]['optional_subject_id'] ?? 0;
 
+                            $subjects_already_shown_for_this_student = [];
                             while($qry->have_posts()):
 
                                 $qry->the_post();
                                 $exam_id = $qry->post->ID;
+
+
                                 $subject_id = get_post_meta( $exam_id, 'subject_id', true );
                                 $connected_subject_id  = $connected_subject_id_mapping[$subject_id] ?? 0;
+
+                                if( in_array( $subject_id, $subjects_already_shown_for_this_student ) ) continue;
+                                $subjects_already_shown_for_this_student[] = $subject_id;      
 
                                 $is_optional = $student_optional_subject_id == $subject_id ? 1 : 0;
                                 if( !$is_optional && $connected_subject_id > 0 ){
@@ -1033,7 +1046,7 @@ class Result extends Post
                             <td><?php echo td($students_data[$student_id]['total_obtained_marks']); ?></td>
 
                         <!-- Merit Position -->
-                            <td><?php $merit_pos = $students_data[$student_id]['merit'] ?? 0; echo EduPress::numberToOrdinal($merit_pos); ?></td>
+                            <td><?php $merit_pos = $students_data[$student_id]['total_obtained_marks'] > 0 ? $students_data[$student_id]['merit'] ?? 0 : 0; echo EduPress::numberToOrdinal($merit_pos); ?></td>
 
                         <!-- SMS -->
                             <?php

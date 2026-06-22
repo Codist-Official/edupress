@@ -305,9 +305,35 @@ class Printer
         $subject_order = $extra_data['subject_order'] ?? [];
         if(empty($user_data)) return "No results found for the user {$user_id}!";
 
+        $result_title_text = Admin::getSetting('result_title_text', 'Academic Progress Report');
+
+        $avatar_id = get_user_meta($user_id, 'avatar_id', true);
+
         ob_start();
+        if($avatar_id){
+            ?>
+            <style>
+                .student-avatar-individual-result{
+                    width: 100px;
+                    height: 100px;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                }
+                .student-avatar-individual-result img{
+                    width: 100px;
+                    height: 100px;
+                    border: 2px solid #000;
+                }
+            </style>
+            <div class="student-avatar-individual-result">
+                <?php echo wp_get_attachment_image($avatar_id, 'thumbnail'); ?>
+            </div>
+            <?php
+        }
         ?>
-        <section class="head"><h2 class="master-title"><?php _t('Academic Progress Report'); ?></h2></section>
+        
+        <section class="head"><h2 class="master-title"><?php _t($result_title_text); ?></h2></section>
         <section class="student-details">
             <div class="details-wrap">
                 <h3 class="master-subtitle"><?php _t('Student Details'); ?></h3>
@@ -321,7 +347,7 @@ class Printer
                             <th><?php _t( 'Roll' ); ?></th>
                             <td><?php echo td(get_user_meta( $user_id, 'roll', true )); ?></td>
                         </tr>
-                        <?php if( EduPress::isActive('branch') ): ?>
+                        <?php if( EduPress::isActive('branch') && 1 == 2 ): ?>
                             <tr>
                                 <th><?php _t( 'Branch' ); ?></th>
                                 <td><?php echo get_the_title(get_user_meta($user_id, 'branch_id', true )); ?></td>

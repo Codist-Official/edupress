@@ -851,6 +851,17 @@ class Admin
                         'after' => "Allowed Keywords: <strong>{branch} {shift} {class} {section} {term} {year}</strong>",
                     )
                 );
+
+                $fields['result_title_text'] = array(
+                    'type'  => 'text',
+                    'name'  => 'result_title_text',
+                    'settings' => array(
+                        'value' => Admin::getSetting('result_title_text', 'Academic Progress Report'),
+                        'label' => t('Result Title', 'edupress'),
+                    )
+                );
+
+                
                 $fields['result_title_font_size'] = array(
                     'type'  => 'select',
                     'name'  => 'result_title_font_size',
@@ -1874,6 +1885,7 @@ class Admin
                         'options' => range(0,100)
                     )
                 );
+
 
                 $fields['print_title_font_size'] = array(
                     'type'  => 'select',

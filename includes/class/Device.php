@@ -102,7 +102,7 @@ class Device
                 return (int) $device_response['data']['cardNumber'];
             }
         }   
-        return '';
+        return $response;
     }
 
     public function deleteUser($data=[], $devices=[])

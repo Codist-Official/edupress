@@ -1196,7 +1196,7 @@ jQuery(document).ready(function(){
             success: function(res, xhr ){
                 clog(res);
                 hideEduPressLoading();
-                printContent(res.data);
+                printContent(res.data, true, {showHeader: false});
             }
         })
     })

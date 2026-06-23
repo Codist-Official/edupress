@@ -1586,6 +1586,14 @@ class Admin
                     )
                 );
 
+                $fields['attendance_delete_device_logs'] = array(
+                    'type'  => 'html',
+                    'name'  => 'attendance_delete_device_logs',
+                    'settings' => array(
+                        'html' => "<a href='javascript:void(0)' data-ajax_action='deleteDeviceLogs' data-success_callback='showPopupOnCallback' class='edupress-btn edupress-ajax-link edupress-delete-device-logs'>Delete Device Logs</a>",
+                    )
+                );
+
                 break;
 
             case 'user':

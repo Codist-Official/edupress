@@ -49,8 +49,18 @@ class Printer
      * @access public
      * @static
      */
-    public static function getHeader()
+    public static function getHeader($configs=[])
     {
+        $user_id = $configs['user_id'] ?? 0;
+        $show_avatar = $configs['show_avatar'] ?? false;
+        if($show_avatar && $user_id){
+            $avatar_id = get_user_meta($user_id, 'avatar_id', true);
+            if($avatar_id){
+                $avatar_url = wp_get_attachment_image_url($avatar_id, 'thumbnail');
+            }
+        }
+
+
         $font_family = Admin::getSetting('print_font_family');
         $font_family_escaped = str_replace(' ', '+', $font_family);
         $font_size = Admin::getSetting('print_font_size');
@@ -147,6 +157,27 @@ class Printer
                 page-break-inside: auto;
             }
         </style>
+        
+        <?php if($show_avatar && $user_id): ?>
+            <style>
+                .edupress-print-header-student-avatar{
+                    width: 100px;
+                    height: 100px;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                }   
+                .edupress-print-header-student-avatar img{
+                    width: 100%;
+                    height: auto;
+                    border: 1px solid #000;
+                }
+            </style>
+            <div class="edupress-print-header-student-avatar">
+                <img src="<?php echo $avatar_url; ?>" alt="" loading="eager">
+            </div>
+        <?php endif; ?>
+
         <div class="edupress-print-header-wrap">
             <?php if( in_array( 'logo', $header_elements ) ): ?>
                 <div class="header-logo"><?php echo wp_get_attachment_image( Admin::getSetting('institute_logo_id'), 'full') ?></div>
@@ -276,9 +307,13 @@ class Printer
                 printWindow.document.write(customContent);
                 printWindow.document.close();
 
-                setTimeout(function(){
-                    printWindow.print()
-                }, 1000);
+                // Trigger print once everything is fully loaded
+                printWindow.onload = function() {
+                    setTimeout(function() {
+                        printWindow.print();
+                    }, 1000);
+                };
+                
             }
         </script>
         <?php echo ob_get_clean();
@@ -303,324 +338,337 @@ class Printer
         $user_id = intval($user_id);
         $format = $extra_data['method'] ?? 'marks';
         $subject_order = $extra_data['subject_order'] ?? [];
-        if(empty($user_data)) return "No results found for the user {$user_id}!";
+        $fname = get_user_meta( $user_id, 'first_name', true ) ?? '';
+        $lname = get_user_meta( $user_id, 'last_name', true ) ?? '';
+        $name = $fname . ' ' . $lname;
+        if(empty($user_data)) return "<br><br>No results found for <strong>{$name}</strong>!";
 
         $result_title_text = Admin::getSetting('result_title_text', 'Academic Progress Report');
 
         $avatar_id = get_user_meta($user_id, 'avatar_id', true);
 
         ob_start();
-        if($avatar_id){
-            ?>
-            <style>
-                .student-avatar-individual-result{
-                    width: 100px;
-                    height: 100px;
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                }
-                .student-avatar-individual-result img{
-                    width: 100px;
-                    height: 100px;
-                    border: 2px solid #000;
-                }
-            </style>
-            <div class="student-avatar-individual-result">
-                <?php echo wp_get_attachment_image($avatar_id, 'thumbnail'); ?>
-            </div>
-            <?php
-        }
         ?>
-        
-        <section class="head"><h2 class="master-title"><?php _t($result_title_text); ?></h2></section>
-        <section class="student-details">
-            <div class="details-wrap">
-                <h3 class="master-subtitle"><?php _t('Student Details'); ?></h3>
-                <div class="edupress-table-wrap">
-                    <table class="edupress-table">
-                        <tr>
-                            <th style="width: 100px;"><?php _t( 'Name' ); ?></th>
-                            <td><?php echo get_user_meta( $user_id, 'first_name', true ) ?? ''; ?></td>
-                        </tr>
-                        <tr>
-                            <th><?php _t( 'Roll' ); ?></th>
-                            <td><?php echo td(get_user_meta( $user_id, 'roll', true )); ?></td>
-                        </tr>
-                        <?php if( EduPress::isActive('branch') && 1 == 2 ): ?>
+        <div class="individual-result-wrap">
+            <section class="head"><h2 class="master-title"><?php _t($result_title_text); ?></h2></section>
+            <section class="student-details">
+                <div class="details-wrap">
+                    <h3 class="master-subtitle"><?php _t('Student Details'); ?></h3>
+                    <div class="edupress-table-wrap">
+                        <table class="edupress-table">
                             <tr>
-                                <th><?php _t( 'Branch' ); ?></th>
-                                <td><?php echo get_the_title(get_user_meta($user_id, 'branch_id', true )); ?></td>
+                                <th style="width: 100px;"><?php _t( 'Name' ); ?></th>
+                                <td><?php echo get_user_meta( $user_id, 'first_name', true ) ?? ''; ?></td>
                             </tr>
-                        <?php endif; ?>
-                        <?php if( EduPress::isActive('shift') ): ?>
                             <tr>
-                                <th><?php _t( 'Shift' ); ?></th>
-                                <td><?php echo get_the_title(get_user_meta($user_id, 'shift_id', true )); ?></td>
+                                <th><?php _t( 'Roll' ); ?></th>
+                                <td><?php echo td(get_user_meta( $user_id, 'roll', true )); ?></td>
                             </tr>
-                        <?php endif; ?>
-                        <?php if( EduPress::isActive('class') ): ?>
-                            <tr>
-                                <th><?php _t( 'Class' ); ?></th>
-                                <td><?php echo get_the_title(get_user_meta($user_id, 'class_id', true )); ?></td>
-                            </tr>
-                        <?php endif; ?>
-                        <?php if( EduPress::isActive('section') ): ?>
-                            <tr>
-                                <th><?php _t( 'Section' ); ?></th>
-                                <td><?php echo get_the_title(get_user_meta($user_id, 'section_id', true )); ?></td>
-                            </tr>
-                        <?php endif; ?>
-                        <tr>
-                            <th><?php _t( 'Exam Term' ); ?></th>
-                            <td><?php echo get_the_title($term_id); ?></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-
-            <?php if(Admin::getSetting('attendance_active') == 'active' ): ?>
-            <div class="attendance-wrap">
-                <h3 class="master-subtitle"><?php _t('Attendance Report'); ?></h3>
-                <div class="edupress-table-wrap">
-                    <table class="edupress-table">
-                        <?php
-                            $term_start = $term_end = '';
-                            if($term_id){
-                                $term_start = get_post_meta( intval($extra_data['term_id']), 'start_date', true);
-                                $term_end = get_post_meta( intval($extra_data['term_id']), 'end_date', true);
-                            }
-                            $start_date = sanitize_text_field($extra_data['start_date'] ?? '');
-                            $end_date = sanitize_text_field($extra_data['end_date'] ?? '');
-                            if(empty($start_date)) $start_date = $term_start;
-                            if(empty($end_date)) $end_date = $term_end;
-                            $user = new User($user_id);
-                            $cal_data = $user->getAttendanceReport( $start_date, $end_date );
-                        ?>
-                        <tr>
-                            <th><?php _t('Dates'); ?></th>
-                            <td><?php echo td(date('d/m/y', strtotime($cal_data['start_date']))) . ' - ' . td(date('d/m/y', strtotime($cal_data['end_date']))); ?></td>
-                            <th><?php _t('Total Days'); ?></th>
-                            <td><?php echo td($cal_data['total_days']); ?></td>
-                        </tr>
-                        <tr>
-                            <th><?php _t('Open'); ?></th>
-                            <td><?php echo td($cal_data['open'] ?? ''); ?></td>
-                            <th><?php _t('Close'); ?></th>
-                            <td><?php echo td($cal_data['close'] ?? ''); ?></td>
-                        </tr>
-                        <tr>
-                            <th><?php _t('Present'); ?></th>
-                            <td><?php echo td($cal_data['present']); ?></td>
-                            <th><?php _t('Absent'); ?></th>
-                            <td><?php echo td($cal_data['absent']); ?></td>
-                        </tr>
-                        <tr>
-                            <th><?php _t('Presence %'); ?></th>
-                            <td><?php echo td(number_format($cal_data['present_percentage'], 2)); ?>%</td>
-                            <th><?php _t('Absence %'); ?></th>
-                            <td><?php echo td(number_format(100 - $cal_data['present_percentage'], 2)); ?>%</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            <?php endif; ?>
-        </section>
-
-        <section class="result-details">
-            <!-- Rank method Marks -->
-            <?php
-                $all_marks_heads = [];
-                $optional_subject_data = [];
-
-                foreach($user_data['results'] as $k=>$v){
-                    foreach($v['marks'] as $markk=>$markv){
-                        if( !in_array( $markk, $all_marks_heads ) ) $all_marks_heads[] = $markk;
-                    }
-                    if( isset($v['is_optional']) && $v['is_optional'] == 1){
-                        $optional_subject_id = $k;
-                        $optional_subject_data = $v;
-                    }
-                }
-                ?>
-            <style>
-                table.ind-result tr th,
-                table.ind-result tr td{
-                    text-align: center;
-                }
-            </style>
-                <div class="edupress-table-wrap">
-                    <h3 class="master-subtitle"><?php _t('Mark Details'); ?></h3>
-                    <table class="edupress-table ind-result">
-                        <thead>
-                            <tr>
-                            <th style="text-align:left;" rowspan="2"><?php _t('Subject'); ?></th>
-                            <?php if($format == 'marks') : ?>
-                                <th rowspan="2"><?php _t('Date<br>of Exam'); ?></th>
+                            <?php if( EduPress::isActive('branch') && 1 == 2 ): ?>
+                                <tr>
+                                    <th><?php _t( 'Branch' ); ?></th>
+                                    <td><?php echo get_the_title(get_user_meta($user_id, 'branch_id', true )); ?></td>
+                                </tr>
                             <?php endif; ?>
-                            <th rowspan="2"><?php _t('Exam<br>Mark'); ?></th>
-                            <th style="text-align: center" colspan="<?php echo count($all_marks_heads);?>"><?php _t('Obtained Marks'); ?></th>
-                            <th rowspan="2"><?php _t('Obtained<br>Total'); ?></th>
-                            <?php if($format == 'marks'){ ?>
-                                <th rowspan="2"><?php _t('Highest<br>Total'); ?></th>
-                                <th rowspan="2"><?php _t('Total'); ?></th>
-                                <th rowspan="2"><?php _t('Merit<br>Pos.'); ?></th>
-                            <?php } else { ?>
-                                <th rowspan="2"><?php _t('Letter<br>Grade'); ?></th>
-                                <th rowspan="2"><?php _t('Grade<br>Point'); ?></th>
-                                <?php if(!empty($optional_subject_data)): ?>
-                                    <th rowspan="2" style="text-align:center;"><?php _t('CGPA <br>Without Optional'); ?></th>
-                                    <th rowspan="2" style="text-align:center;"><?php _t('CGPA <br>With Optional'); ?></th>
-                                <?php else: ?>
-                                    <th rowspan="2" style="text-align:center;"><?php _t('CGPA'); ?></th>
-                                <?php endif; ?>
-                                <th rowspan="2" style="text-align:center;"><?php _t('Grade'); ?></th>
-                            <?php } ?>
-                        </tr>
-                        <tr>
-                            <!-- Head wise marks -->
-                            <?php foreach($all_marks_heads as $k=>$v){
-                                ?>
-                                <th><?php _t($v); ?></th>
+                            <?php if( EduPress::isActive('shift') ): ?>
+                                <tr>
+                                    <th><?php _t( 'Shift' ); ?></th>
+                                    <td><?php echo get_the_title(get_user_meta($user_id, 'shift_id', true )); ?></td>
+                                </tr>
+                            <?php endif; ?>
+                            <?php if( EduPress::isActive('class') ): ?>
+                                <tr>
+                                    <th><?php _t( 'Class' ); ?></th>
+                                    <td><?php echo get_the_title(get_user_meta($user_id, 'class_id', true )); ?></td>
+                                </tr>
+                            <?php endif; ?>
+                            <?php if( EduPress::isActive('section') ): ?>
+                                <tr>
+                                    <th><?php _t( 'Section' ); ?></th>
+                                    <td><?php echo get_the_title(get_user_meta($user_id, 'section_id', true )); ?></td>
+                                </tr>
+                            <?php endif; ?>
+                            <tr>
+                                <th><?php _t( 'Exam Term' ); ?></th>
+                                <td><?php echo get_the_title($term_id); ?></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <?php if(Admin::getSetting('attendance_active') == 'active' ): ?>
+                <div class="attendance-wrap">
+                    <h3 class="master-subtitle"><?php _t('Attendance Report'); ?></h3>
+                    <div class="edupress-table-wrap">
+                        <table class="edupress-table">
+                            <?php
+                                $term_start = $term_end = '';
+                                if($term_id){
+                                    $term_start = get_post_meta( intval($extra_data['term_id']), 'start_date', true);
+                                    $term_end = get_post_meta( intval($extra_data['term_id']), 'end_date', true);
+                                }
+                                $start_date = sanitize_text_field($extra_data['start_date'] ?? '');
+                                $end_date = sanitize_text_field($extra_data['end_date'] ?? '');
+                                if(empty($start_date)) $start_date = $term_start;
+                                if(empty($end_date)) $end_date = $term_end;
+                                $user = new User($user_id);
+                                $cal_data = $user->getAttendanceReport( $start_date, $end_date );
+                            ?>
+                            <tr>
+                                <th><?php _t('Dates'); ?></th>
+                                <td><?php echo td(date('d/m/y', strtotime($cal_data['start_date']))) . ' - ' . td(date('d/m/y', strtotime($cal_data['end_date']))); ?></td>
+                                <th><?php _t('Total Days'); ?></th>
+                                <td><?php echo td($cal_data['total_days']); ?></td>
+                            </tr>
+                            <tr>
+                                <th><?php _t('Open'); ?></th>
+                                <td><?php echo td($cal_data['open'] ?? ''); ?></td>
+                                <th><?php _t('Close'); ?></th>
+                                <td><?php echo td($cal_data['close'] ?? ''); ?></td>
+                            </tr>
+                            <tr>
+                                <th><?php _t('Present'); ?></th>
+                                <td><?php echo td($cal_data['present']); ?></td>
+                                <th><?php _t('Absent'); ?></th>
+                                <td><?php echo td($cal_data['absent']); ?></td>
+                            </tr>
+                            <tr>
+                                <th><?php _t('Presence %'); ?></th>
+                                <td><?php echo td(number_format($cal_data['present_percentage'], 2)); ?>%</td>
+                                <th><?php _t('Absence %'); ?></th>
+                                <td><?php echo td(number_format(100 - $cal_data['present_percentage'], 2)); ?>%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <?php endif; ?>
+            </section>
+
+            <section class="result-details">
+                <!-- Rank method Marks -->
+                <?php
+                    $all_marks_heads = [];
+                    $optional_subject_data = [];
+
+                    foreach($user_data['results'] as $k=>$v){
+                        foreach($v['marks'] as $markk=>$markv){
+                            if( !in_array( $markk, $all_marks_heads ) ) $all_marks_heads[] = $markk;
+                        }
+                        if( isset($v['is_optional']) && $v['is_optional'] == 1){
+                            $optional_subject_id = $k;
+                            $optional_subject_data = $v;
+                        }
+                    }
+                    ?>
+                <style>
+                    table.ind-result tr th,
+                    table.ind-result tr td{
+                        text-align: center;
+                    }
+                    <?php $logo = Admin::getSetting('institute_logo_id'); 
+                        if($logo){
+                            ?>
+                            .individual-result-wrap{
+                                position: relative;
+                                display: inline-block !important;
+                                width: 100% !important;
+                                max-width: 100% !important;
+                                height: auto !important;
+                            }
+                            .individual-result-wrap::before{
+                                content: '';
+                                position: absolute;
+                                top: 50%;
+                                left: 50%;
+                                transform: translate(-50%, -50%);
+                                opacity: 0.1;
+                                width: 400px;
+                                height: 400px;
+                                z-index: -1;
+                                background-image: url('<?php echo wp_get_attachment_image_url($logo, 'full'); ?>');
+                                background-size: cover;
+                                background-position: center;
+                                background-repeat: no-repeat;
+                                }
                                 <?php
-                            }?>
-                        </tr>
-                      </thead>
-                      <?php
-                      $i = 0;
-                      foreach($subject_order as $subject_id){
-
-                          $result = $user_data['results'][$subject_id];
-
-                          if(empty($result)) continue;
-
-                          // Skip if unregistered
-                          if($result['unregistered'] == 1) continue;
-                          if($format != 'marks' && $result['is_optional'] == 1) continue;
-
-                          ?>
-                            <tr data-subject-id="<?php echo $subject_id; ?>" data-connected-subject-id="<?php echo $user_data['results'][$subject_id]['connected_subject_id'] ?? ''; ?>">
-                                <td style="text-align: left;">
-                                    <?php
-                                        if ($format == 'marks'){
-                                            echo get_the_title($subject_id);
-                                        } else {
-                                            $subject_title = '';
-                                           if ( isset($result['connected_subject_id']) && $result['connected_subject_id'] > 0 ) {
-                                               $subject_title = get_post_meta( $result['connected_subject_id'], 'combined_name', true );
-                                           } 
-                                           if(empty($subject_title)) $subject_title = get_the_title($subject_id);
-                                           echo $subject_title;
-                                        }
-                                    ?>
-                                </td>
-
-                                <?php if($format == 'marks'): ?>
-                                    <td><?php echo td(date('d/m/y', strtotime($result['exam_date'] ?? 0))); ?></td>
+                            }
+                            ?>
+                        </style>
+                    <div class="edupress-table-wrap">
+                        <h3 class="master-subtitle"><?php _t('Mark Details'); ?></h3>
+                        <table class="edupress-table ind-result">
+                            <thead>
+                                <tr>
+                                <th style="text-align:left;" rowspan="2"><?php _t('Subject'); ?></th>
+                                <?php if($format == 'marks') : ?>
+                                    <th rowspan="2"><?php _t('Date<br>of Exam'); ?></th>
                                 <?php endif; ?>
-
-                                <td><?php echo td($result['exam_marks']); ?></td>
-
+                                <th rowspan="2"><?php _t('Exam<br>Mark'); ?></th>
+                                <th style="text-align: center" colspan="<?php echo count($all_marks_heads);?>"><?php _t('Obtained Marks'); ?></th>
+                                <th rowspan="2"><?php _t('Obtained<br>Total'); ?></th>
+                                <?php if($format == 'marks'){ ?>
+                                    <th rowspan="2"><?php _t('Highest<br>Total'); ?></th>
+                                    <th rowspan="2"><?php _t('Total'); ?></th>
+                                    <th rowspan="2"><?php _t('Merit<br>Pos.'); ?></th>
+                                <?php } else { ?>
+                                    <th rowspan="2"><?php _t('Letter<br>Grade'); ?></th>
+                                    <th rowspan="2"><?php _t('Grade<br>Point'); ?></th>
+                                    <?php if(!empty($optional_subject_data)): ?>
+                                        <th rowspan="2" style="text-align:center;"><?php _t('GPA <br>Without Optional'); ?></th>
+                                        <th rowspan="2" style="text-align:center;"><?php _t('GPA <br>With Optional'); ?></th>
+                                    <?php else: ?>
+                                        <th rowspan="2" style="text-align:center;"><?php _t('GPA'); ?></th>
+                                    <?php endif; ?>
+                                    <th rowspan="2" style="text-align:center;"><?php _t('Grade'); ?></th>
+                                <?php } ?>
+                            </tr>
+                            <tr>
                                 <!-- Head wise marks -->
                                 <?php foreach($all_marks_heads as $k=>$v){
                                     ?>
-                                    <td>
-                                        <?php echo td($result['marks'][$v]['obtained'] ?? '-'); ?>
-                                        <?php echo isset($result['marks'][$v]['exam_marks']) ? td("({$result['marks'][$v]['exam_marks']})") : ''; ?>
-                                        <?php echo isset($result['marks'][$v]['absent']) && $result['marks'][$v]['absent'] == 1 ? td("(A)") : ''; ?>
-                                        <?php echo isset($result['marks'][$v]['failed']) && $result['marks'][$v]['failed'] == 1 ? td("(F)") : ''; ?>
-                                    </td>
+                                    <th><?php _t($v); ?></th>
                                     <?php
                                 }?>
-
-                                <td><?php echo td($result['obtained']); ?></td>
-
-                                <!-- marks based -->
-                                <?php $rowspan = count($user_data['results']); ?>
-                                <?php if($format == 'marks'){ ?>
-
-                                    <td><?php echo td($result['highest']); ?></td>
-
-                                    <!-- other details -->
-                                    <?php if( $i == 0 ){ ?>
-                                        <td rowspan="<?php echo $rowspan; ?>"><strong><?php echo td($user_data['total_obtained_marks']); ?></strong></td>
-                                        <td rowspan="<?php echo $rowspan; ?>"><strong><?php echo t(Result::ordinal($user_data['merit'] ?? 0)); ?></strong></td>
-                                    <?php } ?>
-
-                                <!-- CGPA based -->
-                                <?php } else { ?>
-
-                                    <?php if( !empty($optional_subject_data) ) $rowspan++; ?>
-                                    <td><?php echo $result['grade'] ?? ''; ?></td>
-                                    <td><?php echo number_format($result['grade_point'], 2); ?></td>
-                                    <!-- showing combined cgpa -->
-                                    <?php if( $i == 0 ){ ?>
-                                        <?php if(!empty($optional_subject_data)): ?>
-                                            <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo number_format($user_data['grade_point_without_optional'], 2); ?></strong></td>
-                                            <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo number_format($user_data['grade_point_with_optional'], 2); ?></strong></td>
-                                        <?php else: ?>
-                                            <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo number_format($user_data['grade_point_without_optional'], 2); ?></strong></td>
-                                        <?php endif; ?>
-                                        <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo $user_data['grade']; ?></strong></td>
-                                    <?php } ?>
-                                <?php } ?>
                             </tr>
-                          <?php
-                          $i++;
-                      }
-                      ?>
+                        </thead>
+                        <?php
+                        $i = 0;
+                        foreach($subject_order as $subject_id){
 
-                      <!-- Optional subject details -->
-                      <?php if($format != 'marks' && !empty($optional_subject_data)) : ?>
-                        <tr>
-                            <td style="text-align: left;" colspan="<?php echo count($all_marks_heads) + 5; ?>"><strong><?php _e('Optional Subject', 'edupress'); ?></strong></td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: left;">
-                                <?php 
-                                    $subject_title = '';
-                                    $subject_title = get_post_meta( $optional_subject_id, 'combined_name', true ); 
-                                    echo empty($subject_title) ? get_the_title($optional_subject_id) : $subject_title; 
-                                ?>
-                            </td>
-                            <td><?php echo $optional_subject_data['exam_marks'] ?? 0; ?></td>
-                            <?php foreach($all_marks_heads as $k => $v): ?>
-                                <td><?php echo isset($optional_subject_data['marks'][$v]['obtained']) ? $optional_subject_data['marks'][$v]['obtained'] . '('. $optional_subject_data['marks'][$v]['exam_marks'] . ')' : '-'; ?></td>
-                            <?php endforeach; ?>
-                            <td><?php echo $optional_subject_data['obtained'] ?? ''; ?></td>
-                            <td><?php echo $optional_subject_data['grade'] ?? ''; ?></td>
-                            <td><?php echo $optional_subject_data['grade_point'] ? number_format($optional_subject_data['grade_point'], 2) : ''; ?></td>
-                        </tr>
-                      <?php endif; ?>
-                  </table>
-                  <p class="legends" style="margin: 5px 0 0 0;"> <strong><?php _t('Obtained Total'); ?>:</strong> <?php echo td(array_sum(array_column($user_data['results'], 'obtained'))); ?> </p>
-                  <p class="legends" style="margin: 5px 0 0 0;"> <?php _t('Legends'); ?>: <strong>(A)</strong> - <?php _t('Absent'); ?>, <strong>(F)</strong> - <?php _t('Failed'); ?>, <strong><?php _t('N/A'); ?></strong> - <?php _t('Not Applicable'); ?> </p>
+                            $result = $user_data['results'][$subject_id];
+
+                            if(empty($result)) continue;
+
+                            // Skip if unregistered
+                            if($result['unregistered'] == 1) continue;
+                            if($format != 'marks' && $result['is_optional'] == 1) continue;
+
+                            ?>
+                                <tr data-subject-id="<?php echo $subject_id; ?>" data-connected-subject-id="<?php echo $user_data['results'][$subject_id]['connected_subject_id'] ?? ''; ?>">
+                                    <td style="text-align: left;">
+                                        <?php
+                                            if ($format == 'marks'){
+                                                echo get_the_title($subject_id);
+                                            } else {
+                                                $subject_title = '';
+                                            if ( isset($result['connected_subject_id']) && $result['connected_subject_id'] > 0 ) {
+                                                $subject_title = get_post_meta( $result['connected_subject_id'], 'combined_name', true );
+                                            } 
+                                            if(empty($subject_title)) $subject_title = get_the_title($subject_id);
+                                            echo $subject_title;
+                                            }
+                                        ?>
+                                    </td>
+
+                                    <?php if($format == 'marks'): ?>
+                                        <td><?php echo td(date('d/m/y', strtotime($result['exam_date'] ?? 0))); ?></td>
+                                    <?php endif; ?>
+
+                                    <td><?php echo td($result['exam_marks']); ?></td>
+
+                                    <!-- Head wise marks -->
+                                    <?php foreach($all_marks_heads as $k=>$v){
+                                        $is_failed = isset($result['marks'][$v]['failed']) && $result['marks'][$v]['failed'] == 1;
+
+                                        ?>
+                                        <td style="color: <?php echo $is_failed ? 'red' : ''; ?>; border-color: <?php echo $is_failed ? 'red' : 'black'; ?>;">
+                                            <?php echo td($result['marks'][$v]['obtained'] ?? '-'); ?>
+                                            <?php echo isset($result['marks'][$v]['exam_marks']) ? td("({$result['marks'][$v]['exam_marks']})") : ''; ?>
+                                            <?php echo isset($result['marks'][$v]['absent']) && $result['marks'][$v]['absent'] == 1 ? td("(A)") : ''; ?>
+                                            <?php echo isset($result['marks'][$v]['failed']) && $result['marks'][$v]['failed'] == 1 ? td("(F)") : ''; ?>
+                                        </td>
+                                        <?php
+                                    }?>
+
+                                    <td><?php echo td($result['obtained']); ?></td>
+
+                                    <!-- marks based -->
+                                    <?php $rowspan = count($user_data['results']); ?>
+                                    <?php if($format == 'marks'){ ?>
+
+                                        <td><?php echo td($result['highest']); ?></td>
+
+                                        <!-- other details -->
+                                        <?php if( $i == 0 ){ ?>
+                                            <td rowspan="<?php echo $rowspan; ?>"><strong><?php echo td($user_data['total_obtained_marks']); ?></strong></td>
+                                            <td rowspan="<?php echo $rowspan; ?>"><strong><?php echo t(Result::ordinal($user_data['merit'] ?? 0)); ?></strong></td>
+                                        <?php } ?>
+
+                                    <!-- CGPA based -->
+                                    <?php } else { ?>
+
+                                        <?php if( !empty($optional_subject_data) ) $rowspan++; ?>
+                                        <td><?php echo $result['grade'] ?? ''; ?></td>
+                                        <td><?php echo number_format($result['grade_point'], 2); ?></td>
+                                        <!-- showing combined cgpa -->
+                                        <?php if( $i == 0 ){ ?>
+                                            <?php if(!empty($optional_subject_data)): ?>
+                                                <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo number_format($user_data['grade_point_without_optional'], 2); ?></strong></td>
+                                                <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo number_format($user_data['grade_point_with_optional'], 2); ?></strong></td>
+                                            <?php else: ?>
+                                                <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo number_format($user_data['grade_point_without_optional'], 2); ?></strong></td>
+                                            <?php endif; ?>
+                                            <td style="text-align:center;" rowspan="<?php echo $rowspan; ?>"><strong><?php echo $user_data['grade']; ?></strong></td>
+                                        <?php } ?>
+                                    <?php } ?>
+                                </tr>
+                            <?php
+                            $i++;
+                        }
+                        ?>
+
+                        <!-- Optional subject details -->
+                        <?php if($format != 'marks' && !empty($optional_subject_data)) : ?>
+                            <tr>
+                                <td style="text-align: left;" colspan="<?php echo count($all_marks_heads) + 5; ?>"><strong><?php _e('Optional Subject', 'edupress'); ?></strong></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">
+                                    <?php 
+                                        $subject_title = '';
+                                        $subject_title = get_post_meta( $optional_subject_id, 'combined_name', true ); 
+                                        echo empty($subject_title) ? get_the_title($optional_subject_id) : $subject_title; 
+                                    ?>
+                                </td>
+                                <td><?php echo $optional_subject_data['exam_marks'] ?? 0; ?></td>
+                                <?php foreach($all_marks_heads as $k => $v): ?>
+                                    <td><?php echo isset($optional_subject_data['marks'][$v]['obtained']) ? $optional_subject_data['marks'][$v]['obtained'] . '('. $optional_subject_data['marks'][$v]['exam_marks'] . ')' : '-'; ?></td>
+                                <?php endforeach; ?>
+                                <td><?php echo $optional_subject_data['obtained'] ?? ''; ?></td>
+                                <td><?php echo $optional_subject_data['grade'] ?? ''; ?></td>
+                                <td><?php echo $optional_subject_data['grade_point'] ? number_format($optional_subject_data['grade_point'], 2) : ''; ?></td>
+                            </tr>
+                        <?php endif; ?>
+                    </table>
+                    <p class="legends" style="margin: 5px 0 0 0;"> <strong><?php _t('Obtained Total'); ?>:</strong> <?php echo td(array_sum(array_column($user_data['results'], 'obtained'))); ?> </p>
+                    <p class="legends" style="margin: 5px 0 0 0;"> <?php _t('Legends'); ?>: <strong>(A)</strong> - <?php _t('Absent'); ?>, <strong>(F)</strong> - <?php _t('Failed'); ?>, <strong><?php _t('N/A'); ?></strong> - <?php _t('Not Applicable'); ?> </p>
+                    </div>
+
+            </section>
+
+            <?php echo Result::getEndorsementBox(); ?>
+
+            <!-- if note not empty --> 
+            <?php if(Admin::getSetting('result_note') != ''): ?>
+                <div class="result-note" style="width: 100%; max-width: calc(100% - 20px); margin: 20px auto 0 auto;">
+                    <span style="font-weight: bold;"><?php _t('Note', 'edupress'); ?></span>
+                    <?php echo nl2br(Admin::getSetting('result_note')); ?> 
                 </div>
+            <?php endif; ?>
 
-        </section>
-
-        <?php echo Result::getEndorsementBox(); ?>
-
-        <!-- if note not empty --> 
-        <?php if(Admin::getSetting('result_note') != ''): ?>
-            <div class="result-note" style="width: 100%; max-width: calc(100% - 20px); margin: 20px auto 0 auto;">
-                <span style="font-weight: bold;"><?php _t('Note', 'edupress'); ?></span>
-                <?php echo nl2br(Admin::getSetting('result_note')); ?> 
-            </div>
+            <?php if($format !== 'marks' ) : ?>
+                <!-- Grade table data -->
+                <style>
+                    .grade-table-wrap{ width: 100%; max-width: 200px; float: right; margin-bottom: 20px;}
+                    .grade-table-wrap table tr th,
+                    .grade-table-wrap table tr td { font-size: 8px !important; line-height: 8px !important; padding: 2px !important; vertical-align: middle !important;}
+                </style>
+                <div class="grade-table-wrap">
+                    <h3 class="master-subtitle"><?php _e( 'Grade Table', 'edupress' ); ?></h3>
+                    <?php echo GradeTable::getTable($extra_data['method']); ?>
+                </div>
         <?php endif; ?>
-
-        <?php if($format !== 'marks' ) : ?>
-            <!-- Grade table data -->
-            <style>
-                .grade-table-wrap{ width: 100%; max-width: 200px; float: right; margin-bottom: 20px;}
-                .grade-table-wrap table tr th,
-                .grade-table-wrap table tr td { font-size: 8px !important; line-height: 8px !important; padding: 2px !important; vertical-align: middle !important;}
-            </style>
-            <div class="grade-table-wrap">
-                <h3 class="master-subtitle"><?php _e( 'Grade Table', 'edupress' ); ?></h3>
-                <?php echo GradeTable::getTable($extra_data['method']); ?>
-            </div>
-        <?php endif; ?>
+        </div>
 
         <?php
         return ob_get_clean();

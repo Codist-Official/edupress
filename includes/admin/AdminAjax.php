@@ -1001,9 +1001,15 @@ class AdminAjax
         $extra_data['end_date'] = sanitize_text_field($_REQUEST['end_date']);
         $exam_data = $_REQUEST['data'];
 
+        $result = Printer::getHeader([
+            'user_id' => $user_id,
+            'show_avatar' => true,
+        ]);
+        $result .= Printer::printIndividualResult( $user_id, $exam_data, $extra_data );
+
         return array(
             'status'    => 1,
-            'data'      => Printer::printIndividualResult( $user_id, $exam_data, $extra_data ),
+            'data'      => $result,
         );
     }
 
@@ -1034,7 +1040,10 @@ class AdminAjax
 
         foreach($students as $id){
 
-            $res .= Printer::getHeader();
+            $res .= Printer::getHeader([
+                'user_id' => $id,
+                'show_avatar' => true,
+            ]);
             $res .= Printer::printIndividualResult( $id , $_REQUEST['data'][$id], $extra_data );
             if($last !== $id) {
                 $res .= "<div class='page-break'></div>";
@@ -1881,6 +1890,21 @@ class AdminAjax
             }
         }
         return $is_success ? ['status' => 1, 'data' => 'Finger deleted successfully'] : ['status' => 0, 'data' => 'Failed to delete finger', 'response' => $responses];
+    }
+
+    public function deleteDeviceLogs()
+    {
+        $device = new Device();
+        $response = $device->deleteLogs(['action' => 'delete_logs']);
+        $success = false;
+        foreach($response as $response){
+            if($response['success']){
+                $success = true;
+                break;
+            }
+        }
+        return $success ? ['status' => 1, 'data' => 'Logs deleted successfully'] : ['status' => 0, 'data' => 'Failed to delete logs', 'response' => $response];
+
     }
 
 

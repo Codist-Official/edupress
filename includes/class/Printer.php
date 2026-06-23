@@ -53,6 +53,7 @@ class Printer
     {
         $user_id = $configs['user_id'] ?? 0;
         $show_avatar = $configs['show_avatar'] ?? false;
+        $avatar_url = '';
         if($show_avatar && $user_id){
             $avatar_id = get_user_meta($user_id, 'avatar_id', true);
             if($avatar_id){
@@ -158,7 +159,7 @@ class Printer
             }
         </style>
         
-        <?php if($show_avatar && $user_id): ?>
+        <?php if($show_avatar && $user_id && !empty($avatar_url)): ?>
             <style>
                 .edupress-print-header-student-avatar{
                     width: 100px;

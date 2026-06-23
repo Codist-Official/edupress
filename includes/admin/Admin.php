@@ -1552,7 +1552,7 @@ class Admin
                             'max' => 365,
                             'step' => 1,
                         ),
-                        'after' => 'Default is 30 days',
+                        'after' => 'Default is 365 days',
                         'value' => Admin::getSetting('attendance_store_log', 365),
                     )
                 );

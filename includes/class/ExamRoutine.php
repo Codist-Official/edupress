@@ -173,8 +173,8 @@ class ExamRoutine extends Post
         $html .= "<div style='float:left;padding-right:10px;box-sizing:border-box;'>".EduPress::generateFormElement('datetime-local', 'date[]', ['options'=>$subjects, 'placeholder'=>t('Select a date'), 'required' => true] ) . "</div>";
         $html .= "
                 <div style='width:60px;float:left;'>
-                    <a href='javascript:void(0)' data-action='copy' class='exam_routine_btn ep_tag_btn'>+</a>
-                    <a href='javascript:void(0)' data-action='delete' class='exam_routine_btn ep_tag_btn'>-</a>
+                    <a href='javascript:void(0)' data-action='copy' class='exam_routine_btn ep-tag-btn'>+</a>
+                    <a href='javascript:void(0)' data-action='delete' class='exam_routine_btn ep-tag-btn'>-</a>
                 </div>";
         $html .= "</div>";
 

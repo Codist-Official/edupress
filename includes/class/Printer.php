@@ -487,7 +487,7 @@ class Printer
                                 height: 400px;
                                 z-index: -1;
                                 background-image: url('<?php echo wp_get_attachment_image_url($logo, 'full'); ?>');
-                                background-size: cover;
+                                background-size: contain;
                                 background-position: center;
                                 background-repeat: no-repeat;
                                 }

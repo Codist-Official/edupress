@@ -180,6 +180,8 @@ class Attendance extends CustomPost
      */
     public function getListHtml()
     {
+        $device_ids = Admin::getSetting('attendance_device_id', []);
+
         $report_type = sanitize_text_field($_REQUEST['report_type'] ?? '');
 
         $args = [];
@@ -215,12 +217,16 @@ class Attendance extends CustomPost
 
                 <thead>
                     <tr>
+                        <?php if(count($device_ids) > 1): ?>
+                            <th><?php _t( 'Device', 'edupress' ); ?></th>
+                        <?php endif; ?>
                         <?php if($branch_active): ?><th><?php _t( 'Branch', 'edupress' ); ?></th><?php endif; ?>
                         <th><?php _t( 'Roll', 'edupress' ); ?></th>
                         <th><?php _t( 'User', 'edupress' ); ?></th>
                         <th><?php _t( 'Date', 'edupress' ); ?></th>
                         <th><?php _t( 'Time', 'edupress' ); ?></th>
                         <th><?php _t( 'Role', 'edupress' ); ?></th>
+                        <th><?php _t( 'Method', 'edupress' ); ?></th>
                         <?php if($shift_active): ?><th><?php _t( 'Shift', 'edupress' ); ?></th><?php endif; ?>
                         <?php if($class_active): ?><th><?php _t( 'Class', 'edupress' ); ?></th><?php endif; ?>
                         <?php if($section_active): ?><th><?php _t( 'Section', 'edupress' ); ?></th><?php endif; ?>
@@ -233,6 +239,9 @@ class Attendance extends CustomPost
 
                 <?php foreach($results as $r): ?>
                     <?php
+                        $auth_type = $r->auth_type;
+                        if($auth_type == 'FP') $auth_type = 'Finger';
+                        elseif($auth_type == 'CD') $auth_type = 'Card';
                         $user = new User($r->user_id);
                         $branch_id = $user->getMeta('branch_id');
                         $shift_id = $user->getMeta('shift_id');
@@ -246,12 +255,14 @@ class Attendance extends CustomPost
                         $voice_status = property_exists($r, 'invoice_id') && !is_null($r->voice_id) ? $wpdb->get_var("SELECT status FROM {$wpdb->prefix}voice_logs WHERE id = {$r->voice_id}") : '';
                     ?>
                     <tr data-role="<?php echo $user->getRole(); ?>" data-user_id="<?php echo $r->user_id; ?>">
+                        <?php if(count($device_ids) > 1): ?><td><?php echo $r->device_id; ?></td><?php endif; ?>
                         <?php if( $branch_active ): ?><td><?php  echo !empty($branch_id) ? get_the_title( $branch_id ) : ''; ?></td><?php endif; ?>
                         <td><?php if($user->getRole() == 'student') echo $user->getMeta('roll'); ?></td>
                         <td><?php echo User::showProfileOnClick( $r->user_id, $user->getMeta('first_name')); ?></td>
                         <td><?php echo date('d/m/y', strtotime($r->report_time) ); ?></td>
                         <td><?php echo date('h:i:s a', strtotime($r->report_time) ); ?></td>
-                        <td><?php _e($role_name, 'edupress'); ?></td>
+                        <td><?php _t($role_name, 'edupress'); ?></td>
+                        <td><?php _t($auth_type); ?></td>
                         <?php if( $shift_active ): ?><td><?php echo !empty($shift_id) ? get_the_title( $shift_id ) : ''; ?></td><?php endif; ?>
                         <?php if( $class_active ): ?><td><?php echo !empty($class_id) && $user->getRole() == 'student' ? get_the_title( $class_id ) : ''; ?></td><?php endif; ?>
                         <?php if( $section_active ): ?><td><?php echo !empty($section_id) && $user->getRole() == 'student' ? get_the_title( $section_id ) : ''; ?></td><?php endif; ?>
@@ -916,7 +927,8 @@ class Attendance extends CustomPost
 
                     $time = date("h:i:s a, d/m/y", strtotime($data['report_time']));
                     
-                    $name = $user->getMeta('first_name');
+                    $name = $user->getMeta('short_name');
+                    if(empty($name)) $name = $user->getMeta('first_name');  
                     $role = $user->getRole();
     
                     $branch = $data['branch_id'] ? get_the_title($data['branch_id']) : '';
@@ -933,13 +945,13 @@ class Attendance extends CustomPost
     
                         if($notif == 'guardian_notification'){
                             if( strtolower($sms_notif) !== 'active' || strtolower($role) !== 'student' ) continue;
-                            $mobile = get_user_meta($user_id, 'mobile', true);
+                            $mobile = $user->getMeta('mobile');
                             if(!$mobile) continue;
+                            if(strtolower($user->getMeta('attendance_sms')) == 'inactive') continue;
                         }
     
                         if($notif == 'admin_notification'){
-    
-                            if($admin_notif !== 'active') continue;
+                            if(strtolower($admin_notif) !== 'active') continue;
                             $allowed_roles = Admin::getSetting('attendance_sms_to_admin_for_roles');
                             $allowed_roles = array_map('strtolower', $allowed_roles);
                             if(!in_array($role, $allowed_roles)) continue;
@@ -980,7 +992,6 @@ class Attendance extends CustomPost
                             );
                         }
                     }
-
                 }
 
                 if( $voice_notif == 'active' ){

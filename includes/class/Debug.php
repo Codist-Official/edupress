@@ -46,30 +46,34 @@ class Debug
      */
     public function debug()
     {
-        ob_start();
-        echo "<br><br><br><br>";
-        $all_users = User::getAll(['role'=>'student', 'number'=>2000, 'orderby'=>'ID','order'=>'DESC']);
-        $device = new Device();
-        foreach($all_users as $user){
-            $attendance_id = (int) get_user_meta($user->ID,'attendance_id', true);
-            $card_number = (int) get_user_meta($user->ID,'card_number', true);
-            if($card_number > 0) continue;
-            $rfid = $device->getUserRfid($attendance_id);
-            if(is_numeric($rfid) && $rfid > 0){
-                update_user_meta($user->ID,'card_number', $rfid);
-                echo "User ID: {$user->ID} - Card Number: {$rfid} - Updated<br>";
-                continue; 
-            }
-        }
-        echo "<br><br><br><br>";
-        return ob_get_clean();
+        // ob_start();
+        // echo "<br><br><br><br>";
+        // $all_users = User::getAll(['role'=>'student', 'number'=>2000, 'orderby'=>'ID','order'=>'DESC']);
+        // $device = new Device();
+        // foreach($all_users as $user){
+        //     $attendance_id = (int) get_user_meta($user->ID,'attendance_id', true);
+        //     $card_number = (int) get_user_meta($user->ID,'card_number', true);
+        //     if($card_number > 0) continue;
+        //     $rfid = $device->getUserRfid($attendance_id);
+        //     if(is_numeric($rfid) && $rfid > 0){
+        //         update_user_meta($user->ID,'card_number', $rfid);
+        //         echo "User ID: {$user->ID} - Card Number: {$rfid} - Updated<br>";
+        //         continue; 
+        //     }
+        // }
+        // echo "<br><br><br><br>";
+        // return ob_get_clean();
         ob_start(); 
         ?> 
         <html>
             <head>
                 <link rel="preconnect" href="https://fonts.googleapis.com">
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-                <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+                <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@100..800&display=swap" rel="stylesheet">
+
+                <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"> -->
             </head>
             <body class="print-card">
                 <style>
@@ -117,23 +121,39 @@ class Debug
                     }
                     .id-thumb-wrap{
                         text-align: center;
-                        margin-top: 85px;
+                        margin-top: 95px;
                     }
                     .id-thumb{
-                        width: 110px;
+                        width: 115px;
                         height: auto;
                         text-align: center;
                         margin: 0 auto;
-                        border: 3px solid #f6881f;
+                        border: 5px solid #fbbd59;
+                        border-radius: 100%;
                     }
                     .details-wrap{
                         margin-left: 5px;
                         width: 250px;
-                        margin-top: 60px;
-                        font-family: 'Poppins', sans-serif;
+                        margin-top: 5px;
+                        font-family: "Anek Bangla", sans-serif;
                         color: #fff;
                         line-height: 1.2;
                         vertical-align: middle;
+                        
+                    }
+                    .title-wrap{
+                        font-size: 16px;
+                        font-weight: bold;
+                        text-align: center;
+                        margin: 5px auto 10px;
+                        background-color: #06662e;
+                        color: #fff;
+                        padding: 5px 10px;
+                        border-radius: 5px;
+                        display: flex;
+                        width: 70px;
+                        text-align: center;
+                        font-family: "Anek Bangla", sans-serif;
                     }
                     .details-wrap div{
                         display: flex;
@@ -177,6 +197,8 @@ class Debug
                         $section = get_the_title($section_id);
                         $section_title = "Section";
                         $attendance_id = (int) $metadata['attendance_id'][0] ?? '';
+                        $guardian = $metadata['guardian'][0] ?? '';
+                        $address = $metadata['address'][0] ?? '';
 
                         $skip_ids = [];
                         if(in_array($attendance_id, $skip_ids)) continue;
@@ -203,17 +225,17 @@ class Debug
                         $mobile = str_replace(' ', '', $mobile);
                         $mobile = str_replace('-', '', $mobile);
 
-                        $data['name'] = ['name' => "Name", 'value' => $name ?? ''];
-                        $data['attendance'] = ['name' => "ID", 'value' => $attendance_id ?? ''];
-                        $data['class'] = ['name' => "Class", 'value' =>  $class_id ? $class : '' ];
-                        $data['section'] = ['name' => $section_title, 'value' => $section ? $section : '' ];
-                        $data['roll'] = ['name' => "Roll", 'value' =>  $roll ? $roll : '' ];
-                        $data['mobile'] = ['name' => "Mobile", 'value' =>  $mobile ? $mobile : '' ];
-                        $data['blood_group'] = ['name' => "Blood Group", 'value' =>  $blood_group ? $blood_group : 'A+' ];
+                        $data['name'] = ['name' => "নাম", 'value' => $name ?? ''];
+                        $data['attendance'] = ['name' => "আইডি নং", 'value' => $attendance_id ?? ''];
+                        $data['class'] = ['name' => "শ্রেণি", 'value' =>  $class_id ? $class : '' ];
+                        $data['roll'] = ['name' => "রোল নং", 'value' =>  $roll ? $roll : '' ];
+                        $data['guardian'] = ['name' => "অভিবাবক", 'value' => $guardian ? $guardian : '' ];
+                        $data['mobile'] = ['name' => "মোবাইল", 'value' =>  $mobile ? $mobile : '' ];
+                        $data['address'] = ['name' => "ঠিকানা", 'value' =>  $address ? $address : '' ];
                         $avatar_id = get_user_meta($user->ID, 'avatar_id', true);
                     ?>
                     <div class="id-card-holder">
-                        <img src="<?php echo EDUPRESS_IMG_URL; ?>id-cards/biis-front.png" style="position: absolute; left: 0; top: 0; z-index: 1; width: 100%; height: 100%; background-size: cover;">
+                        <img src="<?php echo EDUPRESS_IMG_URL; ?>id-cards/ummah-front.png" style="position: absolute; left: 0; top: 0; z-index: 1; width: 100%; height: 100%; background-size: cover;">
                         <div class="id-card-inner">
                             <div class="id-thumb-wrap">
                             <?php 
@@ -225,13 +247,14 @@ class Debug
                                 endif; 
                                 ?>
                             </div>
+                            <div class="title-wrap">পরিচয়পত্র</div>
                             <div class="details-wrap">
-                                <!-- <div class="name"><?php echo $name; ?></div> -->
                                 <?php 
                                     foreach($data as $k=>$v){
                                         if(empty($v['value'])) continue;
+                                        $value_translated = td($v['value']);
                                         echo "<div>
-                                            <span class='key {$k}'>{$v['name']}</span><span class='value'>: {$v['value']}</span>
+                                            <span class='key {$k}'>{$v['name']}</span><span class='value'>: {$value_translated}</span>
                                         </div>";
                                     }
                                 ?>

@@ -190,6 +190,7 @@ class User
 
         $update = update_user_meta( $this->id, $key, $value, $prev_value );
         $usermeta = $this->getUsermeta();
+        if(!is_array($usermeta)) $usermeta = [];
         $usermeta[$key] = get_user_meta( $this->id, $key, false );
         $this->setUsermeta( $usermeta );
         return $update;
@@ -624,7 +625,7 @@ class User
             'type' => 'number',
             'name' => 'roll',
             'settings' => array(
-                'label' => t('Roll / Student ID'),
+                'label' => t('Roll'),
                 'value' => sanitize_text_field($_REQUEST['roll'] ?? ''),
                 'id'=>'roll'
             )
@@ -757,6 +758,48 @@ class User
         $branch = new Branch();
         $branch_options = $branch->getPosts( [], true );
 
+
+        $fields['first_name'] = array(
+            'name'  => 'first_name[]',
+            'type'  => 'text',
+            'settings'=> array(
+                'label' => t('Name'),
+                'placeholder' => t('Full name'),
+                'value' => $settings['first_name'] ?? '',
+                'required' => true,
+            )
+        );
+
+        $shortname = $this->getMeta('short_name');
+        if(empty($shortname)){
+            $shortname = $this->getMeta('first_name');
+            $parts = $shortname ? explode(' ', $shortname) : [];
+            $shortname = $parts[0] ?? '';
+            $this->updateMeta('short_name', $shortname);
+        }
+        $fields['short_name'] = array(
+            'name'  => 'short_name[]',
+            'type'  => 'text',
+            'settings'=> array(
+                'label' => 'Short Name (for SMS)',
+                'value' => $shortname,
+                'required' => false,
+                'placeholder' => 'Input short name here'
+            )
+        );
+
+
+        $fields['role'] = array(
+            'name'  => 'role[]',
+            'type'  => 'select',
+            'settings'=>array(
+                'label' => t('Role'),
+                'options' => self::getRoles(),
+                'value' => $settings['role'] ?? '',
+            )
+        );
+
+
         $fields['branch_id'] = array(
             'name'  => 'branch_id[]',
             'type'  => 'select',
@@ -768,6 +811,7 @@ class User
                 'placeholder' => count($branch_options) > 1 ? 'Select' : '',
             )
         );
+
 
         if ( $settings['role'] === 'student' ){
 
@@ -859,35 +903,16 @@ class User
         }
 
 
-        $fields['role'] = array(
-            'name'  => 'role[]',
-            'type'  => 'select',
-            'settings'=>array(
-                'label' => t('Role'),
-                'options' => self::getRoles(),
-                'value' => $settings['role'] ?? '',
-            )
-        );
 
-        $fields['first_name'] = array(
-            'name'  => 'first_name[]',
-            'type'  => 'text',
-            'settings'=> array(
-                'label' => t('Name'),
-                'placeholder' => t('Full name'),
-                'value' => $settings['first_name'] ?? '',
-                'required' => true,
-            )
-        );
 
         if( $settings['role'] === 'student' ){
             $fields['roll'] = array(
                 'name'  => 'roll[]',
                 'type'  => 'text',
                 'settings'=>array(
-                    'label' => t('Roll / Student ID'),
+                    'label' => t('Roll'),
                     'value' => $settings['roll'] ?? '',
-                    'placeholder' => t('Roll / Student ID'),
+                    'placeholder' => t('Enter roll'),
                     'required' => true,
                 )
             );
@@ -910,6 +935,9 @@ class User
                 'label' => t('Email'),
                 'placeholder' => t('Email'),
                 'value' => $settings['user_email'] ?? '',
+                'data' => array(
+                    'autocomplete' => 'off',
+                )
             )
         );
 
@@ -919,6 +947,9 @@ class User
             'settings'=> array(
                 'label' => t('Password'),
                 'placeholder' => t('Password'),
+                'data' => array(
+                    'autocomplete' => 'off',
+                )
             )
         );
 
@@ -958,7 +989,7 @@ class User
                         'label' => t('Payment Amount'),
                         'required' => true,
                         'placeholder' => t('Enter an amount'),
-                        'value' => $settings['payment_amount']
+                        'value' => $settings['payment_amount'] ?? ''
                     )
                 );
             }
@@ -1020,7 +1051,10 @@ class User
         ob_start();
         ?>
         <script>
-            let edupressBulkUserRowsCount = <?php echo $rows; ?>;
+            if(typeof edupressBulkUserRowsCount == 'undefined') {
+                let edupressBulkUserRowsCount; 
+            }
+            edupressBulkUserRowsCount = <?php echo $rows; ?>;
         </script>
         <form action="" method="post" class="<?php echo EduPress::getClassNames(array( 'edupress-ajax', 'edupress-publish-bulk-user' ), 'form' ); ?>">
 
@@ -1242,6 +1276,17 @@ class User
                 'label'=> t('Guardian', 'edupress'),
             )
         );
+        
+        $fields['attendance_sms'] = array(
+            'type' => 'select',
+            'name' => 'attendance_sms',
+            'settings' => array(
+                'options' => array('Active'=>'Active','Inactive'=>'Inactive'),
+                'value' => $this->getMeta('attendance_sms') ?? 'Active',
+                'label'=> t('Attendance SMS', 'edupress')
+            )
+        );
+        
         $fields['status'] = array(
             'type' => 'select',
             'name' => 'status',
@@ -2385,6 +2430,23 @@ class User
                 'value' => $this->getMeta('first_name'),
                 'required' => true,
                 'placeholder' => 'Input your name here'
+            )
+        );
+        $shortname = $this->getMeta('short_name');
+        if(empty($shortname)){
+            $shortname = $this->getMeta('first_name');
+            $parts = explode(' ', $shortname);
+            $shortname = $parts[0];
+            $this->updateMeta('short_name', $shortname);
+        }
+        $fields['short_name'] = array(
+            'type' => 'text',
+            'name' => 'short_name',
+            'settings' => array(
+                'label' => 'Short Name (for SMS)',
+                'value' => $shortname,
+                'required' => false,
+                'placeholder' => 'Input short name here'
             )
         );
 

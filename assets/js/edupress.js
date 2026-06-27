@@ -157,8 +157,6 @@ jQuery(document).ready(function(){
         let beforeSendCallback = params.get('before_send_callback');
         let successCallback = params.get('success_callback');
         let errorCallback = params.get('error_callback');
-        clog(`BeforeSend: ${beforeSendCallback} Success: ${successCallback} Error: ${errorCallback} ` );
-        clog(data);
 
         $j.ajax({
             url: edupress.ajax_url,

@@ -6,7 +6,7 @@ Plugin Name: EduPress
 Plugin URI: https://edupressbd.com/
 Description: School Management Software
 Author: Mohammad Nur Hossain
-Version: 1.9.2
+Version: 1.9.3
 Author URI: https://nur.codist.dev/
 Text Domain: edupress
 Domain Path: /languages
@@ -740,7 +740,7 @@ class EduPress
      * @acecess public
      * @static
      */
-    public static function generateFormElement( $type, $name, array $settings = array() )
+    public static function generateFormElement( $type, $name, $settings = [] )
     {
         $required = $settings['required'] ?? false;
         $readonly = $settings['readonly'] ?? false;

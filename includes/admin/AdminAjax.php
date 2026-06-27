@@ -1895,15 +1895,15 @@ class AdminAjax
     public function deleteDeviceLogs()
     {
         $device = new Device();
-        $response = $device->deleteLogs(['action' => 'delete_logs']);
+        $responses = $device->deleteLogs(['action' => 'delete_logs']);
         $success = false;
-        foreach($response as $response){
+        foreach($responses as $response){
             if($response['success']){
                 $success = true;
                 break;
             }
         }
-        return $success ? ['status' => 1, 'data' => 'Logs deleted successfully'] : ['status' => 0, 'data' => 'Failed to delete logs', 'response' => $response];
+        return $success ? ['status' => 1, 'data' => 'Logs deleted successfully', 'response' => $responses] : ['status' => 0, 'data' => 'Failed to delete logs', 'response' => $responses];
 
     }
 
